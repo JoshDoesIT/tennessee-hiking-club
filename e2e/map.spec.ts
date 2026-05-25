@@ -11,7 +11,7 @@ test("a map pin links through to its trail page with directions", async ({
     .first()
     .click();
 
-  await expect(page).toHaveURL(/\/trails\/mt-leconte-alum-cave/);
+  await expect(page).toHaveURL(/\/trails\/mt-leconte-alum-cave$/);
   await expect(
     page.getByRole("heading", { name: /Mount LeConte/i }),
   ).toBeVisible();
@@ -19,5 +19,5 @@ test("a map pin links through to its trail page with directions", async ({
   // The "Open in Google Maps" button deep-links with the trailhead coordinates.
   await expect(
     page.getByRole("link", { name: /Open in Google Maps/i }),
-  ).toHaveAttribute("href", /google\.com\/maps\/dir/);
+  ).toHaveAttribute("href", /^https:\/\/www\.google\.com\/maps\/dir\//);
 });
