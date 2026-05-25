@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Ridgeline } from "@/components/ridgeline";
+import { Container } from "@/components/ui/container";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/cn";
 
 const REPO = "https://github.com/JoshDoesIT/tennessee-hiking-club";
 
@@ -12,7 +17,7 @@ export default function Home() {
         <div className="from-cream-50 via-cream to-parchment absolute inset-0 -z-10 bg-gradient-to-b" />
         <Ridgeline className="absolute inset-x-0 bottom-0 -z-10 h-80 w-full sm:h-96" />
 
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-5 pt-16 pb-48 text-center sm:pt-24">
+        <Container className="flex max-w-4xl flex-col items-center pt-16 pb-48 text-center sm:pt-24">
           <Image
             src="/logo.png"
             alt=""
@@ -47,25 +52,22 @@ export default function Home() {
             className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3"
             style={{ animationDelay: "300ms" }}
           >
-            <Link
-              href="/explore"
-              className="bg-forest text-cream hover:bg-pine rounded-full px-6 py-3 text-base font-semibold shadow-sm transition-colors"
-            >
+            <Link href="/explore" className={buttonVariants({ size: "lg" })}>
               Explore the map
             </Link>
             <Link
               href="/trails"
-              className="border-forest/25 text-forest hover:bg-forest/5 bg-cream-50/70 rounded-full border px-6 py-3 text-base font-semibold transition-colors"
+              className={buttonVariants({ variant: "outline", size: "lg" })}
             >
               Browse trails
             </Link>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* -------------------------- MISSION ----------------------------- */}
       <section className="bg-forest text-cream">
-        <div className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:grid-cols-3 sm:py-20">
+        <Container className="grid gap-10 py-16 sm:grid-cols-3 sm:py-20">
           <Value
             title="Explore"
             icon={
@@ -104,67 +106,69 @@ export default function Home() {
             We hike responsibly and teach Leave No Trace, so the trails we love
             stay wild for the next boots on the path.
           </Value>
-        </div>
+        </Container>
       </section>
 
       {/* -------------------------- FEATURES ---------------------------- */}
-      <section className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
-        <div className="max-w-2xl">
-          <p className="eyebrow text-amber-600">What you can do</p>
-          <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
-            Everything you need to find your next trail
-          </h2>
-        </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <FeatureCard
-            title="Interactive Tennessee map"
-            icon={
-              <IconWrap>
-                <path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z" />
-                <circle cx="12" cy="11" r="2.2" />
-              </IconWrap>
-            }
-          >
-            A stylized, clickable map of the state. Tap a pin to open a trail.
-          </FeatureCard>
-          <FeatureCard
-            title="Photos & trail details"
-            icon={
-              <IconWrap>
-                <path d="M4 8h3l1.8-2h6.4L17 8h3v11H4z" />
-                <circle cx="12" cy="13" r="3.4" />
-              </IconWrap>
-            }
-          >
-            Distance, elevation, difficulty, and a gallery for every trail.
-          </FeatureCard>
-          <FeatureCard
-            title="One-tap directions"
-            icon={
-              <IconWrap>
-                <path d="M12 2.5l8.5 18-8.5-3.8-8.5 3.8z" />
-              </IconWrap>
-            }
-          >
-            Jump straight to Google Maps for turn-by-turn to the trailhead.
-          </FeatureCard>
-          <FeatureCard
-            soon
-            title="Club merch"
-            icon={
-              <IconWrap>
-                <path d="M8 4l4 2 4-2 4 3-2.5 2.6V20H6.5V9.6L4 7z" />
-              </IconWrap>
-            }
-          >
-            Tees, stickers, and hats — coming soon to help fund the project.
-          </FeatureCard>
-        </div>
+      <section>
+        <Container className="py-20 sm:py-24">
+          <div className="max-w-2xl">
+            <p className="eyebrow text-amber-600">What you can do</p>
+            <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
+              Everything you need to find your next trail
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <FeatureCard
+              title="Interactive Tennessee map"
+              icon={
+                <IconWrap>
+                  <path d="M12 21s-6-5.3-6-10a6 6 0 1 1 12 0c0 4.7-6 10-6 10z" />
+                  <circle cx="12" cy="11" r="2.2" />
+                </IconWrap>
+              }
+            >
+              A stylized, clickable map of the state. Tap a pin to open a trail.
+            </FeatureCard>
+            <FeatureCard
+              title="Photos & trail details"
+              icon={
+                <IconWrap>
+                  <path d="M4 8h3l1.8-2h6.4L17 8h3v11H4z" />
+                  <circle cx="12" cy="13" r="3.4" />
+                </IconWrap>
+              }
+            >
+              Distance, elevation, difficulty, and a gallery for every trail.
+            </FeatureCard>
+            <FeatureCard
+              title="One-tap directions"
+              icon={
+                <IconWrap>
+                  <path d="M12 2.5l8.5 18-8.5-3.8-8.5 3.8z" />
+                </IconWrap>
+              }
+            >
+              Jump straight to Google Maps for turn-by-turn to the trailhead.
+            </FeatureCard>
+            <FeatureCard
+              soon
+              title="Club merch"
+              icon={
+                <IconWrap>
+                  <path d="M8 4l4 2 4-2 4 3-2.5 2.6V20H6.5V9.6L4 7z" />
+                </IconWrap>
+              }
+            >
+              Tees, stickers, and hats — coming soon to help fund the project.
+            </FeatureCard>
+          </div>
+        </Container>
       </section>
 
       {/* --------------------------- REGIONS ---------------------------- */}
       <section className="bg-parchment/60 border-forest/10 border-y">
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:py-24">
+        <Container className="py-20 sm:py-24">
           <div className="max-w-2xl">
             <p className="eyebrow text-amber-600">Three Tennessees</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
@@ -185,12 +189,12 @@ export default function Home() {
               and full of birdsong.
             </RegionCard>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* ------------------------- CONTRIBUTE --------------------------- */}
       <section className="bg-forest text-cream">
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-5 py-20 text-center sm:py-24">
+        <Container className="flex max-w-4xl flex-col items-center py-20 text-center sm:py-24">
           <h2 className="display text-cream text-3xl sm:text-4xl">
             Help map the Volunteer State
           </h2>
@@ -201,7 +205,7 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/contribute"
-              className="bg-amber text-forest rounded-full px-6 py-3 text-base font-semibold transition-colors hover:bg-amber-600"
+              className={buttonVariants({ variant: "accent", size: "lg" })}
             >
               Contribute a trail
             </Link>
@@ -209,12 +213,15 @@ export default function Home() {
               href={REPO}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-cream/30 text-cream hover:bg-cream/10 rounded-full border px-6 py-3 text-base font-semibold transition-colors"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "border-cream/30 text-cream hover:bg-cream/10",
+              )}
             >
               Star on GitHub
             </Link>
           </div>
-        </div>
+        </Container>
       </section>
     </>
   );
@@ -270,16 +277,12 @@ function FeatureCard({
   soon?: boolean;
 }) {
   return (
-    <div className="border-forest/10 bg-cream-50 relative rounded-2xl border p-6 transition-all hover:-translate-y-1 hover:shadow-lg">
-      {soon && (
-        <span className="bg-amber/20 absolute top-4 right-4 rounded-full px-2 py-0.5 text-[0.6rem] font-bold tracking-wider text-amber-600 uppercase">
-          Soon
-        </span>
-      )}
+    <Card interactive className="relative">
+      {soon ? <Badge className="absolute top-4 right-4">Soon</Badge> : null}
       <div className="text-pine">{icon}</div>
       <h3 className="display text-forest mt-4 text-xl">{title}</h3>
       <p className="text-ink/65 mt-2 text-sm leading-relaxed">{children}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -293,10 +296,10 @@ function RegionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-forest/10 bg-cream-50 rounded-2xl border p-7">
+    <Card className="p-7">
       <span className="eyebrow text-olive">{region} Tennessee</span>
       <h3 className="display text-forest mt-2 text-2xl">{title}</h3>
       <p className="text-ink/65 mt-3 text-sm leading-relaxed">{children}</p>
-    </div>
+    </Card>
   );
 }

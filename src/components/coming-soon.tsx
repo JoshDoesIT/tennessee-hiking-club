@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { buttonVariants } from "./ui/button";
 
 const REPO = "https://github.com/JoshDoesIT/tennessee-hiking-club";
 
@@ -26,17 +27,14 @@ export function ComingSoon({
         {children}
       </div>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-        <Link
-          href="/"
-          className="bg-forest text-cream hover:bg-pine rounded-full px-5 py-2.5 text-sm font-semibold transition-colors"
-        >
+        <Link href="/" className={buttonVariants()}>
           Back to home
         </Link>
         <Link
           href={REPO}
           target="_blank"
           rel="noopener noreferrer"
-          className="border-forest/20 text-forest hover:bg-forest/5 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors"
+          className={buttonVariants({ variant: "outline" })}
         >
           Follow progress on GitHub
         </Link>
