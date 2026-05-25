@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => {
       on,
       addSource: vi.fn(),
       setTerrain,
+      resize: vi.fn(),
       remove: vi.fn(),
     };
   });

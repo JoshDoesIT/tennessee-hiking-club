@@ -20,6 +20,9 @@ const TERRARIUM_DEM =
  * Interactive 3D terrain map of Tennessee (MapLibre GL). Uses open, key-free
  * data: OpenFreeMap vector tiles + public-domain AWS Terrarium elevation.
  * Client-only (WebGL); the trail list on /explore is the accessible fallback.
+ *
+ * Note: the map container needs an explicit height — MapLibre's stylesheet sets
+ * `position: relative` on it, which would cancel an `inset-0`-based size.
  */
 export function TerrainMap({ trails }: { trails: TrailPin[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,6 +60,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
 
         map.on("load", () => {
           if (!map || cancelled) return;
+          map.resize();
 
           map.addSource("terrain-dem", {
             type: "raster-dem",
@@ -132,12 +136,13 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
   }, [trails]);
 
   return (
-    <div
-      role="application"
-      aria-label="Interactive 3D terrain map of Tennessee"
-      className="bg-sage-100/30 border-forest/15 relative h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
-    >
-      <div ref={containerRef} className="absolute inset-0" />
+    <div className="relative w-full">
+      <div
+        ref={containerRef}
+        role="application"
+        aria-label="Interactive 3D terrain map of Tennessee"
+        className="bg-sage-100/30 border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
+      />
       {!ready ? (
         <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
           {failed
