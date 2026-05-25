@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Typecheck · Lint · Test · Build
+    name: CI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
