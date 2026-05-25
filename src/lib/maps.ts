@@ -38,3 +38,21 @@ export function googleMapsPlaceUrl(coords: LatLng): string {
   const query = encodeURIComponent(`${coords.lat},${coords.lng}`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
+
+/** Approximate bounding box of Tennessee, in decimal degrees. */
+export const TENNESSEE_BOUNDS = {
+  latMin: 34.9,
+  latMax: 36.7,
+  lngMin: -90.4,
+  lngMax: -81.6,
+} as const;
+
+/** True if the coordinates fall within Tennessee's bounding box. */
+export function isWithinTennessee({ lat, lng }: LatLng): boolean {
+  return (
+    lat >= TENNESSEE_BOUNDS.latMin &&
+    lat <= TENNESSEE_BOUNDS.latMax &&
+    lng >= TENNESSEE_BOUNDS.lngMin &&
+    lng <= TENNESSEE_BOUNDS.lngMax
+  );
+}
