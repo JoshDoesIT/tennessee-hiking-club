@@ -11,6 +11,13 @@ updates:
       production-dependencies:
         dependency-type: production
         update-types: ["minor", "patch"]
+    ignore:
+      # Blocked until eslint-config-next / eslint-plugin-react support ESLint 10,
+      # and until the TypeScript 6 migration is done. See #36.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
