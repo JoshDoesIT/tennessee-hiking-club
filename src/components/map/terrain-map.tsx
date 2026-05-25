@@ -49,6 +49,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           bearing: -14,
           maxPitch: 80,
           cooperativeGestures: true,
+          attributionControl: false,
           canvasContextAttributes: { preserveDrawingBuffer: true },
         });
 
@@ -229,20 +230,42 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
   }, [trails]);
 
   return (
-    <div className="relative w-full">
-      <div
-        ref={containerRef}
-        role="application"
-        aria-label="Interactive 3D terrain map of Tennessee"
-        className="bg-sage-100/30 border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
-      />
-      {!ready ? (
-        <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
-          {failed
-            ? "The 3D map couldn’t load — use the trail list below."
-            : "Loading the 3D terrain map…"}
-        </div>
-      ) : null}
+    <div className="w-full">
+      <div className="relative w-full">
+        <div
+          ref={containerRef}
+          role="application"
+          aria-label="Interactive 3D terrain map of Tennessee"
+          className="bg-sage-100/30 border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
+        />
+        {!ready ? (
+          <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
+            {failed
+              ? "The 3D map couldn’t load — use the trail list below."
+              : "Loading the 3D terrain map…"}
+          </div>
+        ) : null}
+      </div>
+      <p className="text-ink/40 mt-2 text-xs">
+        Terrain: AWS Terrain Tiles · Map data ©{" "}
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-ink/60 underline"
+        >
+          OpenStreetMap
+        </a>{" "}
+        contributors, via{" "}
+        <a
+          href="https://openfreemap.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-ink/60 underline"
+        >
+          OpenFreeMap
+        </a>
+      </p>
     </div>
   );
 }
