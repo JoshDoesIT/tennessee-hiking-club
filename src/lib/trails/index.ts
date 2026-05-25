@@ -1,0 +1,60 @@
+import fs from "node:fs";
+import path from "node:path";
+import matter from "gray-matter";
+import { trailSchema, type Trail } from "./schema";
+
+const CONTENT_DIR = path.join(process.cwd(), "content", "trails");
+
+/**
+ * Load and validate every trail Markdown file in `dir`.
+ * Throws a descriptive error (naming the file and field) on invalid data or a
+ * duplicate slug. Returns trails sorted by name. Missing dir → empty array.
+ */
+export function loadTrailsFrom(dir: string): Trail[] {
+  if (!fs.existsSync(dir)) return [];
+
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".md"))
+    .sort();
+
+  const seen = new Map<string, string>();
+  const trails: Trail[] = [];
+
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(dir, file), "utf8");
+    const { data, content } = matter(raw);
+
+    const parsed = trailSchema.safeParse({ ...data, body: content.trim() });
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      const field = issue.path.length ? issue.path.join(".") : "(root)";
+      throw new Error(`Invalid trail "${file}": ${field} — ${issue.message}`);
+    }
+
+    const trail = parsed.data;
+    const prior = seen.get(trail.slug);
+    if (prior) {
+      throw new Error(
+        `Duplicate trail slug "${trail.slug}" in "${file}" (already defined in "${prior}")`,
+      );
+    }
+    seen.set(trail.slug, file);
+    trails.push(trail);
+  }
+
+  return trails.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** All trails from the content directory, validated and sorted by name. */
+export function getAllTrails(dir: string = CONTENT_DIR): Trail[] {
+  return loadTrailsFrom(dir);
+}
+
+/** A single trail by slug, or `null` if not found. */
+export function getTrailBySlug(
+  slug: string,
+  dir: string = CONTENT_DIR,
+): Trail | null {
+  return getAllTrails(dir).find((trail) => trail.slug === slug) ?? null;
+}
