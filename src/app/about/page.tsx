@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "About the club",
@@ -48,15 +49,12 @@ export default function AboutPage() {
       </div>
 
       <div className="mt-10 flex flex-wrap gap-3">
-        <Link
-          href="/explore"
-          className="bg-forest text-cream hover:bg-pine rounded-full px-5 py-2.5 text-sm font-semibold transition-colors"
-        >
+        <Link href="/explore" className={buttonVariants()}>
           Explore the map
         </Link>
         <Link
           href="/contribute"
-          className="border-forest/20 text-forest hover:bg-forest/5 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors"
+          className={buttonVariants({ variant: "outline" })}
         >
           Contribute a trail
         </Link>

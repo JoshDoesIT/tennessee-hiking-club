@@ -131,6 +131,10 @@ guidebook. Adventurous but never reckless; we always champion **Leave No Trace**
 
 ## 6. UI components
 
+Reusable primitives live in `src/components/ui` (`Button`/`buttonVariants`,
+`Badge`/`badgeVariants`, `Card`, `Container`) — cva-based, brand-themed, and
+shadcn-compatible. Prefer these over ad-hoc utility strings.
+
 - **Primary button:** `bg-forest text-cream`, fully rounded (`rounded-full`),
   hover `bg-pine`. **Accent button:** `bg-amber text-forest`, hover `bg-amber-600`.
 - **Secondary/ghost button:** `border border-forest/25 text-forest`, hover

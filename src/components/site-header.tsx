@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Logo } from "./logo";
+import { buttonVariants } from "./ui/button";
 
 const NAV = [
   { href: "/explore", label: "Explore" },
@@ -31,10 +32,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/explore"
-            className="bg-forest text-cream hover:bg-pine rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-          >
+          <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
         </nav>
