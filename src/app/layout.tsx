@@ -3,6 +3,7 @@ import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SkipLink } from "@/components/skip-link";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -62,8 +63,15 @@ export default function RootLayout({
       className={`${hanken.variable} ${fraunces.variable} h-full`}
     >
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
+        <SkipLink />
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 focus:outline-none"
+        >
+          {children}
+        </main>
         <SiteFooter />
       </body>
     </html>

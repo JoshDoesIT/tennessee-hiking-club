@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Logo } from "./logo";
 import { buttonVariants } from "./ui/button";
 
@@ -14,6 +14,24 @@ const NAV = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    // Move focus into the menu when it opens.
+    menuRef.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="border-forest/10 bg-cream/85 sticky top-0 z-50 border-b backdrop-blur-md">
@@ -38,6 +56,7 @@ export function SiteHeader() {
         </nav>
 
         <button
+          ref={toggleRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
@@ -66,10 +85,11 @@ export function SiteHeader() {
         </button>
       </div>
 
-      {open && (
+      {open ? (
         <nav
+          ref={menuRef}
           id="mobile-nav"
-          aria-label="Primary"
+          aria-label="Mobile"
           className="border-forest/10 bg-cream border-t md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-3">
@@ -85,7 +105,7 @@ export function SiteHeader() {
             ))}
           </div>
         </nav>
-      )}
+      ) : null}
     </header>
   );
 }
