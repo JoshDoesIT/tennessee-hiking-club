@@ -11,7 +11,7 @@ welcoming, and made for the trail.
 
 The mark is a circular **badge** containing:
 
-- **THC** monogram (the club initials) set in a bold serif.
+- **TNHC** monogram (the club initials) set in a bold serif.
 - A layered **mountain range** with an evergreen forest foreground.
 - A warm **setting sun** rising over the ridgeline — our accent color.
 - **TENNESSEE HIKING CLUB** curved along the bottom of the ring.
