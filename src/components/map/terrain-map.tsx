@@ -2,6 +2,8 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
+import type { Feature, MultiPolygon, Polygon, Position } from "geojson";
+import { TENNESSEE } from "@/lib/geo/tennessee";
 
 export type TrailPin = {
   slug: string;
@@ -43,10 +45,11 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           style: OPENFREEMAP_STYLE,
           center: TN_CENTER,
           zoom: 6.1,
-          pitch: 62,
+          pitch: 55,
           bearing: -14,
           maxPitch: 80,
           cooperativeGestures: true,
+          canvasContextAttributes: { preserveDrawingBuffer: true },
         });
 
         map.addControl(
@@ -62,6 +65,44 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           if (!map || cancelled) return;
           map.resize();
 
+          // Recolor the OpenFreeMap base toward the vintage brand palette.
+          for (const layer of map.getStyle().layers ?? []) {
+            try {
+              if (layer.type === "background") {
+                map.setPaintProperty(layer.id, "background-color", "#f1e9d6");
+              } else if (layer.type === "fill") {
+                if (/water|ocean|river|lake|bay/i.test(layer.id)) {
+                  map.setPaintProperty(layer.id, "fill-color", "#b6c8c0");
+                } else if (
+                  /wood|forest|park|grass|scrub|wetland|landcover|landuse|nature/i.test(
+                    layer.id,
+                  )
+                ) {
+                  map.setPaintProperty(layer.id, "fill-color", "#bcc391");
+                } else {
+                  map.setPaintProperty(layer.id, "fill-color", "#efe6d2");
+                }
+              } else if (layer.type === "line") {
+                if (/water|river|stream/i.test(layer.id)) {
+                  map.setPaintProperty(layer.id, "line-color", "#b6c8c0");
+                } else if (/boundary|admin/i.test(layer.id)) {
+                  map.setPaintProperty(layer.id, "line-color", "#b8ad8e");
+                } else {
+                  map.setPaintProperty(layer.id, "line-color", "#dccfb2");
+                }
+              } else if (
+                layer.type === "symbol" &&
+                layer.layout &&
+                "text-field" in layer.layout
+              ) {
+                map.setPaintProperty(layer.id, "text-color", "#2a3623");
+                map.setPaintProperty(layer.id, "text-halo-color", "#fbf6e9");
+              }
+            } catch {
+              /* layer doesn't support this paint property */
+            }
+          }
+
           map.addSource("terrain-dem", {
             type: "raster-dem",
             tiles: [TERRARIUM_DEM],
@@ -71,7 +112,59 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
             attribution:
               'Elevation: <a href="https://github.com/tilezen/joerd">Mapzen / AWS Terrain Tiles</a>',
           });
-          map.setTerrain({ source: "terrain-dem", exaggeration: 1.6 });
+          map.setTerrain({ source: "terrain-dem", exaggeration: 2.6 });
+
+          // Shaded relief so the terrain reads even from above.
+          const firstSymbol = map
+            .getStyle()
+            .layers?.find((l) => l.type === "symbol")?.id;
+          map.addLayer(
+            {
+              id: "hillshade",
+              type: "hillshade",
+              source: "terrain-dem",
+              paint: {
+                "hillshade-exaggeration": 0.9,
+                "hillshade-shadow-color": "#3d3422",
+              },
+            },
+            firstSymbol,
+          );
+
+          // Mask everything outside Tennessee with the page's cream.
+          const geom = TENNESSEE.geometry as Polygon | MultiPolygon;
+          const tnRings: Position[][] =
+            geom.type === "MultiPolygon"
+              ? geom.coordinates.map((poly) => poly[0])
+              : [geom.coordinates[0]];
+          const worldRing: Position[] = [
+            [-180, -85],
+            [180, -85],
+            [180, 85],
+            [-180, 85],
+            [-180, -85],
+          ];
+          const maskData = {
+            type: "Feature",
+            properties: {},
+            geometry: { type: "Polygon", coordinates: [worldRing, ...tnRings] },
+          } as Feature;
+          map.addSource("tn-mask", { type: "geojson", data: maskData });
+          map.addLayer({
+            id: "tn-mask",
+            type: "fill",
+            source: "tn-mask",
+            paint: { "fill-color": "#fbf6e9", "fill-opacity": 1 },
+          });
+
+          // Crisp Tennessee outline on top.
+          map.addSource("tn-outline", { type: "geojson", data: TENNESSEE });
+          map.addLayer({
+            id: "tn-outline",
+            type: "line",
+            source: "tn-outline",
+            paint: { "line-color": "#2a3623", "line-width": 1.5 },
+          });
 
           for (const trail of trails) {
             const el = document.createElement("button");
