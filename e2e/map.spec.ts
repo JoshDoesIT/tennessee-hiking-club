@@ -1,0 +1,23 @@
+import { test, expect } from "@playwright/test";
+
+test("a map pin links through to its trail page with directions", async ({
+  page,
+}) => {
+  await page.goto("/explore");
+
+  // Mt. LeConte appears as a map pin (and in the fallback list); click one.
+  await page
+    .getByRole("link", { name: /Mount LeConte/i })
+    .first()
+    .click();
+
+  await expect(page).toHaveURL(/\/trails\/mt-leconte-alum-cave/);
+  await expect(
+    page.getByRole("heading", { name: /Mount LeConte/i }),
+  ).toBeVisible();
+
+  // The "Open in Google Maps" button deep-links with the trailhead coordinates.
+  await expect(
+    page.getByRole("link", { name: /Open in Google Maps/i }),
+  ).toHaveAttribute("href", /google\.com\/maps\/dir/);
+});
