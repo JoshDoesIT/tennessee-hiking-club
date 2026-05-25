@@ -5,3 +5,4 @@ playwright-report
 test-results
 pnpm-lock.yaml
 public
+src/lib/geo/tennessee.ts
