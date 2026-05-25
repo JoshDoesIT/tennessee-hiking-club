@@ -18,11 +18,16 @@ The mark is a circular **badge** containing:
 
 ### Files
 
-| File                                  | Use                                                                          |
-| ------------------------------------- | ---------------------------------------------------------------------------- |
-| `public/logo.png`                     | Primary badge, 1024×1024, **transparent background**. Use everywhere in-app. |
-| `src/app/icon.png`                    | Favicon / app icon (512×512), generated from the badge.                      |
-| `docs/brand/assets/logo-original.png` | Original master artwork. Source of truth — do not edit in place.             |
+| File                                                | Use                                                                          |
+| --------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `public/logo.png`                                   | Primary badge, 1024×1024, **transparent background**. Use everywhere in-app. |
+| `src/app/icon.png`                                  | Favicon / app icon (512×512), generated from the badge.                      |
+| `src/app/favicon.ico`                               | Legacy multi-size favicon (16/32/48).                                        |
+| `src/app/apple-icon.png`                            | Apple touch icon (180×180, badge on a cream tile).                           |
+| `src/app/opengraph-image.png` / `twitter-image.png` | 1200×630 social share card (auto-used for OG/Twitter).                       |
+| `docs/brand/assets/logo-mono-forest.png`            | Monochrome (forest) treatment for light backgrounds.                         |
+| `docs/brand/assets/logo-mono-cream.png`             | Monochrome (cream) treatment for dark backgrounds.                           |
+| `docs/brand/assets/logo-original.png`               | Original master artwork. Source of truth — do not edit in place.             |
 
 The `Logo` React component (`src/components/logo.tsx`) renders the badge with an
 optional wordmark and a `tone="light" | "dark"` for placement on dark or light
@@ -39,9 +44,10 @@ backgrounds.
   subtle built-in one, crop the circle, or place the dark ring on a dark green
   background without sufficient contrast.
 
-> **TODO (M1):** produce dedicated horizontal lockup, single-color (1-color
-> forest + 1-color cream) variants, and a proper multi-size `favicon.ico` +
-> `apple-touch-icon`. Tracked in the M1 milestone.
+The **horizontal lockup** is the `Logo` component (badge + wordmark). **Monochrome**
+treatments (forest for light, cream for dark) live in `docs/brand/assets/` for
+single-color contexts. Favicons and the social card are generated from the badge
+and auto-wired by Next.js (file-based metadata).
 
 ---
 
