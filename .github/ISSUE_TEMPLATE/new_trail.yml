@@ -1,0 +1,85 @@
+name: 🥾 New trail
+description: Suggest a Tennessee trail to add to the map
+title: "[Trail]: "
+labels: ["trail", "content"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping map Tennessee! Fill in what you can — a maintainer
+        will turn this into a trail page. Accuracy on coordinates matters most.
+  - type: input
+    id: name
+    attributes:
+      label: Trail name
+      placeholder: Virgin Falls
+    validations:
+      required: true
+  - type: dropdown
+    id: region
+    attributes:
+      label: Grand Division
+      options: ["East", "Middle", "West"]
+    validations:
+      required: true
+  - type: input
+    id: area
+    attributes:
+      label: Park / area
+      placeholder: Virgin Falls State Natural Area
+    validations:
+      required: true
+  - type: input
+    id: coordinates
+    attributes:
+      label: Trailhead coordinates (lat, lng)
+      description: Decimal degrees. Must be the trailhead/parking, within Tennessee.
+      placeholder: "35.8267, -85.2861"
+    validations:
+      required: true
+  - type: input
+    id: length
+    attributes:
+      label: Length (miles)
+      placeholder: "8.6"
+  - type: input
+    id: gain
+    attributes:
+      label: Elevation gain (ft)
+      placeholder: "1610"
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options: ["easy", "moderate", "hard", "strenuous"]
+  - type: dropdown
+    id: routetype
+    attributes:
+      label: Route type
+      options: ["loop", "out-and-back", "point-to-point"]
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What makes it special? Highlights, hazards, parking, fees.
+    validations:
+      required: true
+  - type: textarea
+    id: photos
+    attributes:
+      label: Photos
+      description: Links to photos you have the right to share, with credit.
+  - type: input
+    id: links
+    attributes:
+      label: Helpful links
+      placeholder: AllTrails, park website…
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: The coordinates point to the trailhead/parking and are in Tennessee.
+          required: true
+        - label: I have the right to share any photos I linked, and included credit.
+          required: true

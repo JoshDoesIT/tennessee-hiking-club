@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ *  Tennessee Hiking Club — design tokens
+ *  Palette sampled directly from the badge logo.
+ *  Full guidelines: docs/brand/BRAND.md
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-forest: #2a3623; /* primary dark — ring, headings on light */
+  --color-pine: #475036; /* secondary green */
+  --color-olive: #6c724a;
+  --color-sage: #959760;
+  --color-sage-100: #c6c680; /* light sage — borders, fills */
+  --color-cream: #fbf6e9; /* page background (warm paper) */
+  --color-cream-50: #fefcf5;
+  --color-parchment: #f1e9d6;
+  --color-amber: #e0a24c; /* trail-sun accent / CTAs */
+  --color-amber-600: #c8852f;
+  --color-ink: #1e2419; /* body text */
+
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-ink);
+
+  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-sun: sun-glow 7s ease-in-out infinite;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sun-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fraunces display face: optical sizing + a touch of its "soft" character */
+.display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 40;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+}
+
+/* Tracked, uppercase "trail-sign" label */
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* Subtle printed-paper grain across the whole page */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background-color: var(--color-amber);
+  color: var(--color-forest);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-amber-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

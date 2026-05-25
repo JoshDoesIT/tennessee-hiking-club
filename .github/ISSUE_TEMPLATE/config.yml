@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Contributing guide
+    url: https://github.com/JoshDoesIT/tennessee-hiking-club/blob/main/CONTRIBUTING.md
+    about: How to set up the project, add a trail, and open a pull request.
+  - name: 🔒 Report a security issue (private)
+    url: https://github.com/JoshDoesIT/tennessee-hiking-club/security/advisories/new
+    about: Report a vulnerability privately — please do not open a public issue.
