@@ -13,6 +13,8 @@ const mocks = vi.hoisted(() => {
       addControl: vi.fn(),
       on,
       addSource: vi.fn(),
+      addLayer: vi.fn(),
+      getStyle: () => ({ layers: [] }),
       setTerrain,
       resize: vi.fn(),
       remove: vi.fn(),
