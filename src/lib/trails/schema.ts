@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isWithinTennessee } from "@/lib/maps";
+import { isWithinTennessee } from "../maps";
 
 export const REGIONS = ["East", "Middle", "West"] as const;
 export const DIFFICULTIES = ["easy", "moderate", "hard", "strenuous"] as const;

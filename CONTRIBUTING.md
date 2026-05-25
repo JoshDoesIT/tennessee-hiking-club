@@ -88,6 +88,8 @@ Guidelines:
 - **Photos:** horizontal, ≥ 1200px wide, compressed, in `public/trails/<slug>/`.
   Only submit photos you have the right to use, and include a `credit`.
 - Be honest about difficulty and hazards. Encourage Leave No Trace.
+- Run `pnpm validate:content` before opening a PR — it checks every trail file
+  against the schema. CI and `pnpm build` run it too, so invalid data can't ship.
 
 ## Code style
 
