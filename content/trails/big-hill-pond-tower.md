@@ -12,7 +12,7 @@ difficulty: moderate
 routeType: out-and-back
 dogFriendly: true
 feeRequired: false
-tags: [tower, views, pond]
+tags: [tower, views, pond, state-park]
 photos:
   - src: /trails/big-hill-pond-tower.jpg
     alt: A boardwalk winding through bottomland forest at Big Hill Pond State Park

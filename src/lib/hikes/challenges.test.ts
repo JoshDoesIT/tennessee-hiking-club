@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { evaluateChallenge, CHALLENGES, type Challenge } from "./challenges";
+import {
+  evaluateChallenge,
+  CHALLENGES,
+  challengeSchema,
+  type Challenge,
+} from "./challenges";
 import type { Trail } from "@/lib/trails/schema";
+import { getAllTrails } from "@/lib/trails";
 
 const make = (over: Partial<Trail>): Trail => ({
   slug: "x",
@@ -84,5 +90,84 @@ describe("evaluateChallenge", () => {
     expect(CHALLENGES.some((c) => c.criterion.kind === "allRegions")).toBe(
       true,
     );
+  });
+});
+
+describe("CHALLENGES seed against the real catalog", () => {
+  const catalog = getAllTrails();
+  const allSlugs = catalog.map((t) => t.slug);
+
+  it("ships the themed and seasonal challenges", () => {
+    const slugs = CHALLENGES.map((c) => c.slug);
+    for (const expected of [
+      "cross-the-state",
+      "tennessee-waterfaller",
+      "grassy-balds",
+      "state-parks-passport",
+      "roan-rhododendron",
+      "reelfoot-eagles",
+      "fall-color-tour",
+    ]) {
+      expect(slugs, `missing challenge "${expected}"`).toContain(expected);
+    }
+  });
+
+  it("every challenge is completable by hiking the whole catalog", () => {
+    for (const c of CHALLENGES) {
+      const { done, progress, total } = evaluateChallenge(c, allSlugs, catalog);
+      expect(
+        done,
+        `"${c.slug}" is not completable with the current catalog (${progress}/${total})`,
+      ).toBe(true);
+    }
+  });
+
+  it("has no challenge that references a trail slug missing from the catalog", () => {
+    const known = new Set(allSlugs);
+    for (const c of CHALLENGES) {
+      if (c.criterion.kind !== "trails") continue;
+      for (const slug of c.criterion.slugs) {
+        expect(known, `"${c.slug}" references unknown trail "${slug}"`).toContain(
+          slug,
+        );
+      }
+    }
+  });
+
+  it("seasonal challenges declare their season", () => {
+    for (const slug of [
+      "roan-rhododendron",
+      "reelfoot-eagles",
+      "fall-color-tour",
+    ]) {
+      const c = CHALLENGES.find((x) => x.slug === slug);
+      expect(c?.season, `"${slug}" needs a season`).toBeTruthy();
+    }
+  });
+});
+
+describe("challengeSchema", () => {
+  it("validates the shipped challenge set", () => {
+    expect(() => challengeSchema.array().parse(CHALLENGES)).not.toThrow();
+  });
+
+  it("rejects an unknown criterion kind", () => {
+    const bad = {
+      slug: "bad",
+      name: "Bad",
+      description: "d",
+      criterion: { kind: "nope" },
+    };
+    expect(challengeSchema.safeParse(bad).success).toBe(false);
+  });
+
+  it("rejects a tagCount criterion with a non-positive count", () => {
+    const bad = {
+      slug: "bad",
+      name: "Bad",
+      description: "d",
+      criterion: { kind: "tagCount", tag: "x", count: 0 },
+    };
+    expect(challengeSchema.safeParse(bad).success).toBe(false);
   });
 });

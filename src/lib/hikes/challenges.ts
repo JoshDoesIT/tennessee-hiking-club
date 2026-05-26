@@ -1,19 +1,35 @@
+import { z } from "zod";
 import { REGIONS, type Trail } from "@/lib/trails/schema";
 
-/** How a challenge is satisfied, evaluated from a hiker's completed trails. */
-export type Criterion =
-  | { kind: "allRegions" }
-  | { kind: "trails"; slugs: string[] }
-  | { kind: "tagCount"; tag: string; count: number }
-  | { kind: "count"; count: number };
+/**
+ * How a challenge is satisfied, evaluated from a hiker's completed trails.
+ * The schema is the source of truth (like the trail catalog); the types below
+ * are inferred from it, and the seed set is validated against it at load.
+ */
+export const criterionSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("allRegions") }),
+  z.object({
+    kind: z.literal("trails"),
+    slugs: z.array(z.string().min(1)).min(1),
+  }),
+  z.object({
+    kind: z.literal("tagCount"),
+    tag: z.string().min(1),
+    count: z.number().int().positive(),
+  }),
+  z.object({ kind: z.literal("count"), count: z.number().int().positive() }),
+]);
 
-export type Challenge = {
-  slug: string;
-  name: string;
-  description: string;
-  criterion: Criterion;
-  season?: string;
-};
+export const challengeSchema = z.object({
+  slug: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().min(1),
+  criterion: criterionSchema,
+  season: z.string().min(1).optional(),
+});
+
+export type Criterion = z.infer<typeof criterionSchema>;
+export type Challenge = z.infer<typeof challengeSchema>;
 
 export type ChallengeProgress = {
   done: boolean;
@@ -63,8 +79,12 @@ export function evaluateChallenge(
   }
 }
 
-/** Seed Tennessee challenge set (breadth + seasonal/regional identity). */
-export const CHALLENGES: Challenge[] = [
+/**
+ * Seed Tennessee challenge set (breadth + seasonal/regional identity).
+ * Every challenge here must be completable with the shipped trail catalog;
+ * `challenges.test.ts` enforces that against the real content.
+ */
+export const CHALLENGES: Challenge[] = challengeSchema.array().parse([
   {
     slug: "cross-the-state",
     name: "Cross the State",
@@ -73,16 +93,22 @@ export const CHALLENGES: Challenge[] = [
     criterion: { kind: "allRegions" },
   },
   {
-    slug: "tennessee-waterfaller",
-    name: "Tennessee Waterfaller",
-    description: "Chase three of Tennessee's waterfalls.",
-    criterion: { kind: "tagCount", tag: "waterfall", count: 3 },
+    slug: "state-parks-passport",
+    name: "State Parks Passport",
+    description: "Explore three of Tennessee's state parks.",
+    criterion: { kind: "tagCount", tag: "state-park", count: 3 },
   },
   {
-    slug: "five-and-counting",
-    name: "Five and Counting",
-    description: "Log five different trails to find your stride.",
-    criterion: { kind: "count", count: 5 },
+    slug: "tennessee-waterfaller",
+    name: "Tennessee Waterfaller",
+    description: "Chase two of Tennessee's classic waterfalls.",
+    criterion: { kind: "tagCount", tag: "waterfall", count: 2 },
+  },
+  {
+    slug: "grassy-balds",
+    name: "Grassy Balds",
+    description: "Walk the open, grass-topped balds of the high country.",
+    criterion: { kind: "tagCount", tag: "balds", count: 1 },
   },
   {
     slug: "smoky-summits",
@@ -94,4 +120,32 @@ export const CHALLENGES: Challenge[] = [
       slugs: ["mt-leconte-alum-cave", "charlies-bunion"],
     },
   },
-];
+  {
+    slug: "five-and-counting",
+    name: "Five and Counting",
+    description: "Log five different trails to find your stride.",
+    criterion: { kind: "count", count: 5 },
+  },
+  {
+    slug: "roan-rhododendron",
+    name: "Roan Rhododendron",
+    description:
+      "Catch the Roan Highlands rhododendron gardens in their June bloom.",
+    criterion: { kind: "trails", slugs: ["roan-highlands-balds"] },
+    season: "Late June",
+  },
+  {
+    slug: "reelfoot-eagles",
+    name: "Reelfoot Eagles",
+    description: "Visit Reelfoot Lake while the bald eagles winter over.",
+    criterion: { kind: "trails", slugs: ["reelfoot-black-bayou"] },
+    season: "Winter",
+  },
+  {
+    slug: "fall-color-tour",
+    name: "Fall Color Tour",
+    description: "Stand on three big overlooks as the hardwoods turn.",
+    criterion: { kind: "tagCount", tag: "views", count: 3 },
+    season: "October",
+  },
+]);
