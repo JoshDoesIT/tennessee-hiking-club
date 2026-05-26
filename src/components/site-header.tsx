@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "./logo";
 import { buttonVariants } from "./ui/button";
+import { AuthControl } from "./auth/auth-control";
 
 const NAV = [
   { href: "/explore", label: "Explore" },
@@ -54,6 +55,7 @@ export function SiteHeader() {
           <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
+          <AuthControl />
         </nav>
 
         <button
@@ -104,6 +106,9 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <div className="pt-3">
+              <AuthControl />
+            </div>
           </div>
         </nav>
       ) : null}
