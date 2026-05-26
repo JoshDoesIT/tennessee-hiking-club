@@ -54,6 +54,18 @@ describe("exportLogJson / parseLogJson", () => {
     expect(parseLogJson(JSON.stringify(log))).toEqual(log);
   });
 
+  it("carries note and conditions through JSON", () => {
+    const detailed: HikeLogEntry[] = [
+      {
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        note: "muddy but worth it",
+        conditions: "Muddy",
+      },
+    ];
+    expect(parseLogJson(exportLogJson(detailed))).toEqual(detailed);
+  });
+
   it("throws on malformed JSON", () => {
     expect(() => parseLogJson("{not json")).toThrow();
   });
@@ -68,7 +80,7 @@ describe("exportLogJson / parseLogJson", () => {
 describe("importLogJson", () => {
   it("replaces the stored log", () => {
     const s = memStorage();
-    addHike("old", "2025-12-31", s);
+    addHike("old", "2025-12-31", undefined, s);
     const next = importLogJson(exportLogJson(log), "replace", s);
     expect(next).toEqual(log);
     expect(readLog(s)).toEqual(log);

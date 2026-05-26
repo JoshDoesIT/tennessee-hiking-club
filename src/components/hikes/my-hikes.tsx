@@ -57,21 +57,41 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
       <ul className="mt-6 grid gap-x-8 gap-y-2 sm:grid-cols-2">
         {distinct.map((slug) => {
           const trail = bySlug.get(slug)!;
-          const count = log.filter((e) => e.trailSlug === slug).length;
+          const entries = log.filter((e) => e.trailSlug === slug);
+          const detail = [...entries]
+            .reverse()
+            .find((e) => e.note || e.conditions);
           return (
-            <li
-              key={slug}
-              className="border-forest/5 flex items-baseline justify-between gap-3 border-b py-1.5"
-            >
-              <Link
-                href={`/trails/${slug}`}
-                className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
-              >
-                {trail.name}
-              </Link>
-              <span className="text-ink/70 shrink-0 text-sm">
-                {trail.region} TN{count > 1 ? ` · ${count}x` : ""}
-              </span>
+            <li key={slug} className="border-forest/5 border-b py-1.5">
+              <div className="flex items-baseline justify-between gap-3">
+                <Link
+                  href={`/trails/${slug}`}
+                  className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
+                >
+                  {trail.name}
+                </Link>
+                <span className="text-ink/70 shrink-0 text-sm">
+                  {trail.region} TN
+                  {entries.length > 1 ? ` · ${entries.length}x` : ""}
+                </span>
+              </div>
+              {detail ? (
+                <p className="mt-0.5 text-xs">
+                  {detail.conditions ? (
+                    <span className="text-olive font-medium">
+                      {detail.conditions}
+                    </span>
+                  ) : null}
+                  {detail.conditions && detail.note ? (
+                    <span className="text-ink/40"> &middot; </span>
+                  ) : null}
+                  {detail.note ? (
+                    <span className="text-ink/70 italic">
+                      &ldquo;{detail.note}&rdquo;
+                    </span>
+                  ) : null}
+                </p>
+              ) : null}
             </li>
           );
         })}

@@ -43,4 +43,16 @@ describe("MyHikes", () => {
     );
     expect(screen.getByText(/11 mi/)).toBeInTheDocument();
   });
+
+  it("surfaces the note and conditions from a logged hike", async () => {
+    addHike("a", "2026-01-01", {
+      note: "spring wildflowers",
+      conditions: "Muddy",
+    });
+    render(<MyHikes trails={trails} />);
+    expect(
+      await screen.findByText(/spring wildflowers/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/muddy/i)).toBeInTheDocument();
+  });
 });
