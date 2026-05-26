@@ -168,7 +168,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         className="bg-parchment border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
       />
       {!ready ? (
-        <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
+        <div className="text-pine pointer-events-none absolute inset-0 grid place-items-center text-sm">
           {failed
             ? "The 3D map couldn’t load. Use the trail list below."
             : "Loading the 3D terrain map…"}

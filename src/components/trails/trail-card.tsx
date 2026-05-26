@@ -32,7 +32,7 @@ export function TrailCard({ trail }: { trail: Trail }) {
           <h3 className="display text-forest mt-3 text-xl leading-tight">
             {trail.name}
           </h3>
-          <p className="text-ink/60 mt-1 text-sm">
+          <p className="text-ink/70 mt-1 text-sm">
             {trail.lengthMiles} mi · {trail.area}
           </p>
         </div>

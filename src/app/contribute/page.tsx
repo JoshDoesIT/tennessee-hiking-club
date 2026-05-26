@@ -17,7 +17,7 @@ const CONTRIBUTING = `${REPO}/blob/main/CONTRIBUTING.md`;
 export default function ContributePage() {
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-600">Open source</p>
+      <p className="eyebrow text-amber-700">Open source</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Add a trail to the map
       </h1>
@@ -80,7 +80,7 @@ export default function ContributePage() {
         </Link>
       </section>
 
-      <p className="text-ink/60 mt-10 text-sm leading-relaxed">
+      <p className="text-ink/70 mt-10 text-sm leading-relaxed">
         Please hike responsibly and practice Leave No Trace. Only add trails
         that are open to the public, and leave fragile or sensitive spots off
         the map.
