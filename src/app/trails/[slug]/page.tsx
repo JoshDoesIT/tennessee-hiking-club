@@ -5,6 +5,7 @@ import { getAllTrails, getTrailBySlug } from "@/lib/trails";
 import { trailMetadata } from "@/lib/trails/metadata";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
 import { TrailGallery } from "@/components/trails/trail-gallery";
+import { TrailContextMap } from "@/components/map/trail-context-map";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -56,16 +57,22 @@ export default async function TrailPage({ params }: Params) {
         <Stat label="Route" value={trail.routeType} />
       </dl>
 
-      <div className="mt-6">
-        <a
-          href={googleMapsDirectionsUrl(trail.coordinates)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonVariants({ variant: "accent" })}
-        >
-          Open in Google Maps
-        </a>
-      </div>
+      <section className="mt-8">
+        <h2 className="display text-forest text-2xl">Find the trailhead</h2>
+        <div className="mt-4">
+          <TrailContextMap coordinates={trail.coordinates} name={trail.name} />
+        </div>
+        <div className="mt-4">
+          <a
+            href={googleMapsDirectionsUrl(trail.coordinates)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: "accent" })}
+          >
+            Open in Google Maps
+          </a>
+        </div>
+      </section>
 
       <div className="text-ink/80 mt-8 space-y-4 leading-relaxed">
         {trail.body.split(/\n\n+/).map((paragraph, i) => (
