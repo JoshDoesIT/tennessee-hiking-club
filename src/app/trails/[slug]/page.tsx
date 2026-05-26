@@ -5,6 +5,8 @@ import { getAllTrails, getTrailBySlug } from "@/lib/trails";
 import { trailMetadata, trailJsonLd } from "@/lib/trails/metadata";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
 import { TrailGallery } from "@/components/trails/trail-gallery";
+import { WeatherForecast } from "@/components/trails/weather-forecast";
+import { fetchTrailWeather } from "@/lib/weather/forecast";
 import { TrailContextMap } from "@/components/map/trail-context-map";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +30,11 @@ export default async function TrailPage({ params }: Params) {
   const { slug } = await params;
   const trail = getTrailBySlug(slug);
   if (!trail) notFound();
+
+  const weather = await fetchTrailWeather(
+    trail.coordinates.lat,
+    trail.coordinates.lng,
+  );
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
@@ -82,6 +89,8 @@ export default async function TrailPage({ params }: Params) {
           </a>
         </div>
       </section>
+
+      <WeatherForecast weather={weather} />
 
       <div className="text-ink/80 mt-8 space-y-4 leading-relaxed">
         {trail.body.split(/\n\n+/).map((paragraph, i) => (
