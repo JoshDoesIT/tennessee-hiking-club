@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { MyHikes } from "@/components/hikes/my-hikes";
 import { Challenges } from "@/components/hikes/challenges";
+import { LogTransfer } from "@/components/hikes/log-transfer";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
@@ -37,6 +38,8 @@ export default function MyHikesPage() {
       </div>
 
       <Challenges trails={trails} />
+
+      <LogTransfer trails={trails} />
     </Container>
   );
 }
