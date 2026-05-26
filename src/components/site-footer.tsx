@@ -42,7 +42,7 @@ export function SiteFooter() {
           <Logo tone="light" size={48} />
           <p className="text-cream/65 max-w-xs text-sm leading-relaxed">
             A community hiking club mapping the Volunteer State&rsquo;s best
-            trails — open source and free to explore.
+            trails, open source and free to explore.
           </p>
         </div>
         <FooterCol

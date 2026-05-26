@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ *
- *  Tennessee Hiking Club — design tokens
+ *  Tennessee Hiking Club: design tokens
  *  Palette sampled directly from the badge logo.
  *  Full guidelines: docs/brand/BRAND.md
  * ------------------------------------------------------------------ */
 @theme {
-  --color-forest: #2a3623; /* primary dark — ring, headings on light */
+  --color-forest: #2a3623; /* primary dark, ring, headings on light */
   --color-pine: #475036; /* secondary green */
   --color-olive: #6c724a;
   --color-sage: #959760;
-  --color-sage-100: #c6c680; /* light sage — borders, fills */
+  --color-sage-100: #c6c680; /* light sage, borders, fills */
   --color-cream: #fbf6e9; /* page background (warm paper) */
   --color-cream-50: #fefcf5;
   --color-parchment: #f1e9d6;

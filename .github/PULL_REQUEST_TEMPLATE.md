@@ -8,16 +8,16 @@ Closes #
 
 ## Type of change
 
-- [ ] ✨ Feature
-- [ ] 🐛 Fix
-- [ ] 📖 Docs
-- [ ] 🥾 Trail content
-- [ ] 🧹 Chore / refactor
+- [ ] Feature
+- [ ] Fix
+- [ ] Docs
+- [ ] Trail content
+- [ ] Chore / refactor
 
 ## Checklist
 
 - [ ] Linked the issue this addresses (above)
-- [ ] Followed **spec-first / test-first** — tests added or updated, and watched
+- [ ] Followed **spec-first / test-first**: tests added or updated, and watched
       them fail before implementing
 - [ ] Checked off the **acceptance criteria** in the linked issue, citing the
       file/test that satisfies each

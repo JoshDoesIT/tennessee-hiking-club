@@ -3,7 +3,7 @@
  *
  * These produce universal cross-platform deep links (the documented
  * `api=1` Google Maps URL scheme) so a tap opens the native Maps app on
- * mobile or maps.google.com on desktop — no API key, no billing.
+ * mobile or maps.google.com on desktop; no API key, no billing.
  */
 
 export interface LatLng {

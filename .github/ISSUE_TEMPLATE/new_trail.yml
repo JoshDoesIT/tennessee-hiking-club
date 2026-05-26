@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping map Tennessee! Fill in what you can — a maintainer
+        Thanks for helping map Tennessee! Fill in what you can; a maintainer
         will turn this into a trail page. Accuracy on coordinates matters most.
   - type: input
     id: name

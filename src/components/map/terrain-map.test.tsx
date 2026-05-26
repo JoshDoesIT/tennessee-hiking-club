@@ -57,7 +57,12 @@ const baseStyle = {
   layers: [
     { id: "background", type: "background", paint: {} },
     { id: "water", type: "fill", paint: {} },
-    { id: "label", type: "symbol", layout: { "text-field": "{name}" }, paint: {} },
+    {
+      id: "label",
+      type: "symbol",
+      layout: { "text-field": "{name}" },
+      paint: {},
+    },
   ],
 };
 
@@ -117,7 +122,9 @@ describe("TerrainMap", () => {
     const style = mapOptions().style;
     expect(style.terrain).toBeTruthy();
     const ids = style.layers.map((l: { id: string }) => l.id);
-    expect(ids).toEqual(expect.arrayContaining(["hillshade", "tn-mask", "tn-outline"]));
+    expect(ids).toEqual(
+      expect.arrayContaining(["hillshade", "tn-mask", "tn-outline"]),
+    );
   });
 
   it("adds one marker per trail", async () => {

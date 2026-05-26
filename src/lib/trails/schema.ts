@@ -9,7 +9,7 @@ export const ROUTE_TYPES = ["loop", "out-and-back", "point-to-point"] as const;
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /**
- * The trail data model — the executable spec for all trail content.
+ * The trail data model: the executable spec for all trail content.
  * Front-matter from `content/trails/*.md` is validated against this; invalid
  * data throws at build/test time so the site never ships broken trails.
  */

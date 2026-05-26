@@ -29,7 +29,7 @@ export function loadTrailsFrom(dir: string): Trail[] {
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
       const field = issue.path.length ? issue.path.join(".") : "(root)";
-      throw new Error(`Invalid trail "${file}": ${field} — ${issue.message}`);
+      throw new Error(`Invalid trail "${file}": ${field}: ${issue.message}`);
     }
 
     const trail = parsed.data;

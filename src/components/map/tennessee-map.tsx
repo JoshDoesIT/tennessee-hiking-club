@@ -13,7 +13,7 @@ import { getAllTrails } from "@/lib/trails";
  * Stylized, clickable map of Tennessee. Server-rendered: the SVG outline is
  * drawn with d3-geo and each trail is an HTML pin link positioned by its
  * projected coordinate (as a % of the viewBox, so it scales responsively).
- * No client JS — hover/focus tooltips are CSS-only and pins are real links.
+ * No client JS; hover/focus tooltips are CSS-only and pins are real links.
  */
 export function TennesseeMap() {
   const projection = tennesseeProjection();
@@ -46,7 +46,7 @@ export function TennesseeMap() {
           <Link
             key={trail.slug}
             href={`/trails/${trail.slug}`}
-            aria-label={`${trail.name} — ${trail.region} Tennessee`}
+            aria-label={`${trail.name}, ${trail.region} Tennessee`}
             className="group absolute -translate-x-1/2 -translate-y-1/2 rounded-full focus-visible:outline-2 focus-visible:outline-offset-2"
             style={{
               left: `${(x / MAP_WIDTH) * 100}%`,

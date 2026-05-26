@@ -17,7 +17,7 @@ acceptance criteria become the tests we write first (TDD).
 ## Template
 
 ```md
-# NNNN — Title
+# NNNN: Title
 
 - **Status:** Draft | Approved | In progress | Shipped
 - **Milestone:** Mx

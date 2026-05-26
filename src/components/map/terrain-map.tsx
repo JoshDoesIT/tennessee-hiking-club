@@ -28,11 +28,11 @@ const TN_BOUNDS: [[number, number], [number, number]] = [
  *
  * The OpenFreeMap style is fetched and rebranded *before* the map is created
  * (see build-style), so the very first frame already shows our palette,
- * terrain, and the cream wash over neighbouring states — no flash of the
+ * terrain, and the cream wash over neighbouring states; no flash of the
  * default map. The camera opens on the whole state, level and north-up; users
  * can tilt up to 80° with the navigation control for the 3D view.
  *
- * Note: the map container needs an explicit height — MapLibre's stylesheet sets
+ * Note: the map container needs an explicit height; MapLibre's stylesheet sets
  * `position: relative` on it, which would cancel an `inset-0`-based size.
  */
 export function TerrainMap({ trails }: { trails: TrailPin[] }) {
@@ -91,7 +91,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
             el.type = "button";
             el.setAttribute(
               "aria-label",
-              `${trail.name} — ${trail.region} Tennessee`,
+              `${trail.name}, ${trail.region} Tennessee`,
             );
             Object.assign(el.style, {
               width: "16px",
@@ -159,7 +159,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
       {!ready ? (
         <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
           {failed
-            ? "The 3D map couldn’t load — use the trail list below."
+            ? "The 3D map couldn’t load. Use the trail list below."
             : "Loading the 3D terrain map…"}
         </div>
       ) : null}

@@ -1,4 +1,4 @@
-# 0003 — Trail directory & detail pages
+# 0003: Trail directory & detail pages
 
 - **Status:** Approved
 - **Milestone:** M4
@@ -7,7 +7,7 @@
 ## Problem
 
 Beyond the map, visitors need to browse/filter all trails and see a rich detail
-page for each — including the "click it and it takes you there" Google Maps link.
+page for each, including the "click it and it takes you there" Google Maps link.
 
 ## User stories
 
@@ -44,6 +44,6 @@ page for each — including the "click it and it takes you there" Google Maps li
 
 ## Test plan
 
-- Component: filter logic (pure function over trails) — Vitest.
+- Component: filter logic (pure function over trails): Vitest.
 - Component: detail renders Google Maps href with correct coords.
 - E2E: filter on /trails, open a trail, assert directions link host + coords.

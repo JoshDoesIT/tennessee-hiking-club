@@ -27,7 +27,7 @@ once a fix is released.
 
 In scope: this repository's source, its deployed site, and its CI/CD config.
 Out of scope: third-party services we integrate with (Vercel, Stripe, Printful,
-OpenStreetMap) — report those to the respective vendor. Denial-of-service,
+OpenStreetMap); report those to the respective vendor. Denial-of-service,
 social engineering, and automated scanner noise are not eligible.
 
 Thanks for helping keep the Tennessee Hiking Club community safe.

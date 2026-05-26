@@ -100,7 +100,7 @@ describe("buildTennesseeStyle", () => {
     expect((s.sources["tn-outline"] as { data: unknown }).data).toBe(TENNESSEE);
   });
 
-  it("dims — but does not hide — the area outside Tennessee", () => {
+  it("dims, but does not hide, the area outside Tennessee", () => {
     const opacity = byId(buildTennesseeStyle(base()), "tn-mask")?.paint?.[
       "fill-opacity"
     ] as number;

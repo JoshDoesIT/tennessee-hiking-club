@@ -45,7 +45,7 @@ export default function Home() {
             style={{ animationDelay: "220ms" }}
           >
             Discover the Volunteer State&rsquo;s best trails on an interactive
-            map — photos, coordinates, and one-tap directions straight to the
+            map: photos, coordinates, and one-tap directions straight to the
             trailhead.
           </p>
           <div
@@ -78,7 +78,7 @@ export default function Home() {
             }
           >
             From the Smokies to the Cumberland Plateau, find trails worth the
-            drive — searchable, mapped, and photographed.
+            drive: searchable, mapped, and photographed.
           </Value>
           <Value
             title="Connect"
@@ -91,8 +91,8 @@ export default function Home() {
               </IconWrap>
             }
           >
-            A club for everyone who loves Tennessee on foot — share favorites
-            and help build the most complete trail map in the state.
+            A club for everyone who loves Tennessee on foot: share favorites and
+            help build the most complete trail map in the state.
           </Value>
           <Value
             title="Protect"
@@ -160,7 +160,7 @@ export default function Home() {
                 </IconWrap>
               }
             >
-              Tees, stickers, and hats — coming soon to help fund the project.
+              Tees, stickers, and hats. Coming soon to help fund the project.
             </FeatureCard>
           </div>
         </Container>
@@ -177,15 +177,15 @@ export default function Home() {
           </div>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             <RegionCard region="East" title="Mountains & mist">
-              The Great Smokies and Blue Ridge — high balds, waterfalls, and the
+              The Great Smokies and Blue Ridge: high balds, waterfalls, and the
               highest peaks east of the Mississippi.
             </RegionCard>
             <RegionCard region="Middle" title="Plateau & gorges">
-              The Cumberland Plateau and Highland Rim — deep gorges, sandstone
+              The Cumberland Plateau and Highland Rim: deep gorges, sandstone
               arches, and the state&rsquo;s most dramatic waterfalls.
             </RegionCard>
             <RegionCard region="West" title="Rivers & bottomlands">
-              Bottomland forests and bluffs along the Mississippi — quiet, flat,
+              Bottomland forests and bluffs along the Mississippi: quiet, flat,
               and full of birdsong.
             </RegionCard>
           </div>
@@ -200,7 +200,7 @@ export default function Home() {
           </h2>
           <p className="text-cream/75 mt-4 max-w-xl text-lg leading-relaxed">
             This is an open-source, community project. Know a trail we&rsquo;re
-            missing? Add it — every contribution makes the map better.
+            missing? Add it. Every contribution makes the map better.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link

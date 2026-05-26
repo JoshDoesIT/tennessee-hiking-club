@@ -26,7 +26,7 @@ export default function ExplorePage() {
         Explore Tennessee
       </h1>
       <p className="text-ink/70 mt-4 max-w-xl text-lg leading-relaxed">
-        Tilt, rotate, and zoom the terrain, then tap a pin to open the trail —{" "}
+        Tilt, rotate, and zoom the terrain, then tap a pin to open the trail.{" "}
         {trails.length} across all three Grand Divisions.
       </p>
 

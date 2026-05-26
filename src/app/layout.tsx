@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s · Tennessee Hiking Club",
   },
   description:
-    "Discover the Volunteer State's best trails on an interactive map — photos, coordinates, and one-tap directions to the trailhead. A community hiking club for Tennessee.",
+    "Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead. A community hiking club for Tennessee.",
   keywords: [
     "Tennessee hiking",
     "Tennessee trails",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     siteName: "Tennessee Hiking Club",
     title: "Tennessee Hiking Club",
     description:
-      "Discover the Volunteer State's best trails on an interactive map — photos, coordinates, and one-tap directions.",
+      "Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions.",
     url: "/",
   },
   twitter: {

@@ -16,7 +16,7 @@ tags: [tower, views, pond]
 photos:
   - src: /trails/placeholder.png
     alt: A wooden observation tower above a forested bottomland
-    credit: Placeholder — real photo wanted (#32)
+    credit: Placeholder, real photo wanted (#32)
 summary: A rolling forest hike to a 70-foot observation tower overlooking the Tuscumbia bottomlands and Travis McNatt Lake.
 ---
 
