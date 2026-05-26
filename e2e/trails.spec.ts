@@ -1,0 +1,44 @@
+import { test, expect } from "@playwright/test";
+
+// Trail-card links only (href has a slug); excludes the "Clear" link to /trails.
+const results = (page: import("@playwright/test").Page) =>
+  page.locator('section[aria-label="Trail results"] a[href^="/trails/"]');
+
+test("filtering by region narrows the trail directory", async ({ page }) => {
+  await page.goto("/trails");
+
+  const total = await results(page).count();
+  expect(total).toBeGreaterThan(3);
+
+  // Apply a region filter via the no-JS GET form.
+  await page.getByLabel("Region").selectOption("East");
+  await page.getByRole("button", { name: /apply filters/i }).click();
+
+  // Filter is reflected in the URL (shareable) and the list is narrowed.
+  await expect(page).toHaveURL(/region=East/);
+  const filtered = await results(page).count();
+  expect(filtered).toBeGreaterThan(0);
+  expect(filtered).toBeLessThan(total);
+});
+
+test("a shareable filter URL renders narrowed results on the server", async ({
+  page,
+}) => {
+  await page.goto("/trails?difficulty=easy");
+  await expect(
+    page.getByRole("region", { name: "Trail results" }),
+  ).toBeVisible();
+  // The directory loads pre-filtered straight from the URL, no interaction.
+  expect(await results(page).count()).toBeGreaterThan(0);
+});
+
+test("shows an empty state when no trails match", async ({ page }) => {
+  // West has no "hard" trails, so this combination is always empty.
+  await page.goto("/trails?region=West&difficulty=hard");
+
+  expect(await results(page).count()).toBe(0);
+  await expect(page.getByText(/no trails match/i)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /clear filters/i }),
+  ).toBeVisible();
+});
