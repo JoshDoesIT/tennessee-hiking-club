@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { MyHikes } from "@/components/hikes/my-hikes";
 import { Challenges } from "@/components/hikes/challenges";
+import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
+import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
 
 export const metadata: Metadata = {
@@ -13,6 +15,7 @@ export const metadata: Metadata = {
 
 export default function MyHikesPage() {
   const trails = getAllTrails();
+  const mapData = tennesseeMapData(trails);
 
   return (
     <Container className="py-12 sm:py-16">
@@ -26,6 +29,10 @@ export default function MyHikesPage() {
       </p>
 
       <div className="mt-8">
+        <YourTennesseeMap data={mapData} />
+      </div>
+
+      <div className="mt-10">
         <MyHikes trails={trails} />
       </div>
 
