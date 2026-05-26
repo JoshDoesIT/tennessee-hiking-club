@@ -7,6 +7,8 @@ const pages = [
   { name: "trail directory", path: "/trails" },
   { name: "trail detail", path: "/trails/mt-leconte-alum-cave" },
   { name: "contribute", path: "/contribute" },
+  { name: "shop", path: "/shop" },
+  { name: "product", path: "/shop/trail-tee" },
 ];
 
 for (const { name, path } of pages) {
