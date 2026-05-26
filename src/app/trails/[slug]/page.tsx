@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllTrails, getTrailBySlug } from "@/lib/trails";
-import { trailMetadata } from "@/lib/trails/metadata";
+import { trailMetadata, trailJsonLd } from "@/lib/trails/metadata";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
 import { TrailGallery } from "@/components/trails/trail-gallery";
 import { TrailContextMap } from "@/components/map/trail-context-map";
@@ -30,6 +30,10 @@ export default async function TrailPage({ params }: Params) {
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(trailJsonLd(trail)) }}
+      />
       <Link href="/explore" className="text-olive hover:text-forest text-sm">
         ← Back to the map
       </Link>

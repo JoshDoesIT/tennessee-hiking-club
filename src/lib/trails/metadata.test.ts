@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { trailMetadata } from "./metadata";
+import { trailMetadata, trailJsonLd } from "./metadata";
 import type { Trail } from "./schema";
 
 const trail: Trail = {
@@ -25,21 +25,30 @@ describe("trailMetadata", () => {
     expect(m.description).toBe("A classic climb.");
   });
 
-  it("includes Open Graph and Twitter cards with the trail photo", () => {
+  it("includes Open Graph (article) and a Twitter summary card", () => {
     const og = trailMetadata(trail).openGraph as Record<string, unknown>;
     expect(og.title).toBe("Mount X");
     expect(og.type).toBe("article");
-    expect(JSON.stringify(og.images)).toContain("/trails/placeholder.png");
 
     const tw = trailMetadata(trail).twitter as Record<string, unknown>;
     expect(tw.card).toBe("summary_large_image");
   });
 
-  it("omits images when the trail has no photos", () => {
-    const og = trailMetadata({ ...trail, photos: [] }).openGraph as Record<
-      string,
-      unknown
-    >;
-    expect(og.images).toBeUndefined();
+  it("sets a canonical URL for the trail", () => {
+    expect(trailMetadata(trail).alternates?.canonical).toBe("/trails/mt-x");
+  });
+});
+
+describe("trailJsonLd", () => {
+  it("produces schema.org structured data with geo coordinates", () => {
+    const ld = trailJsonLd(trail) as Record<string, unknown>;
+    expect(ld["@context"]).toBe("https://schema.org");
+    expect(ld["@type"]).toBe("TouristAttraction");
+    expect(ld.name).toBe("Mount X");
+    expect(ld.geo).toMatchObject({
+      "@type": "GeoCoordinates",
+      latitude: 35.6,
+      longitude: -83.4,
+    });
   });
 });
