@@ -12,7 +12,7 @@ difficulty: easy
 routeType: loop
 dogFriendly: true
 feeRequired: false
-tags: [lake, birding, boardwalk, accessible]
+tags: [lake, birding, boardwalk, accessible, state-park]
 photos:
   - src: /trails/reelfoot-black-bayou.jpg
     alt: A boardwalk along the cypress-lined shore of Reelfoot Lake

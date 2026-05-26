@@ -12,7 +12,7 @@ difficulty: moderate
 routeType: out-and-back
 dogFriendly: true
 feeRequired: false
-tags: [waterfall, gorge]
+tags: [waterfall, gorge, state-park]
 photos:
   - src: /trails/fall-creek-falls.jpg
     alt: A high waterfall plunging into a shaded plunge pool

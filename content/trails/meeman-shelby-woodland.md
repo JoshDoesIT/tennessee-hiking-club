@@ -12,7 +12,7 @@ difficulty: moderate
 routeType: loop
 dogFriendly: true
 feeRequired: false
-tags: [forest, bluffs, river]
+tags: [forest, bluffs, river, state-park]
 photos:
   - src: /trails/meeman-shelby-woodland.jpg
     alt: Bottomland water and forest at Meeman-Shelby Forest State Park

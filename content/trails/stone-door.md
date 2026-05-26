@@ -12,7 +12,7 @@ difficulty: easy
 routeType: out-and-back
 dogFriendly: true
 feeRequired: false
-tags: [overlook, gorge, geology]
+tags: [overlook, gorge, geology, state-park]
 photos:
   - src: /trails/stone-door.jpg
     alt: The forested Savage Gulf gorge seen from the Stone Door plateau

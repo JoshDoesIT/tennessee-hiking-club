@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { MyHikes } from "@/components/hikes/my-hikes";
+import { Challenges } from "@/components/hikes/challenges";
 import { getAllTrails } from "@/lib/trails";
 
 export const metadata: Metadata = {
@@ -27,6 +28,8 @@ export default function MyHikesPage() {
       <div className="mt-8">
         <MyHikes trails={trails} />
       </div>
+
+      <Challenges trails={trails} />
     </Container>
   );
 }
