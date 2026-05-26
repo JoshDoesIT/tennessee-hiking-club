@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [balds, views, wildflowers]
 photos:
-  - src: /trails/placeholder.png
-    alt: Open grassy bald ridge under a wide sky
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/roan-highlands-balds.jpg
+    alt: A footpath crossing the grassy Roan balds toward Round Bald
+    credit: Photo by Brian Stansberry, CC BY 2.5, via Wikimedia Commons
 summary: An open, grassy ridge walk across the Roan balds, Round Bald to Jane Bald, with 360-degree views and famous June rhododendron.
 ---
 

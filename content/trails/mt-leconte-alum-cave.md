@@ -14,9 +14,9 @@ dogFriendly: false
 feeRequired: true
 tags: [views, summit, old-growth]
 photos:
-  - src: /trails/placeholder.png
-    alt: Layered Smoky Mountain ridgelines at golden hour
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/mt-leconte-alum-cave.jpg
+    alt: The overhanging Alum Cave Bluffs on the trail to Mount LeConte
+    credit: Photo by Brian Stansberry, CC BY 3.0, via Wikimedia Commons
 summary: The classic strenuous climb past Arch Rock and Alum Cave Bluffs to the 6,593-ft summit of Mount LeConte.
 ---
 

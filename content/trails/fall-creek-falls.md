@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [waterfall, gorge]
 photos:
-  - src: /trails/placeholder.png
+  - src: /trails/fall-creek-falls.jpg
     alt: A high waterfall plunging into a shaded plunge pool
-    credit: Placeholder, real photo wanted (#32)
+    credit: Photo by Jsfouche, CC BY-SA 3.0, via Wikimedia Commons
 summary: A short but steep descent to the base of one of the tallest waterfalls in the eastern U.S., plunging 256 feet into a shaded gorge.
 ---
 

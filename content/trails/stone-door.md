@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [overlook, gorge, geology]
 photos:
-  - src: /trails/placeholder.png
-    alt: A cliff-line overlook above a deep forested gorge
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/stone-door.jpg
+    alt: The forested Savage Gulf gorge seen from the Stone Door plateau
+    credit: Photo by Mark Spangler, CC BY 2.0, via Wikimedia Commons
 summary: An easy walk to a 100-foot natural crack in the cliff line that opens onto sweeping views over Savage Gulf.
 ---
 

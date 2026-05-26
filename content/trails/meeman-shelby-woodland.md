@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [forest, bluffs, river]
 photos:
-  - src: /trails/placeholder.png
-    alt: A hardwood forest trail along a river bluff
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/meeman-shelby-woodland.jpg
+    alt: Bottomland water and forest at Meeman-Shelby Forest State Park
+    credit: Photo by Thomas R. Machnitzki, CC BY 3.0, via Wikimedia Commons
 summary: A quiet hardwood-forest loop along the Chickasaw Bluffs above the Mississippi River, just north of Memphis.
 ---
 
