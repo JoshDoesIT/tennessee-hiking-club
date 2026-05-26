@@ -87,13 +87,23 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           map.resize();
 
           for (const trail of trails) {
-            const el = document.createElement("button");
-            el.type = "button";
+            const lngLat: [number, number] = [
+              trail.coordinates.lng,
+              trail.coordinates.lat,
+            ];
+
+            // Each pin is a real link: focusable, and Enter or click opens the
+            // trail page. The global :focus-visible ring makes the focused pin
+            // obvious. (The trail list below is the always-available,
+            // no-WebGL keyboard/screen-reader fallback.)
+            const el = document.createElement("a");
+            el.href = `/trails/${trail.slug}`;
             el.setAttribute(
               "aria-label",
               `${trail.name}, ${trail.region} Tennessee`,
             );
             Object.assign(el.style, {
+              display: "block",
               width: "16px",
               height: "16px",
               borderRadius: "9999px",
@@ -103,6 +113,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               boxShadow: "0 1px 4px rgba(0,0,0,.35)",
             });
 
+            // Name + region preview, shown on hover or keyboard focus.
             const content = document.createElement("div");
             const title = document.createElement("strong");
             title.textContent = trail.name;
@@ -113,26 +124,26 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               color: "#5c6d4a",
               marginTop: "2px",
             });
-            const link = document.createElement("a");
-            link.href = `/trails/${trail.slug}`;
-            link.textContent = "View trail →";
-            Object.assign(link.style, {
-              display: "inline-block",
-              marginTop: "6px",
-              color: "#2a3623",
-              fontWeight: "600",
-            });
-            content.append(title, region, link);
+            content.append(title, region);
 
             const popup = new maplibregl.Popup({
               offset: 16,
-              closeButton: true,
-            }).setDOMContent(content);
+              closeButton: false,
+              closeOnClick: false,
+            })
+              .setLngLat(lngLat)
+              .setDOMContent(content);
 
-            new maplibregl.Marker({ element: el })
-              .setLngLat([trail.coordinates.lng, trail.coordinates.lat])
-              .setPopup(popup)
-              .addTo(map);
+            const showPreview = () => {
+              if (map) popup.addTo(map);
+            };
+            const hidePreview = () => popup.remove();
+            el.addEventListener("mouseenter", showPreview);
+            el.addEventListener("mouseleave", hidePreview);
+            el.addEventListener("focus", showPreview);
+            el.addEventListener("blur", hidePreview);
+
+            new maplibregl.Marker({ element: el }).setLngLat(lngLat).addTo(map);
           }
 
           if (!cancelled) setReady(true);
