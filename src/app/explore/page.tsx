@@ -35,8 +35,10 @@ export default function ExplorePage() {
       </div>
 
       {/* Accessible / no-WebGL fallback: every trail as a plain link. */}
-      <section className="mt-10">
-        <h2 className="display text-forest text-2xl">All trails</h2>
+      <section aria-labelledby="all-trails-heading" className="mt-10">
+        <h2 id="all-trails-heading" className="display text-forest text-2xl">
+          All trails
+        </h2>
         <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
           {trails.map((trail) => (
             <li

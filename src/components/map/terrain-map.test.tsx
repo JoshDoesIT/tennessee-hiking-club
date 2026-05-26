@@ -32,7 +32,12 @@ const mocks = vi.hoisted(() => {
     };
   });
   const Popup = vi.fn(function () {
-    return { setDOMContent: vi.fn().mockReturnThis() };
+    return {
+      setLngLat: vi.fn().mockReturnThis(),
+      setDOMContent: vi.fn().mockReturnThis(),
+      addTo: vi.fn().mockReturnThis(),
+      remove: vi.fn(),
+    };
   });
   return { Map, Marker, Popup };
 });
@@ -97,6 +102,8 @@ afterEach(() => {
 });
 
 const mapOptions = () => (mocks.Map as unknown as Mock).mock.calls[0][0];
+const markerElements = (): HTMLElement[] =>
+  (mocks.Marker as unknown as Mock).mock.calls.map((c) => c[0].element);
 
 describe("TerrainMap", () => {
   it("renders a labeled, accessible map region", () => {
@@ -132,5 +139,22 @@ describe("TerrainMap", () => {
     await waitFor(() =>
       expect(mocks.Marker).toHaveBeenCalledTimes(trails.length),
     );
+  });
+
+  it("renders each pin as a link to its trail, named by trail and region", async () => {
+    render(<TerrainMap trails={trails} />);
+    await waitFor(() =>
+      expect(mocks.Marker).toHaveBeenCalledTimes(trails.length),
+    );
+    for (const trail of trails) {
+      const el = markerElements().find(
+        (e) => e.getAttribute("href") === `/trails/${trail.slug}`,
+      );
+      // A real anchor: focusable and activates (navigates) on Enter.
+      expect(el?.tagName).toBe("A");
+      const label = el?.getAttribute("aria-label") ?? "";
+      expect(label).toContain(trail.name);
+      expect(label).toContain(trail.region);
+    }
   });
 });
