@@ -9,6 +9,7 @@ const pages = [
   { name: "contribute", path: "/contribute" },
   { name: "shop", path: "/shop" },
   { name: "product", path: "/shop/trail-tee" },
+  { name: "my hikes", path: "/hikes" },
 ];
 
 for (const { name, path } of pages) {

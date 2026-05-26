@@ -8,6 +8,7 @@ import { buttonVariants } from "./ui/button";
 const NAV = [
   { href: "/explore", label: "Explore" },
   { href: "/trails", label: "Trails" },
+  { href: "/hikes", label: "My hikes" },
   { href: "/about", label: "About" },
   { href: "/contribute", label: "Contribute" },
 ];
