@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getAllTrails, getTrailBySlug } from "@/lib/trails";
+import { trailMetadata } from "@/lib/trails/metadata";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
+import { TrailGallery } from "@/components/trails/trail-gallery";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -18,15 +19,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const trail = getTrailBySlug(slug);
   if (!trail) return {};
-  return { title: trail.name, description: trail.summary };
+  return trailMetadata(trail);
 }
 
 export default async function TrailPage({ params }: Params) {
   const { slug } = await params;
   const trail = getTrailBySlug(slug);
   if (!trail) notFound();
-
-  const photo = trail.photos[0];
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
@@ -45,15 +44,7 @@ export default async function TrailPage({ params }: Params) {
         {trail.summary}
       </p>
 
-      {photo ? (
-        <Image
-          src={photo.src}
-          alt={photo.alt}
-          width={1200}
-          height={800}
-          className="border-forest/10 mt-6 w-full rounded-2xl border"
-        />
-      ) : null}
+      <TrailGallery photos={trail.photos} />
 
       <dl className="border-forest/10 bg-cream-50 mt-6 grid grid-cols-2 gap-4 rounded-2xl border p-5 sm:grid-cols-4">
         <Stat label="Length" value={`${trail.lengthMiles} mi`} />

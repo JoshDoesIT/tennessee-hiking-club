@@ -18,7 +18,7 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tnhikingclub.com"),
+  metadataBase: new URL("https://tnhiking.club"),
   title: {
     default: "Tennessee Hiking Club",
     template: "%s · Tennessee Hiking Club",
