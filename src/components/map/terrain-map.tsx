@@ -2,8 +2,9 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
-import type { Feature, MultiPolygon, Polygon, Position } from "geojson";
-import { TENNESSEE } from "@/lib/geo/tennessee";
+import type { StyleSpecification } from "maplibre-gl";
+import { buildTennesseeStyle, type MapStyle } from "./build-style";
+import { TENNESSEE_BOUNDS } from "@/lib/maps";
 
 export type TrailPin = {
   slug: string;
@@ -12,16 +13,24 @@ export type TrailPin = {
   coordinates: { lat: number; lng: number };
 };
 
-/** Roughly the center of Tennessee. */
-const TN_CENTER: [number, number] = [-86.6, 35.86];
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
-const TERRARIUM_DEM =
-  "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
+
+/** South-west and north-east corners of Tennessee, for the opening fit. */
+const TN_BOUNDS: [[number, number], [number, number]] = [
+  [TENNESSEE_BOUNDS.lngMin, TENNESSEE_BOUNDS.latMin],
+  [TENNESSEE_BOUNDS.lngMax, TENNESSEE_BOUNDS.latMax],
+];
 
 /**
  * Interactive 3D terrain map of Tennessee (MapLibre GL). Uses open, key-free
  * data: OpenFreeMap vector tiles + public-domain AWS Terrarium elevation.
  * Client-only (WebGL); the trail list on /explore is the accessible fallback.
+ *
+ * The OpenFreeMap style is fetched and rebranded *before* the map is created
+ * (see build-style), so the very first frame already shows our palette,
+ * terrain, and the cream wash over neighbouring states — no flash of the
+ * default map. The camera opens on the whole state, level and north-up; users
+ * can tilt up to 80° with the navigation control for the 3D view.
  *
  * Note: the map container needs an explicit height — MapLibre's stylesheet sets
  * `position: relative` on it, which would cancel an `inset-0`-based size.
@@ -37,16 +46,28 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
 
     (async () => {
       try {
-        const maplibregl = (await import("maplibre-gl")).default;
+        // Load the library and base style in parallel, then rebrand the style
+        // before first paint so the map never flashes its default colors.
+        const [maplibregl, baseStyle] = await Promise.all([
+          import("maplibre-gl").then((m) => m.default),
+          fetch(OPENFREEMAP_STYLE).then(async (r) => {
+            if (!r.ok) throw new Error(`Map style request failed: ${r.status}`);
+            return (await r.json()) as MapStyle;
+          }),
+        ]);
         if (cancelled || !containerRef.current) return;
+
+        const style = buildTennesseeStyle(
+          baseStyle,
+        ) as unknown as StyleSpecification;
 
         map = new maplibregl.Map({
           container: containerRef.current,
-          style: OPENFREEMAP_STYLE,
-          center: TN_CENTER,
-          zoom: 6.1,
-          pitch: 55,
-          bearing: -14,
+          style,
+          bounds: TN_BOUNDS,
+          fitBoundsOptions: { padding: 24 },
+          pitch: 0,
+          bearing: 0,
           maxPitch: 80,
           cooperativeGestures: true,
           canvasContextAttributes: { preserveDrawingBuffer: true },
@@ -64,107 +85,6 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
-
-          // Recolor the OpenFreeMap base toward the vintage brand palette.
-          for (const layer of map.getStyle().layers ?? []) {
-            try {
-              if (layer.type === "background") {
-                map.setPaintProperty(layer.id, "background-color", "#f1e9d6");
-              } else if (layer.type === "fill") {
-                if (/water|ocean|river|lake|bay/i.test(layer.id)) {
-                  map.setPaintProperty(layer.id, "fill-color", "#b6c8c0");
-                } else if (
-                  /wood|forest|park|grass|scrub|wetland|landcover|landuse|nature/i.test(
-                    layer.id,
-                  )
-                ) {
-                  map.setPaintProperty(layer.id, "fill-color", "#bcc391");
-                } else {
-                  map.setPaintProperty(layer.id, "fill-color", "#efe6d2");
-                }
-              } else if (layer.type === "line") {
-                if (/water|river|stream/i.test(layer.id)) {
-                  map.setPaintProperty(layer.id, "line-color", "#b6c8c0");
-                } else if (/boundary|admin/i.test(layer.id)) {
-                  map.setPaintProperty(layer.id, "line-color", "#b8ad8e");
-                } else {
-                  map.setPaintProperty(layer.id, "line-color", "#dccfb2");
-                }
-              } else if (
-                layer.type === "symbol" &&
-                layer.layout &&
-                "text-field" in layer.layout
-              ) {
-                map.setPaintProperty(layer.id, "text-color", "#2a3623");
-                map.setPaintProperty(layer.id, "text-halo-color", "#fbf6e9");
-              }
-            } catch {
-              /* layer doesn't support this paint property */
-            }
-          }
-
-          map.addSource("terrain-dem", {
-            type: "raster-dem",
-            tiles: [TERRARIUM_DEM],
-            encoding: "terrarium",
-            tileSize: 256,
-            maxzoom: 13,
-            attribution:
-              'Elevation: <a href="https://github.com/tilezen/joerd">Mapzen / AWS Terrain Tiles</a>',
-          });
-          map.setTerrain({ source: "terrain-dem", exaggeration: 2.6 });
-
-          // Shaded relief so the terrain reads even from above.
-          const firstSymbol = map
-            .getStyle()
-            .layers?.find((l) => l.type === "symbol")?.id;
-          map.addLayer(
-            {
-              id: "hillshade",
-              type: "hillshade",
-              source: "terrain-dem",
-              paint: {
-                "hillshade-exaggeration": 0.9,
-                "hillshade-shadow-color": "#3d3422",
-              },
-            },
-            firstSymbol,
-          );
-
-          // Mask everything outside Tennessee with the page's cream.
-          const geom = TENNESSEE.geometry as Polygon | MultiPolygon;
-          const tnRings: Position[][] =
-            geom.type === "MultiPolygon"
-              ? geom.coordinates.map((poly) => poly[0])
-              : [geom.coordinates[0]];
-          const worldRing: Position[] = [
-            [-180, -85],
-            [180, -85],
-            [180, 85],
-            [-180, 85],
-            [-180, -85],
-          ];
-          const maskData = {
-            type: "Feature",
-            properties: {},
-            geometry: { type: "Polygon", coordinates: [worldRing, ...tnRings] },
-          } as Feature;
-          map.addSource("tn-mask", { type: "geojson", data: maskData });
-          map.addLayer({
-            id: "tn-mask",
-            type: "fill",
-            source: "tn-mask",
-            paint: { "fill-color": "#fbf6e9", "fill-opacity": 1 },
-          });
-
-          // Crisp Tennessee outline on top.
-          map.addSource("tn-outline", { type: "geojson", data: TENNESSEE });
-          map.addLayer({
-            id: "tn-outline",
-            type: "line",
-            source: "tn-outline",
-            paint: { "line-color": "#2a3623", "line-width": 1.5 },
-          });
 
           for (const trail of trails) {
             const el = document.createElement("button");
@@ -234,7 +154,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         ref={containerRef}
         role="application"
         aria-label="Interactive 3D terrain map of Tennessee"
-        className="bg-sage-100/30 border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
+        className="bg-parchment border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
       />
       {!ready ? (
         <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">

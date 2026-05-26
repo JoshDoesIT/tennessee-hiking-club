@@ -1,10 +1,18 @@
-import { describe, it, expect, vi } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import { TENNESSEE_BOUNDS } from "@/lib/maps";
 
 // WebGL can't run in jsdom, so we mock maplibre-gl and assert our wiring.
 // Constructors must be `function` (not arrows) to be usable with `new`.
 const mocks = vi.hoisted(() => {
-  const setTerrain = vi.fn();
   const on = vi.fn((evt: string, cb: () => void) => {
     if (evt === "load") cb();
   });
@@ -12,10 +20,6 @@ const mocks = vi.hoisted(() => {
     return {
       addControl: vi.fn(),
       on,
-      addSource: vi.fn(),
-      addLayer: vi.fn(),
-      getStyle: () => ({ layers: [] }),
-      setTerrain,
       resize: vi.fn(),
       remove: vi.fn(),
     };
@@ -30,7 +34,7 @@ const mocks = vi.hoisted(() => {
   const Popup = vi.fn(function () {
     return { setDOMContent: vi.fn().mockReturnThis() };
   });
-  return { Map, Marker, Popup, setTerrain };
+  return { Map, Marker, Popup };
 });
 
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
@@ -45,6 +49,17 @@ vi.mock("maplibre-gl", () => ({
 }));
 
 import { TerrainMap } from "./terrain-map";
+
+// Minimal OpenFreeMap-shaped style the component fetches before creating the map.
+const baseStyle = {
+  version: 8,
+  sources: {},
+  layers: [
+    { id: "background", type: "background", paint: {} },
+    { id: "water", type: "fill", paint: {} },
+    { id: "label", type: "symbol", layout: { "text-field": "{name}" }, paint: {} },
+  ],
+};
 
 const trails = [
   {
@@ -61,16 +76,54 @@ const trails = [
   },
 ];
 
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({
+      ok: true,
+      json: async () => structuredClone(baseStyle),
+    })),
+  );
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+const mapOptions = () => (mocks.Map as unknown as Mock).mock.calls[0][0];
+
 describe("TerrainMap", () => {
   it("renders a labeled, accessible map region", () => {
     render(<TerrainMap trails={trails} />);
     expect(screen.getByLabelText(/3D terrain map/i)).toBeInTheDocument();
   });
 
-  it("initializes the map with 3D terrain and one marker per trail", async () => {
+  it("opens framed to the whole state, level and north-up", async () => {
     render(<TerrainMap trails={trails} />);
     await waitFor(() => expect(mocks.Map).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(mocks.setTerrain).toHaveBeenCalled());
-    expect(mocks.Marker).toHaveBeenCalledTimes(trails.length);
+    const opts = mapOptions();
+    expect(opts.pitch).toBe(0);
+    expect(opts.bearing).toBe(0);
+    expect(opts.bounds).toEqual([
+      [TENNESSEE_BOUNDS.lngMin, TENNESSEE_BOUNDS.latMin],
+      [TENNESSEE_BOUNDS.lngMax, TENNESSEE_BOUNDS.latMax],
+    ]);
+  });
+
+  it("creates the map with a pre-branded, terrain-enabled style (no flash)", async () => {
+    render(<TerrainMap trails={trails} />);
+    await waitFor(() => expect(mocks.Map).toHaveBeenCalledTimes(1));
+    const style = mapOptions().style;
+    expect(style.terrain).toBeTruthy();
+    const ids = style.layers.map((l: { id: string }) => l.id);
+    expect(ids).toEqual(expect.arrayContaining(["hillshade", "tn-mask", "tn-outline"]));
+  });
+
+  it("adds one marker per trail", async () => {
+    render(<TerrainMap trails={trails} />);
+    await waitFor(() =>
+      expect(mocks.Marker).toHaveBeenCalledTimes(trails.length),
+    );
   });
 });
