@@ -6,6 +6,7 @@ import { getAllProducts, getProductBySlug } from "@/lib/shop";
 import { formatPrice } from "@/lib/shop/price";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 type Params = { params: Promise<{ product: string }> };
 
@@ -55,36 +56,77 @@ export default async function ProductPage({ params }: Params) {
             {product.body || product.description}
           </p>
 
-          {product.sizes.length > 0 ? (
-            <Variants label="Size" options={product.sizes} />
-          ) : null}
-          {product.colors.length > 0 ? (
-            <Variants label="Color" options={product.colors} />
-          ) : null}
+          <form action="/api/checkout" method="post">
+            <input type="hidden" name="slug" value={product.slug} />
+            {product.sizes.length > 0 ? (
+              <VariantSelect label="Size" name="size" options={product.sizes} />
+            ) : null}
+            {product.colors.length > 0 ? (
+              <VariantSelect
+                label="Color"
+                name="color"
+                options={product.colors}
+              />
+            ) : null}
 
-          <p className="text-ink/70 mt-8 text-sm">
-            Checkout is coming soon, with hosted, secure payment via Stripe.
-          </p>
+            <div className="mt-5 flex items-end gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="quantity"
+                  className="text-forest text-sm font-medium"
+                >
+                  Quantity
+                </label>
+                <input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min={1}
+                  max={10}
+                  defaultValue={1}
+                  inputMode="numeric"
+                  className="border-forest/20 bg-cream text-ink w-20 rounded-lg border px-3 py-2 text-sm"
+                />
+              </div>
+              <Button type="submit" variant="accent" size="lg">
+                Buy now
+              </Button>
+            </div>
+            <p className="text-ink/70 mt-3 text-sm">
+              Secure, hosted checkout via Stripe. No charge until you confirm.
+            </p>
+          </form>
         </div>
       </div>
     </Container>
   );
 }
 
-function Variants({ label, options }: { label: string; options: string[] }) {
+function VariantSelect({
+  label,
+  name,
+  options,
+}: {
+  label: string;
+  name: string;
+  options: string[];
+}) {
   return (
-    <fieldset className="mt-6">
-      <legend className="text-forest text-sm font-medium">{label}</legend>
-      <div className="mt-2 flex flex-wrap gap-2">
+    <div className="mt-5 flex flex-col gap-1.5">
+      <label htmlFor={name} className="text-forest text-sm font-medium">
+        {label}
+      </label>
+      <select
+        id={name}
+        name={name}
+        className="border-forest/20 bg-cream text-ink max-w-xs rounded-lg border px-3 py-2 text-sm"
+      >
         {options.map((o) => (
-          <span
-            key={o}
-            className="border-forest/20 text-ink/80 rounded-full border px-3 py-1 text-sm"
-          >
+          <option key={o} value={o}>
             {o}
-          </span>
+          </option>
         ))}
-      </div>
-    </fieldset>
+      </select>
+    </div>
   );
 }
