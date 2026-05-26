@@ -93,6 +93,19 @@ Tracked in [GitHub Milestones & Issues](https://github.com/JoshDoesIT/tennessee-
 5. **M5–M6** Polish & **v1 launch**
 6. **M7–M9** Merch store & growth
 
+## Contributors
+
+A community project, built in the open. Thanks to everyone who adds trails,
+fixes details, and helps make the map more complete.
+
+- [@JoshDoesIT](https://github.com/JoshDoesIT) (maintainer)
+
+The best first contribution is a trail. Browse the
+[trail wishlist](https://github.com/JoshDoesIT/tennessee-hiking-club/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22+label%3Atrail)
+(issues labeled `good first issue` and `trail`), or open a
+[New trail issue](https://github.com/JoshDoesIT/tennessee-hiking-club/issues/new?template=new_trail.yml).
+Open a pull request and we will add you here.
+
 ## License
 
 [MIT](LICENSE) © Joshua Jones and Tennessee Hiking Club contributors.
