@@ -9,6 +9,7 @@ import { TrailContextMap } from "@/components/map/trail-context-map";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { MarkHiked } from "@/components/hikes/mark-hiked";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -48,6 +49,10 @@ export default async function TrailPage({ params }: Params) {
       <p className="text-ink/75 mt-3 text-lg leading-relaxed">
         {trail.summary}
       </p>
+
+      <div className="mt-6">
+        <MarkHiked slug={trail.slug} />
+      </div>
 
       <TrailGallery photos={trail.photos} />
 

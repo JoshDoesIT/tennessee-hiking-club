@@ -1,0 +1,27 @@
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MarkHiked } from "./mark-hiked";
+import { isHiked } from "@/lib/hikes/local-log";
+
+beforeEach(() => localStorage.clear());
+
+describe("MarkHiked", () => {
+  it("toggles hiked state and persists it locally", async () => {
+    const user = userEvent.setup();
+    render(<MarkHiked slug="radnor-lake" />);
+
+    const button = await screen.findByRole("button", {
+      name: /mark as hiked/i,
+    });
+    expect(isHiked("radnor-lake")).toBe(false);
+
+    await user.click(button);
+    expect(isHiked("radnor-lake")).toBe(true);
+    const pressed = screen.getByRole("button", { name: /hiked/i });
+    expect(pressed).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(pressed);
+    expect(isHiked("radnor-lake")).toBe(false);
+  });
+});
