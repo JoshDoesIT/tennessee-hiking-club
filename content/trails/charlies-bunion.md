@@ -14,9 +14,9 @@ dogFriendly: false
 feeRequired: true
 tags: [views, ridgeline, appalachian-trail]
 photos:
-  - src: /trails/placeholder.png
-    alt: Rocky outcrop on a high Smoky Mountains ridge
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/charlies-bunion.jpg
+    alt: Layered Smoky Mountain ridges seen from Charlies Bunion
+    credit: Photo by Jason Hollinger, CC BY 2.0, via Wikimedia Commons
 summary: A rugged Appalachian Trail ridge walk from Newfound Gap to a dramatic rocky outcrop with wide-open Smokies views.
 ---
 

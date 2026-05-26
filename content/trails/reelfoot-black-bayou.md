@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [lake, birding, boardwalk, accessible]
 photos:
-  - src: /trails/placeholder.png
-    alt: A boardwalk winding through bald cypress over still water
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/reelfoot-black-bayou.jpg
+    alt: A boardwalk along the cypress-lined shore of Reelfoot Lake
+    credit: Photo by Thomas R. Machnitzki, CC BY 3.0, via Wikimedia Commons
 summary: A flat boardwalk loop over a cypress-studded bayou, prime territory for bald eagles in winter and herons year-round.
 ---
 

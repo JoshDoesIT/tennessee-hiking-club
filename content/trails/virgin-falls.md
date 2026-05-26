@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [waterfall, backcountry, cave]
 photos:
-  - src: /trails/placeholder.png
-    alt: A tall waterfall spilling over a mossy cliff into a gorge
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/virgin-falls.jpg
+    alt: Virgin Falls cascading over a mossy cliff into the gorge
+    credit: Photo by Joshua Ness, CC0, via Wikimedia Commons
 summary: A strenuous Cumberland Plateau trek to a 110-foot waterfall that pours from a cave mouth and vanishes back into the ground.
 ---
 

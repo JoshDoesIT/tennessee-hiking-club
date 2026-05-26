@@ -14,9 +14,9 @@ dogFriendly: true
 feeRequired: false
 tags: [tower, views, pond]
 photos:
-  - src: /trails/placeholder.png
-    alt: A wooden observation tower above a forested bottomland
-    credit: Placeholder, real photo wanted (#32)
+  - src: /trails/big-hill-pond-tower.jpg
+    alt: A boardwalk winding through bottomland forest at Big Hill Pond State Park
+    credit: Photo by Bill Automata, CC BY 2.0, via Wikimedia Commons
 summary: A rolling forest hike to a 70-foot observation tower overlooking the Tuscumbia bottomlands and Travis McNatt Lake.
 ---
 
