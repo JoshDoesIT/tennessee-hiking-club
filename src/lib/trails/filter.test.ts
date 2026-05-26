@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { filterTrails, parseTrailFilters } from "./filter";
+import { filterTrails, parseTrailFilters, featuredTrails } from "./filter";
 import type { Trail } from "./schema";
 
 const make = (over: Partial<Trail>): Trail => ({
@@ -83,5 +83,19 @@ describe("parseTrailFilters", () => {
 
   it("takes the first value when a param repeats", () => {
     expect(parseTrailFilters({ region: ["East", "West"] }).region).toBe("East");
+  });
+});
+
+describe("featuredTrails", () => {
+  it("returns one trail per region in East, Middle, West order", () => {
+    const featured = featuredTrails(trails);
+    expect(featured.map((t) => t.region)).toEqual(["East", "Middle", "West"]);
+    // The first trail found for each region.
+    expect(featured.map((t) => t.slug)).toEqual(["a", "b", "c"]);
+  });
+
+  it("skips regions that have no trails", () => {
+    const eastOnly = trails.filter((t) => t.region === "East");
+    expect(featuredTrails(eastOnly).map((t) => t.region)).toEqual(["East"]);
   });
 });

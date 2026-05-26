@@ -33,6 +33,13 @@ export function filterTrails(trails: Trail[], filters: TrailFilters): Trail[] {
   });
 }
 
+/** One representative trail per region (East, Middle, West), for the home page. */
+export function featuredTrails(trails: Trail[]): Trail[] {
+  return REGIONS.map((region) =>
+    trails.find((trail) => trail.region === region),
+  ).filter((trail): trail is Trail => trail !== undefined);
+}
+
 type RawParam = string | string[] | undefined;
 
 /** Validate raw URL search params into typed filters, dropping bad values. */

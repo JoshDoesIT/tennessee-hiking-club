@@ -6,10 +6,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { TrailCard } from "@/components/trails/trail-card";
+import { getAllTrails } from "@/lib/trails";
+import { featuredTrails } from "@/lib/trails/filter";
 
 const REPO = "https://github.com/JoshDoesIT/tennessee-hiking-club";
 
 export default function Home() {
+  const featured = featuredTrails(getAllTrails());
   return (
     <>
       {/* ----------------------------- HERO ----------------------------- */}
@@ -189,6 +193,33 @@ export default function Home() {
               and full of birdsong.
             </RegionCard>
           </div>
+        </Container>
+      </section>
+
+      {/* ----------------------- FEATURED TRAILS ------------------------ */}
+      <section>
+        <Container className="py-20 sm:py-24">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl">
+              <p className="eyebrow text-amber-600">Featured trails</p>
+              <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
+                Start with a few favorites
+              </h2>
+            </div>
+            <Link
+              href="/trails"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              Browse all trails
+            </Link>
+          </div>
+          <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((trail) => (
+              <li key={trail.slug}>
+                <TrailCard trail={trail} />
+              </li>
+            ))}
+          </ul>
         </Container>
       </section>
 
