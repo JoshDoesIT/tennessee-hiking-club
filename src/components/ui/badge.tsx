@@ -7,7 +7,7 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        soft: "bg-amber/20 text-amber-600",
+        soft: "bg-amber/20 text-amber-700",
         forest: "bg-forest text-cream",
         outline: "border border-forest/20 text-forest",
       },

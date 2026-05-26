@@ -98,7 +98,7 @@ export function TrailContextMap({
         className="bg-parchment border-forest/15 h-72 w-full overflow-hidden rounded-2xl border"
       />
       {failed ? (
-        <div className="text-olive pointer-events-none absolute inset-0 grid place-items-center text-sm">
+        <div className="text-pine pointer-events-none absolute inset-0 grid place-items-center text-sm">
           Map unavailable. Use Open in Google Maps below.
         </div>
       ) : null}

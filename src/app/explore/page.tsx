@@ -21,7 +21,7 @@ export default function ExplorePage() {
 
   return (
     <Container className="py-12 sm:py-16">
-      <p className="eyebrow text-amber-600">Interactive map</p>
+      <p className="eyebrow text-amber-700">Interactive map</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Explore Tennessee
       </h1>
@@ -51,7 +51,7 @@ export default function ExplorePage() {
               >
                 {trail.name}
               </Link>
-              <span className="text-ink/50 shrink-0 text-sm">
+              <span className="text-ink/70 shrink-0 text-sm">
                 {trail.region} TN
               </span>
             </li>

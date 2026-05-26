@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <article className="mx-auto max-w-2xl px-5 py-20 sm:py-28">
-      <p className="eyebrow text-amber-600">About the club</p>
+      <p className="eyebrow text-amber-700">About the club</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         For everyone who loves Tennessee on foot
       </h1>

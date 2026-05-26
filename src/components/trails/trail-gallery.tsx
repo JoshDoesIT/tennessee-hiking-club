@@ -24,7 +24,7 @@ export function TrailGallery({ photos }: { photos: Trail["photos"] }) {
             priority={i === 0}
           />
           {photo.credit ? (
-            <figcaption className="text-ink/50 mt-1 text-xs">
+            <figcaption className="text-ink/70 mt-1 text-xs">
               {photo.credit}
             </figcaption>
           ) : null}

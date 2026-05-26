@@ -39,7 +39,7 @@ export default async function TrailsPage({
 
   return (
     <Container className="py-12 sm:py-16">
-      <p className="eyebrow text-amber-600">Trail directory</p>
+      <p className="eyebrow text-amber-700">Trail directory</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Every trail, in one place
       </h1>
@@ -96,7 +96,7 @@ export default async function TrailsPage({
       </form>
 
       <section aria-label="Trail results" className="mt-8">
-        <p className="text-ink/60 text-sm">
+        <p className="text-ink/70 text-sm">
           {isFiltered
             ? `Showing ${trails.length} of ${allTrails.length} trails`
             : `${allTrails.length} trails`}
@@ -107,7 +107,7 @@ export default async function TrailsPage({
             <p className="text-forest font-medium">
               No trails match those filters.
             </p>
-            <p className="text-ink/60 mt-1 text-sm">
+            <p className="text-ink/70 mt-1 text-sm">
               Try widening your search.
             </p>
             <Link

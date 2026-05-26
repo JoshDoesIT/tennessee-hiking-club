@@ -15,7 +15,8 @@
   --color-cream-50: #fefcf5;
   --color-parchment: #f1e9d6;
   --color-amber: #e0a24c; /* trail-sun accent / CTAs */
-  --color-amber-600: #c8852f;
+  --color-amber-600: #c8852f; /* amber on dark / hover fills */
+  --color-amber-700: #8a5a1c; /* AA-safe amber for text on light (>=4.5:1) */
   --color-ink: #1e2419; /* body text */
 
   --color-background: var(--color-cream);
@@ -52,6 +53,10 @@
   }
 }
 
+html {
+  color-scheme: light;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-cream);
@@ -66,6 +71,7 @@ body {
   font-variation-settings: "SOFT" 40;
   letter-spacing: -0.015em;
   line-height: 1.02;
+  text-wrap: balance;
 }
 
 /* Tracked, uppercase "trail-sign" label */

@@ -40,7 +40,7 @@ export default async function TrailPage({ params }: Params) {
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Badge variant="forest">{trail.region} Tennessee</Badge>
-        <span className="text-ink/60 text-sm">{trail.area}</span>
+        <span className="text-ink/70 text-sm">{trail.area}</span>
       </div>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         {trail.name}

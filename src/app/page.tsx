@@ -31,7 +31,7 @@ export default function Home() {
             className="animate-rise drop-shadow-md"
           />
           <p
-            className="eyebrow animate-rise mt-7 text-amber-600"
+            className="eyebrow animate-rise mt-7 text-amber-700"
             style={{ animationDelay: "80ms" }}
           >
             Est. 2026 · The Volunteer State
@@ -117,7 +117,7 @@ export default function Home() {
       <section>
         <Container className="py-20 sm:py-24">
           <div className="max-w-2xl">
-            <p className="eyebrow text-amber-600">What you can do</p>
+            <p className="eyebrow text-amber-700">What you can do</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               Everything you need to find your next trail
             </h2>
@@ -174,7 +174,7 @@ export default function Home() {
       <section className="bg-parchment/60 border-forest/10 border-y">
         <Container className="py-20 sm:py-24">
           <div className="max-w-2xl">
-            <p className="eyebrow text-amber-600">Three Tennessees</p>
+            <p className="eyebrow text-amber-700">Three Tennessees</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               One state, three very different hikes
             </h2>
@@ -201,7 +201,7 @@ export default function Home() {
         <Container className="py-20 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="eyebrow text-amber-600">Featured trails</p>
+              <p className="eyebrow text-amber-700">Featured trails</p>
               <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
                 Start with a few favorites
               </h2>
