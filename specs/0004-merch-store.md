@@ -1,4 +1,4 @@
-# 0004 — Merch store (Stripe + print-on-demand)
+# 0004: Merch store (Stripe + print-on-demand)
 
 - **Status:** Draft
 - **Milestone:** M7 (checkout) → M8 (fulfillment)
@@ -6,7 +6,7 @@
 
 ## Problem
 
-A small merch shop (tees, stickers, hats) to help fund hosting and the domain —
+A small merch shop (tees, stickers, hats) to help fund hosting and the domain,
 with **no inventory, no monthly fees**, fully within the free tier.
 
 ## User stories
@@ -15,7 +15,7 @@ with **no inventory, no monthly fees**, fully within the free tier.
 - As a maintainer, I want orders printed and shipped automatically, holding no
   stock and paying no monthly fee.
 
-## Acceptance criteria (M7 — catalog & checkout)
+## Acceptance criteria (M7: catalog & checkout)
 
 - [ ] `/shop` lists products (title, image, price) from a typed, validated
       product catalog (Zod, mirroring spec 0001's pattern).
@@ -23,10 +23,10 @@ with **no inventory, no monthly fees**, fully within the free tier.
 - [ ] "Buy" creates a **Stripe Checkout** session via a route handler
       (`/api/checkout`) and redirects to Stripe; success/cancel routes exist.
 - [ ] Secret keys come from environment variables only (never committed); Stripe
-      is mocked in tests (MSW) — no live calls in CI.
+      is mocked in tests (MSW); no live calls in CI.
 - [ ] Prices/inventory are server-validated (no client-trusted amounts).
 
-## Acceptance criteria (M8 — fulfillment)
+## Acceptance criteria (M8: fulfillment)
 
 - [ ] On `checkout.session.completed`, a verified Stripe webhook
       (`/api/webhooks/stripe`) submits the order to Printful/Printify.

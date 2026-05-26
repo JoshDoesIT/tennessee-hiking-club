@@ -40,7 +40,7 @@ export function ComingSoon({
         </Link>
       </div>
       <p className="text-olive mt-8 text-sm">
-        On the roadmap — <span className="font-semibold">{milestone}</span>
+        On the roadmap: <span className="font-semibold">{milestone}</span>
       </p>
     </section>
   );

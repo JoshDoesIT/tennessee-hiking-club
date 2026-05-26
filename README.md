@@ -4,7 +4,7 @@
 
 # Tennessee Hiking Club
 
-**Discover the Volunteer State's best trails on an interactive map — photos, coordinates, and one-tap directions to the trailhead.**
+**Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead.**
 
 [![CI](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml)
@@ -14,19 +14,19 @@
 
 ---
 
-A free, open-source, community project mapping Tennessee's trails — from the high
+A free, open-source, community project mapping Tennessee's trails, from the high
 balds of the Smokies to the waterfalls of the Cumberland Plateau and the quiet
 bottomlands of West Tennessee. Built with Next.js and hosted on Vercel's free
 tier.
 
 ## Features
 
-- 🗺️ **Stylized, interactive Tennessee map** with a pin for every trail
-- 🥾 **Trail directory** — filter by region, difficulty, and length
-- 📸 **Rich trail pages** — photos, stats, coordinates, and a context map
-- 🧭 **One-tap directions** straight to Google Maps
-- 🛍️ **Merch shop** (coming soon) — print-on-demand, to help fund the project
-- ♿ Accessible, responsive, and fast
+- **Stylized, interactive Tennessee map** with a pin for every trail
+- **Trail directory**: filter by region, difficulty, and length
+- **Rich trail pages**: photos, stats, coordinates, and a context map
+- **One-tap directions** straight to Google Maps
+- **Merch shop** (coming soon): print-on-demand, to help fund the project
+- Accessible, responsive, and fast
 
 ## Tech stack
 
@@ -66,7 +66,7 @@ pnpm format       # prettier --write
 src/app/            # routes (App Router)
 src/components/      # shared UI (header, footer, logo, ridgeline…)
 src/lib/            # utilities (maps, trails loader, geo)
-content/trails/     # trail data — Markdown + front-matter (add yours here!)
+content/trails/     # trail data: Markdown + front-matter (add yours here!)
 specs/              # feature specifications (spec-driven development)
 docs/brand/         # brand guidelines + logo source
 e2e/                # Playwright tests
@@ -74,7 +74,7 @@ e2e/                # Playwright tests
 
 ## Contributing
 
-We'd love your help — especially **adding trails**. See
+We'd love your help, especially **adding trails**. See
 [CONTRIBUTING.md](CONTRIBUTING.md) and our
 [Code of Conduct](CODE_OF_CONDUCT.md). This project uses **spec-driven** and
 **test-driven** development; specs live in [`specs/`](specs/).

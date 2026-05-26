@@ -1,4 +1,4 @@
-# 0002 — Interactive Tennessee map
+# 0002: Interactive Tennessee map
 
 - **Status:** Approved
 - **Milestone:** M3

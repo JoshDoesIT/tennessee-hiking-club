@@ -25,8 +25,8 @@ export default function AboutPage() {
         <p>
           We&rsquo;re building an interactive, stylized map of Tennessee where
           every trail has photos, coordinates, and one-tap directions to the
-          trailhead — from the high balds of the Smokies to the waterfalls of
-          the Cumberland Plateau and the quiet bottomlands of West Tennessee.
+          trailhead, from the high balds of the Smokies to the waterfalls of the
+          Cumberland Plateau and the quiet bottomlands of West Tennessee.
         </p>
         <p>
           The whole project is{" "}
@@ -39,8 +39,8 @@ export default function AboutPage() {
             open source
           </Link>
           . Anyone can suggest a trail, fix a detail, or help build a feature. A
-          small merch shop is on the way to help cover hosting and domain costs
-          — everything else runs on community effort.
+          small merch shop is on the way to help cover hosting and domain costs;
+          everything else runs on community effort.
         </p>
         <p className="text-forest font-medium">
           We hike responsibly and practice Leave No Trace. Pack it in, pack it

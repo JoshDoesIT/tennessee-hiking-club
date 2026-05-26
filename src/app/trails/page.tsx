@@ -14,7 +14,7 @@ export default function TrailsPage() {
       title="Every trail, in one place"
       milestone="M4 · Trail Directory & Detail Pages"
     >
-      A searchable directory of Tennessee trails — filter by region, difficulty,
+      A searchable directory of Tennessee trails: filter by region, difficulty,
       and length, then open a trail for photos, stats, and one-tap directions.
     </ComingSoon>
   );

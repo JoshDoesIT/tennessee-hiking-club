@@ -16,8 +16,8 @@ tags: [views, summit, old-growth]
 photos:
   - src: /trails/placeholder.png
     alt: Layered Smoky Mountain ridgelines at golden hour
-    credit: Placeholder — real photo wanted (#32)
+    credit: Placeholder, real photo wanted (#32)
 summary: The classic strenuous climb past Arch Rock and Alum Cave Bluffs to the 6,593-ft summit of Mount LeConte.
 ---
 
-One of the most beloved hikes in the Smokies. The Alum Cave Trail climbs steadily past Arch Rock and the Alum Cave Bluffs, then traces a string of cliffside overlooks before topping out near LeConte Lodge. Expect steel cables on the exposed sections, crowds in summer and fall, and weather that turns fast near the summit — pack layers and start early. A parking tag is required park-wide.
+One of the most beloved hikes in the Smokies. The Alum Cave Trail climbs steadily past Arch Rock and the Alum Cave Bluffs, then traces a string of cliffside overlooks before topping out near LeConte Lodge. Expect steel cables on the exposed sections, crowds in summer and fall, and weather that turns fast near the summit; pack layers and start early. A parking tag is required park-wide.

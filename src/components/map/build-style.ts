@@ -106,7 +106,7 @@ function tennesseeMask(): Feature {
  * cream wash that dims everything outside the state.
  *
  * Returns a brand-new style (the input is never mutated) so the map can be
- * created with it directly — the first frame already shows our palette,
+ * created with it directly; the first frame already shows our palette,
  * terrain, and mask, with no flash of the default OpenFreeMap colors.
  */
 export function buildTennesseeStyle(base: MapStyle): MapStyle {

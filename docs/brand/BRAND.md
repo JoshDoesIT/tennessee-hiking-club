@@ -1,4 +1,4 @@
-# Tennessee Hiking Club — Brand Guidelines
+# Tennessee Hiking Club: Brand Guidelines
 
 Our brand is **vintage heritage outdoors**: the look of a hand-screened
 national-park poster or an enamel trail badge. Warm paper, deep forest green,
@@ -13,7 +13,7 @@ The mark is a circular **badge** containing:
 
 - **TNHC** monogram (the club initials) set in a bold serif.
 - A layered **mountain range** with an evergreen forest foreground.
-- A warm **setting sun** rising over the ridgeline — our accent color.
+- A warm **setting sun** rising over the ridgeline, our accent color.
 - **TENNESSEE HIKING CLUB** curved along the bottom of the ring.
 
 ### Files
@@ -27,7 +27,7 @@ The mark is a circular **badge** containing:
 | `src/app/opengraph-image.png` / `twitter-image.png` | 1200×630 social share card (auto-used for OG/Twitter).                       |
 | `docs/brand/assets/logo-mono-forest.png`            | Monochrome (forest) treatment for light backgrounds.                         |
 | `docs/brand/assets/logo-mono-cream.png`             | Monochrome (cream) treatment for dark backgrounds.                           |
-| `docs/brand/assets/logo-original.png`               | Original master artwork. Source of truth — do not edit in place.             |
+| `docs/brand/assets/logo-original.png`               | Original master artwork. Source of truth; do not edit in place.              |
 
 The `Logo` React component (`src/components/logo.tsx`) renders the badge with an
 optional wordmark and a `tone="light" | "dark"` for placement on dark or light
@@ -37,7 +37,7 @@ backgrounds.
 
 - **Clear space:** keep at least 25% of the badge diameter clear on all sides.
 - **Minimum size:** 28 px (favicon) / 32 px (in-product). Below this the curved
-  text becomes illegible — use the badge without the wordmark.
+  text becomes illegible; use the badge without the wordmark.
 - **Backgrounds:** the badge is transparent and reads well on `cream`, `forest`,
   and photography. On busy photos, place it on a solid or lightly scrimmed area.
 - **Don't:** recolor it, stretch/skew it, rotate it, add drop shadows beyond the
@@ -73,10 +73,10 @@ code.
 
 ### Contrast & accessibility (WCAG)
 
-- `ink`/`forest` on `cream` → ~11:1. ✅ Passes AA & AAA for body text.
-- `cream`/`sage-100` on `forest` → high contrast. ✅ Use for footer/dark sections.
-- `amber` on `forest` → ~5:1. ✅ AA for normal text; used for CTA fills.
-- **`amber` is an accent, not a text color on light** — it fails contrast as text
+- `ink`/`forest` on `cream` → ~11:1. Passes AA & AAA for body text.
+- `cream`/`sage-100` on `forest` → high contrast. Use for footer/dark sections.
+- `amber` on `forest` → ~5:1. AA for normal text; used for CTA fills.
+- **`amber` is an accent, not a text color on light**: it fails contrast as text
   on `cream`. Use it as a fill (with `forest` text) or a small highlight only.
 
 ---
@@ -93,9 +93,9 @@ A characterful display serif paired with a warm, modern sans. Loaded via
 
 Helper classes in `globals.css`:
 
-- `.display` — applies Fraunces, optical sizing, `SOFT 40`, tight tracking. Put
+- `.display`: applies Fraunces, optical sizing, `SOFT 40`, tight tracking. Put
   it on every display heading.
-- `.eyebrow` — uppercase, `0.24em` tracking, 600 weight — the "trail-sign" label
+- `.eyebrow`: uppercase, `0.24em` tracking, 600 weight, the "trail-sign" label
   above section titles. Pair with `text-amber-600`.
 
 **Type scale (Tailwind):** hero `text-5xl`→`text-7xl`; section titles
@@ -103,25 +103,25 @@ Helper classes in `globals.css`:
 `text-lg`; eyebrow `text-xs`.
 
 Never substitute generic system fonts (Inter, Arial, Roboto) for the display
-face — the Fraunces character is core to the brand.
+face; the Fraunces character is core to the brand.
 
 ---
 
 ## 4. Voice & tone
 
-Warm, knowledgeable, and welcoming — a friend who knows the trails, not a
+Warm, knowledgeable, and welcoming, a friend who knows the trails, not a
 guidebook. Adventurous but never reckless; we always champion **Leave No Trace**.
 
 - **Do:** "Discover the Volunteer State's best trails." "Pack it in, pack it out."
 - **Don't:** hype ("EPIC!!!"), gatekeeping, or jargon. No exclamation spam.
-- Use "the Volunteer State" and "Grand Divisions" naturally — it's local pride.
+- Use "the Volunteer State" and "Grand Divisions" naturally; it's local pride.
 
 ---
 
 ## 5. Imagery
 
 - Real Tennessee landscape photography: golden-hour ridgelines, waterfalls,
-  forest trails. Earthy, natural color — avoid heavy saturation or cool filters.
+  forest trails. Earthy, natural color; avoid heavy saturation or cool filters.
 - Decorative **layered ridgelines** (see `src/components/ridgeline.tsx`) are a
   recurring motif; reuse them rather than inventing new illustration styles.
 - Trail photos should be horizontal, ≥1200px wide, and compressed (see
@@ -132,7 +132,7 @@ guidebook. Adventurous but never reckless; we always champion **Leave No Trace**
 ## 6. UI components
 
 Reusable primitives live in `src/components/ui` (`Button`/`buttonVariants`,
-`Badge`/`badgeVariants`, `Card`, `Container`) — cva-based, brand-themed, and
+`Badge`/`badgeVariants`, `Card`, `Container`), cva-based, brand-themed, and
 shadcn-compatible. Prefer these over ad-hoc utility strings.
 
 - **Primary button:** `bg-forest text-cream`, fully rounded (`rounded-full`),
@@ -150,8 +150,8 @@ shadcn-compatible. Prefer these over ad-hoc utility strings.
 
 Restrained and earthy. One orchestrated entrance beats scattered effects.
 
-- `animate-rise` — staggered fade-up for hero elements (use `animationDelay`).
-- `animate-sun` — slow glow/pulse on the setting sun.
+- `animate-rise`: staggered fade-up for hero elements (use `animationDelay`).
+- `animate-sun`: slow glow/pulse on the setting sun.
 - All motion respects `prefers-reduced-motion` (handled globally). Keep
   transitions ≤ 200ms for interactive states.
 

@@ -1,6 +1,6 @@
 /**
  * Decorative layered ridgeline + setting sun that echoes the badge logo.
- * Purely ornamental — hidden from assistive tech.
+ * Purely ornamental; hidden from assistive tech.
  */
 export function Ridgeline({ className = "" }: { className?: string }) {
   return (

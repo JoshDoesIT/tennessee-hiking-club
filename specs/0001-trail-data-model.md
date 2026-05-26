@@ -1,4 +1,4 @@
-# 0001 — Trail data model & content pipeline
+# 0001: Trail data model & content pipeline
 
 - **Status:** Approved
 - **Milestone:** M2
@@ -8,7 +8,7 @@
 
 Trails are the core content of the site. We need a typed, validated, version-
 controlled data model that (a) renders the map and trail pages, (b) lets anyone
-contribute a trail via a reviewed pull request, and (c) cannot silently drift —
+contribute a trail via a reviewed pull request, and (c) cannot silently drift:
 bad data should fail the build, not ship.
 
 ## User stories
@@ -61,7 +61,7 @@ bad data should fail the build, not ship.
 ## Non-goals
 
 - User-submitted reviews/ratings, GPX track rendering, live trail conditions.
-- A database — content stays as files in the repo for this phase.
+- A database: content stays as files in the repo for this phase.
 
 ## Technical approach
 

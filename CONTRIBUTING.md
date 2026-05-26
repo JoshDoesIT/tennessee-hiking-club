@@ -6,11 +6,11 @@ you agree to our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Ways to contribute
 
-- **Add a trail** — the most valuable contribution. See [below](#adding-a-trail).
+- **Add a trail**: the most valuable contribution. See [below](#adding-a-trail).
 - **Report a bug** or **request a feature** via the
   [issue templates](https://github.com/JoshDoesIT/tennessee-hiking-club/issues/new/choose).
 - **Improve docs**, fix typos, or refine the design.
-- **Pick up an issue** — look for `good first issue`.
+- **Pick up an issue**: look for `good first issue`.
 
 ## Development setup
 
@@ -88,18 +88,18 @@ Guidelines:
 - **Photos:** horizontal, ≥ 1200px wide, compressed, in `public/trails/<slug>/`.
   Only submit photos you have the right to use, and include a `credit`.
 - Be honest about difficulty and hazards. Encourage Leave No Trace.
-- Run `pnpm validate:content` before opening a PR — it checks every trail file
+- Run `pnpm validate:content` before opening a PR; it checks every trail file
   against the schema. CI and `pnpm build` run it too, so invalid data can't ship.
 
 ## Code style
 
 - TypeScript strict; prefer pure, testable functions in `src/lib`.
-- Tailwind utility classes; use brand tokens (`bg-forest`, `text-amber`, …) — see
+- Tailwind utility classes; use brand tokens (`bg-forest`, `text-amber`, …); see
   [`docs/brand/BRAND.md`](docs/brand/BRAND.md). Run `pnpm format` before pushing.
 - Accessibility is not optional: semantic HTML, labels, keyboard support,
   sufficient contrast.
 
 ## Reporting security issues
 
-Please **do not** open a public issue for vulnerabilities — see
+Please **do not** open a public issue for vulnerabilities; see
 [SECURITY.md](SECURITY.md).
