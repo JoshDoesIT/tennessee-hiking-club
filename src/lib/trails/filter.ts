@@ -14,10 +14,12 @@ export type TrailFilters = {
   region?: Region;
   difficulty?: Difficulty;
   length?: LengthBucket;
+  query?: string;
 };
 
 /** Trails matching every provided filter (an absent filter is unconstrained). */
 export function filterTrails(trails: Trail[], filters: TrailFilters): Trail[] {
+  const query = filters.query?.trim().toLowerCase();
   return trails.filter((trail) => {
     if (filters.region && trail.region !== filters.region) return false;
     if (filters.difficulty && trail.difficulty !== filters.difficulty) {
@@ -29,6 +31,7 @@ export function filterTrails(trails: Trail[], filters: TrailFilters): Trail[] {
     ) {
       return false;
     }
+    if (query && !trail.name.toLowerCase().includes(query)) return false;
     return true;
   });
 }
@@ -50,8 +53,10 @@ export function parseTrailFilters(
   const region = first(params.region);
   const difficulty = first(params.difficulty);
   const length = first(params.length);
+  const query = first(params.q)?.trim();
 
   const filters: TrailFilters = {};
+  if (query) filters.query = query;
   if (region && (REGIONS as readonly string[]).includes(region)) {
     filters.region = region as Region;
   }

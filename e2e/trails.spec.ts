@@ -32,6 +32,31 @@ test("a shareable filter URL renders narrowed results on the server", async ({
   expect(await results(page).count()).toBeGreaterThan(0);
 });
 
+test("searching by name narrows the directory and is shareable", async ({
+  page,
+}) => {
+  await page.goto("/trails");
+  const total = await results(page).count();
+
+  await page.getByLabel("Search by name").fill("falls");
+  await page.getByRole("button", { name: /apply filters/i }).click();
+
+  await expect(page).toHaveURL(/q=falls/);
+  const filtered = await results(page).count();
+  expect(filtered).toBeGreaterThan(0);
+  expect(filtered).toBeLessThan(total);
+});
+
+test("a shareable search URL renders matching trails on the server", async ({
+  page,
+}) => {
+  await page.goto("/trails?q=virgin");
+  await expect(
+    page.getByRole("link", { name: /virgin falls/i }),
+  ).toBeVisible();
+  expect(await results(page).count()).toBe(1);
+});
+
 test("shows an empty state when no trails match", async ({ page }) => {
   // West has no "hard" trails, so this combination is always empty.
   await page.goto("/trails?region=West&difficulty=hard");
