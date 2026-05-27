@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Container } from "@/components/ui/container";
+import { FACEBOOK_GROUP_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Credits",
@@ -42,6 +43,11 @@ export default function CreditsPage() {
           permission, or sourced under open licenses such as Creative Commons
           and the public domain. The credit for each photo appears on its trail
           page.
+        </p>
+        <p className="text-ink/75 mt-3 leading-relaxed">
+          Many come from members of our{" "}
+          <ExtLink href={FACEBOOK_GROUP_URL}>Facebook group</ExtLink>, shared
+          for use here.
         </p>
         <p className="text-ink/70 mt-3 text-sm leading-relaxed">
           Are you a photographer who would like a photo added, updated, or taken
