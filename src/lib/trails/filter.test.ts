@@ -64,6 +64,30 @@ describe("filterTrails", () => {
       filterTrails(trails, { region: "West", difficulty: "easy" }),
     ).toEqual([]);
   });
+
+  it("filters by name query (case-insensitive substring)", () => {
+    const named: Trail[] = [
+      make({ slug: "burgess", name: "Burgess Falls" }),
+      make({ slug: "house", name: "House Mountain" }),
+      make({ slug: "cummins", name: "Cummins Falls" }),
+    ];
+    expect(slugs(filterTrails(named, { query: "falls" }))).toEqual([
+      "burgess",
+      "cummins",
+    ]);
+    expect(slugs(filterTrails(named, { query: "MOUNTAIN" }))).toEqual(["house"]);
+    expect(filterTrails(named, { query: "" })).toHaveLength(3);
+  });
+
+  it("combines a query with other filters", () => {
+    const named: Trail[] = [
+      make({ slug: "a", name: "Laurel Falls", region: "East" }),
+      make({ slug: "b", name: "Cummins Falls", region: "Middle" }),
+    ];
+    expect(
+      slugs(filterTrails(named, { query: "falls", region: "East" })),
+    ).toEqual(["a"]);
+  });
 });
 
 describe("parseTrailFilters", () => {
@@ -83,6 +107,12 @@ describe("parseTrailFilters", () => {
 
   it("takes the first value when a param repeats", () => {
     expect(parseTrailFilters({ region: ["East", "West"] }).region).toBe("East");
+  });
+
+  it("parses a trimmed search query and drops a blank one", () => {
+    expect(parseTrailFilters({ q: "  falls  " }).query).toBe("falls");
+    expect(parseTrailFilters({ q: "   " }).query).toBeUndefined();
+    expect(parseTrailFilters({}).query).toBeUndefined();
   });
 });
 

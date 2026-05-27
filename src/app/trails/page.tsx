@@ -34,7 +34,7 @@ export default async function TrailsPage({
   const allTrails = getAllTrails();
   const trails = filterTrails(allTrails, filters);
   const isFiltered = Boolean(
-    filters.region || filters.difficulty || filters.length,
+    filters.region || filters.difficulty || filters.length || filters.query,
   );
 
   return (
@@ -54,6 +54,19 @@ export default async function TrailsPage({
         method="get"
         className="border-forest/10 bg-cream-50 mt-8 grid gap-4 rounded-2xl border p-4 sm:grid-cols-[repeat(3,minmax(0,1fr))_auto] sm:items-end"
       >
+        <div className="flex flex-col gap-1.5 sm:col-span-full">
+          <label htmlFor="q" className="text-forest text-sm font-medium">
+            Search by name
+          </label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            defaultValue={filters.query ?? ""}
+            placeholder="e.g. Falls, LeConte, Reelfoot"
+            className="border-forest/20 bg-cream text-ink rounded-lg border px-3 py-2 text-sm"
+          />
+        </div>
         <Field id="region" label="Region" defaultValue={filters.region ?? ""}>
           <option value="">All regions</option>
           {REGIONS.map((r) => (
