@@ -12,5 +12,8 @@ describe("CreditsPage", () => {
     expect(
       screen.getByRole("link", { name: /openstreetmap/i }),
     ).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
+    expect(
+      screen.getByRole("link", { name: /facebook group/i }),
+    ).toBeInTheDocument();
   });
 });

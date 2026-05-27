@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./logo";
+import { FACEBOOK_GROUP_URL } from "@/lib/site";
 
 const REPO = "https://github.com/JoshDoesIT/tennessee-hiking-club";
 
@@ -58,6 +59,11 @@ export function SiteFooter() {
           links={[
             { label: "About the club", href: "/about" },
             { label: "Contribute a trail", href: "/contribute" },
+            {
+              label: "Facebook group",
+              href: FACEBOOK_GROUP_URL,
+              external: true,
+            },
             { label: "Credits", href: "/credits" },
             { label: "Shop (coming soon)", href: "/" },
           ]}

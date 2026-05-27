@@ -9,4 +9,11 @@ describe("SiteFooter", () => {
       screen.getByRole("link", { name: /credits/i }),
     ).toHaveAttribute("href", "/credits");
   });
+
+  it("links out to the Facebook community group in a new tab", () => {
+    render(<SiteFooter />);
+    const fb = screen.getByRole("link", { name: /facebook group/i });
+    expect(fb.getAttribute("href")).toContain("facebook.com");
+    expect(fb).toHaveAttribute("target", "_blank");
+  });
 });
