@@ -15,6 +15,7 @@ export type TrailFilters = {
   difficulty?: Difficulty;
   length?: LengthBucket;
   query?: string;
+  dogFriendly?: boolean;
 };
 
 /** Trails matching every provided filter (an absent filter is unconstrained). */
@@ -32,6 +33,7 @@ export function filterTrails(trails: Trail[], filters: TrailFilters): Trail[] {
       return false;
     }
     if (query && !trail.name.toLowerCase().includes(query)) return false;
+    if (filters.dogFriendly && trail.dogFriendly !== true) return false;
     return true;
   });
 }
@@ -54,9 +56,11 @@ export function parseTrailFilters(
   const difficulty = first(params.difficulty);
   const length = first(params.length);
   const query = first(params.q)?.trim();
+  const dog = first(params.dog);
 
   const filters: TrailFilters = {};
   if (query) filters.query = query;
+  if (dog === "1" || dog === "true" || dog === "on") filters.dogFriendly = true;
   if (region && (REGIONS as readonly string[]).includes(region)) {
     filters.region = region as Region;
   }

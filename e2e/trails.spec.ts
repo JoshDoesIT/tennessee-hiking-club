@@ -57,6 +57,21 @@ test("a shareable search URL renders matching trails on the server", async ({
   expect(await results(page).count()).toBe(1);
 });
 
+test("filtering to dog-friendly narrows the directory and is shareable", async ({
+  page,
+}) => {
+  await page.goto("/trails");
+  const total = await results(page).count();
+
+  await page.getByLabel(/dog-friendly only/i).check();
+  await page.getByRole("button", { name: /apply filters/i }).click();
+
+  await expect(page).toHaveURL(/dog=1/);
+  const filtered = await results(page).count();
+  expect(filtered).toBeGreaterThan(0);
+  expect(filtered).toBeLessThan(total);
+});
+
 test("shows an empty state when no trails match", async ({ page }) => {
   // West has no "hard" trails, so this combination is always empty.
   await page.goto("/trails?region=West&difficulty=hard");
