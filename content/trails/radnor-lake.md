@@ -23,7 +23,7 @@ tags:
 photos:
   - src: /trails/radnor-lake.jpg
     alt: Radnor Lake seen from the trail, still water reflecting surrounding hardwood forest
-    credit: "Brian Stansberry, CC BY 3.0, via Wikimedia Commons"
+    credit:  "Photo by Kaldari, CC0, via Wikimedia Commons"
 
 summary: A peaceful lakeside loop through one of Nashville's most beloved urban nature preserves, circling 85-acre Radnor Lake past beaver dams, herons, and old-growth hardwoods — just six miles from downtown.
 ---
