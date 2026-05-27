@@ -1,32 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { SignOutButton } from "./sign-out-button";
 
-type User = {
-  sub: string;
-  name?: string;
-  email?: string;
-  picture?: string;
+type SessionUser = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
 };
 
 /**
- * Header auth control. Fetches the session from `/api/auth/me` on mount (so the
- * pages stay statically rendered) and shows either a "Sign in with Vercel" link
- * or the signed-in user with a sign-out button. Renders nothing until loaded to
- * avoid a hydration mismatch and auth-state flicker.
+ * Header auth control. Reads the Auth.js session from `/api/auth/session` on
+ * mount (so pages stay statically rendered) and shows either a "Sign in" link
+ * to the provider page or the signed-in user with a sign-out button. Renders
+ * nothing until loaded to avoid a hydration mismatch and auth-state flicker.
  */
 export function AuthControl({ className }: { className?: string }) {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
 
   useEffect(() => {
     let active = true;
-    fetch("/api/auth/me")
+    fetch("/api/auth/session")
       .then((r) => r.json())
-      .then((data) => {
-        if (active) setUser((data.user as User | null) ?? null);
+      .then((session) => {
+        if (active) setUser((session?.user as SessionUser | undefined) ?? null);
       })
       .catch(() => {
         if (active) setUser(null);
@@ -40,12 +40,12 @@ export function AuthControl({ className }: { className?: string }) {
 
   if (!user) {
     return (
-      <a
-        href="/api/auth/authorize"
+      <Link
+        href="/signin"
         className={cn(buttonVariants({ variant: "ghost", size: "sm" }), className)}
       >
         Sign in
-      </a>
+      </Link>
     );
   }
 

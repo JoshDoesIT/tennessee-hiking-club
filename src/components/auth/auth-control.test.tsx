@@ -2,12 +2,17 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AuthControl } from "./auth-control";
 
-function mockMe(user: unknown) {
+// Auth.js /api/auth/session returns {} when signed out, { user, expires } in.
+function mockSession(user: unknown) {
   vi.stubGlobal(
     "fetch",
     vi.fn(
       async () =>
-        ({ ok: true, json: async () => ({ user }) }) as unknown as Response,
+        ({
+          ok: true,
+          json: async () =>
+            user ? { user, expires: "2099-01-01" } : {},
+        }) as unknown as Response,
     ),
   );
 }
@@ -15,15 +20,15 @@ function mockMe(user: unknown) {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("AuthControl", () => {
-  it("shows a sign-in link when signed out", async () => {
-    mockMe(null);
+  it("links to the sign-in page when signed out", async () => {
+    mockSession(null);
     render(<AuthControl />);
     const link = await screen.findByRole("link", { name: /sign in/i });
-    expect(link).toHaveAttribute("href", "/api/auth/authorize");
+    expect(link).toHaveAttribute("href", "/signin");
   });
 
   it("shows the user and a sign-out control when signed in", async () => {
-    mockMe({ sub: "u1", name: "Josh" });
+    mockSession({ name: "Josh" });
     render(<AuthControl />);
     expect(await screen.findByText(/josh/i)).toBeInTheDocument();
     expect(
