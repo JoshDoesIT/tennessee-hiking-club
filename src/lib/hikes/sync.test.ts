@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { mergeHikes } from "./sync";
+import { mergeHikes, planSync, rowToEntry, entryToInsert } from "./sync";
 import type { HikeLogEntry } from "./types";
 
 describe("mergeHikes", () => {
@@ -40,5 +40,61 @@ describe("mergeHikes", () => {
       "2026-01-01",
       "2026-03-01",
     ]);
+  });
+});
+
+describe("planSync", () => {
+  it("inserts local entries the account does not have, and merges the rest", () => {
+    const local: HikeLogEntry[] = [
+      { trailSlug: "a", hikedOn: "2026-01-01" },
+      { trailSlug: "b", hikedOn: "2026-02-01", note: "muddy" },
+    ];
+    const remote: HikeLogEntry[] = [{ trailSlug: "b", hikedOn: "2026-02-01" }];
+
+    const { toInsert, merged } = planSync(local, remote);
+    expect(toInsert).toEqual([{ trailSlug: "a", hikedOn: "2026-01-01" }]);
+    expect(merged.map((e) => e.trailSlug)).toEqual(["a", "b"]);
+  });
+
+  it("inserts nothing when the account already has every local hike", () => {
+    const local: HikeLogEntry[] = [{ trailSlug: "a", hikedOn: "2026-01-01" }];
+    const remote: HikeLogEntry[] = [{ trailSlug: "a", hikedOn: "2026-01-01" }];
+    expect(planSync(local, remote).toInsert).toEqual([]);
+  });
+});
+
+describe("row mappers", () => {
+  it("rowToEntry drops null note and conditions", () => {
+    expect(
+      rowToEntry({
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        note: null,
+        conditions: null,
+      }),
+    ).toEqual({ trailSlug: "a", hikedOn: "2026-01-01" });
+  });
+
+  it("rowToEntry keeps a note and conditions when present", () => {
+    expect(
+      rowToEntry({
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        note: "great",
+        conditions: "Dry",
+      }),
+    ).toMatchObject({ note: "great", conditions: "Dry" });
+  });
+
+  it("entryToInsert sets the user id and nulls absent fields", () => {
+    expect(entryToInsert("u1", { trailSlug: "a", hikedOn: "2026-01-01" })).toEqual(
+      {
+        userId: "u1",
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        note: null,
+        conditions: null,
+      },
+    );
   });
 });

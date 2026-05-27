@@ -17,7 +17,16 @@ function buildConfig(): NextAuthConfig {
   if (process.env.AUTH_GITHUB_ID) providers.push(GitHub);
   if (process.env.AUTH_GOOGLE_ID) providers.push(Google);
 
-  const config: NextAuthConfig = { providers, trustHost: true };
+  const config: NextAuthConfig = {
+    providers,
+    trustHost: true,
+    callbacks: {
+      session({ session, user }) {
+        if (user?.id && session.user) session.user.id = user.id;
+        return session;
+      },
+    },
+  };
 
   if (process.env.DATABASE_URL) {
     config.adapter = DrizzleAdapter(getDb(), {

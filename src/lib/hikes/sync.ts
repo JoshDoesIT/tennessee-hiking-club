@@ -33,3 +33,48 @@ export function mergeHikes(
 
   return [...byKey.values()].sort((x, y) => x.hikedOn.localeCompare(y.hikedOn));
 }
+
+/**
+ * Decide what an account sync should do: which local hikes are missing from the
+ * account (to insert) and the full merged log to hand back to the client. Only
+ * additions are made, so sync never deletes a hike.
+ */
+export function planSync(
+  local: HikeLogEntry[],
+  remote: HikeLogEntry[],
+): { toInsert: HikeLogEntry[]; merged: HikeLogEntry[] } {
+  const remoteKeys = new Set(remote.map(keyOf));
+  return {
+    toInsert: local.filter((e) => !remoteKeys.has(keyOf(e))),
+    merged: mergeHikes(local, remote),
+  };
+}
+
+type HikeRowLike = {
+  trailSlug: string;
+  hikedOn: string;
+  note: string | null;
+  conditions: string | null;
+};
+
+/** A database row to a log entry (dropping null note/conditions). */
+export function rowToEntry(row: HikeRowLike): HikeLogEntry {
+  const entry: HikeLogEntry = {
+    trailSlug: row.trailSlug,
+    hikedOn: row.hikedOn,
+  };
+  if (row.note) entry.note = row.note;
+  if (row.conditions) entry.conditions = row.conditions;
+  return entry;
+}
+
+/** A log entry to an insertable row for a given user. */
+export function entryToInsert(userId: string, entry: HikeLogEntry) {
+  return {
+    userId,
+    trailSlug: entry.trailSlug,
+    hikedOn: entry.hikedOn,
+    note: entry.note ?? null,
+    conditions: entry.conditions ?? null,
+  };
+}
