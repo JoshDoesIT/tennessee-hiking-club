@@ -58,6 +58,7 @@ export function SiteFooter() {
           links={[
             { label: "About the club", href: "/about" },
             { label: "Contribute a trail", href: "/contribute" },
+            { label: "Credits", href: "/credits" },
             { label: "Shop (coming soon)", href: "/" },
           ]}
         />
