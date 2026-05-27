@@ -34,7 +34,11 @@ export default async function TrailsPage({
   const allTrails = getAllTrails();
   const trails = filterTrails(allTrails, filters);
   const isFiltered = Boolean(
-    filters.region || filters.difficulty || filters.length || filters.query,
+    filters.region ||
+      filters.difficulty ||
+      filters.length ||
+      filters.query ||
+      filters.dogFriendly,
   );
 
   return (
@@ -67,6 +71,16 @@ export default async function TrailsPage({
             className="border-forest/20 bg-cream text-ink rounded-lg border px-3 py-2 text-sm"
           />
         </div>
+        <label className="text-forest flex items-center gap-2 text-sm font-medium sm:col-span-full">
+          <input
+            type="checkbox"
+            name="dog"
+            value="1"
+            defaultChecked={filters.dogFriendly ?? false}
+            className="accent-forest h-4 w-4"
+          />
+          Dog-friendly only
+        </label>
         <Field id="region" label="Region" defaultValue={filters.region ?? ""}>
           <option value="">All regions</option>
           {REGIONS.map((r) => (

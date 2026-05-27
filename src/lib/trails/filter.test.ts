@@ -88,6 +88,17 @@ describe("filterTrails", () => {
       slugs(filterTrails(named, { query: "falls", region: "East" })),
     ).toEqual(["a"]);
   });
+
+  it("filters to dog-friendly trails only", () => {
+    const pups: Trail[] = [
+      make({ slug: "yes", dogFriendly: true }),
+      make({ slug: "no", dogFriendly: false }),
+      make({ slug: "unset" }),
+    ];
+    expect(slugs(filterTrails(pups, { dogFriendly: true }))).toEqual(["yes"]);
+    // An unset/false dogFriendly filter is unconstrained.
+    expect(filterTrails(pups, {})).toHaveLength(3);
+  });
 });
 
 describe("parseTrailFilters", () => {
@@ -113,6 +124,12 @@ describe("parseTrailFilters", () => {
     expect(parseTrailFilters({ q: "  falls  " }).query).toBe("falls");
     expect(parseTrailFilters({ q: "   " }).query).toBeUndefined();
     expect(parseTrailFilters({}).query).toBeUndefined();
+  });
+
+  it("parses the dog-friendly flag only when truthy", () => {
+    expect(parseTrailFilters({ dog: "1" }).dogFriendly).toBe(true);
+    expect(parseTrailFilters({ dog: "0" }).dogFriendly).toBeUndefined();
+    expect(parseTrailFilters({}).dogFriendly).toBeUndefined();
   });
 });
 
