@@ -16,8 +16,17 @@ export function LeaderboardOptIn() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/profile")
-      .then(async (r) => {
+    (async () => {
+      try {
+        // Gate the profile fetch on the session, otherwise /api/profile would
+        // 401 for signed-out visitors and the browser would log a network
+        // error in DevTools even though the UI handles it.
+        const session = await (await fetch("/api/auth/session")).json();
+        if (!session?.user) {
+          if (active) setState("anon");
+          return;
+        }
+        const r = await fetch("/api/profile");
         if (!r.ok) {
           if (active) setState("anon");
           return;
@@ -28,10 +37,10 @@ export function LeaderboardOptIn() {
           setDisplayName(data.displayName ?? "");
           setState("ready");
         }
-      })
-      .catch(() => {
+      } catch {
         if (active) setState("anon");
-      });
+      }
+    })();
     return () => {
       active = false;
     };
