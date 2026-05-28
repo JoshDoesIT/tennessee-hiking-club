@@ -11,6 +11,7 @@ const pages = [
   { name: "product", path: "/shop/trail-tee" },
   { name: "my hikes", path: "/hikes" },
   { name: "credits", path: "/credits" },
+  { name: "leaderboard", path: "/leaderboard" },
 ];
 
 for (const { name, path } of pages) {

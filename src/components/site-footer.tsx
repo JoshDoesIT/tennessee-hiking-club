@@ -59,6 +59,7 @@ export function SiteFooter() {
           links={[
             { label: "About the club", href: "/about" },
             { label: "Contribute a trail", href: "/contribute" },
+            { label: "Leaderboard", href: "/leaderboard" },
             {
               label: "Facebook group",
               href: FACEBOOK_GROUP_URL,
