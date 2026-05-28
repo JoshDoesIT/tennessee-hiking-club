@@ -33,7 +33,9 @@ export default async function OgImage({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: 80,
+        // Generous padding keeps every line in the safe-zone that platforms
+        // like Teams crop into when they preview a 1200x630 card.
+        padding: "108px 96px",
         background: "#2a3623",
         color: "#fbf6e9",
       }}
@@ -41,8 +43,8 @@ export default async function OgImage({
       <div
         style={{
           display: "flex",
-          fontSize: 30,
-          letterSpacing: 6,
+          fontSize: 26,
+          letterSpacing: 4,
           fontWeight: 600,
           color: "#e0a24c",
         }}
