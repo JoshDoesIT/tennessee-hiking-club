@@ -112,10 +112,13 @@ function tennesseeMask(): Feature {
 export function buildTennesseeStyle(base: MapStyle): MapStyle {
   const recolored = base.layers.map(recolor);
 
+  // MapLibre warns when the same source backs both `hillshade` and 3D
+  // `terrain`. Use two distinct sources (pointing at the same Terrarium
+  // tiles) so it can cache and rasterise each independently.
   const hillshade: MapLayer = {
     id: "hillshade",
     type: "hillshade",
-    source: "terrain-dem",
+    source: "hillshade-dem",
     paint: {
       "hillshade-exaggeration": 0.9,
       "hillshade-shadow-color": COLOR.hillshadeShadow,
@@ -157,6 +160,13 @@ export function buildTennesseeStyle(base: MapStyle): MapStyle {
         maxzoom: 13,
         attribution:
           'Elevation: <a href="https://github.com/tilezen/joerd">Mapzen / AWS Terrain Tiles</a>',
+      },
+      "hillshade-dem": {
+        type: "raster-dem",
+        tiles: [TERRARIUM_DEM],
+        encoding: "terrarium",
+        tileSize: 256,
+        maxzoom: 13,
       },
       "tn-mask": { type: "geojson", data: tennesseeMask() },
       "tn-outline": { type: "geojson", data: TENNESSEE },
