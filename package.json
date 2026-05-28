@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "validate:content": "tsx scripts/validate-content.ts",
     "generate:geo": "tsx scripts/build-tn-geo.ts",
     "db:generate": "drizzle-kit generate",

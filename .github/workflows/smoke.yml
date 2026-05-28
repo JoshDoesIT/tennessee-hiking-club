@@ -1,0 +1,57 @@
+name: Smoke
+
+# Production smoke suite against the live deploy. Runs daily and on demand,
+# so a Vercel rollout that broke a critical path gets caught even if no PR
+# is open.
+
+on:
+  schedule:
+    # 12:00 UTC daily (~07:00 ET).
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "SMOKE_BASE_URL override (default https://www.tnhiking.club)"
+        required: false
+        default: "https://www.tnhiking.club"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    name: Smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run smoke tests against production
+        env:
+          SMOKE_BASE_URL: ${{ inputs.base_url || 'https://www.tnhiking.club' }}
+        run: pnpm test:smoke
+
+      - name: Upload report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: smoke-playwright-report
+          path: playwright-report/
+          retention-days: 14
