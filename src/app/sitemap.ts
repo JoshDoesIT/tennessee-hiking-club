@@ -15,6 +15,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: `${SITE_URL}/leaderboard`,
+      changeFrequency: "daily",
+      priority: 0.5,
+    },
+    { url: `${SITE_URL}/credits`, changeFrequency: "monthly", priority: 0.3 },
+    {
+      url: `${SITE_URL}/leave-no-trace`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 
   const trailRoutes: MetadataRoute.Sitemap = getAllTrails().map((trail) => ({
