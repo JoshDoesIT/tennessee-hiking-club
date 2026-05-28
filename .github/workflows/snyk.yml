@@ -1,0 +1,55 @@
+name: Snyk
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: snyk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    name: Snyk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # Secrets are not exposed to fork PRs, so this gate also makes the job a
+      # no-op (still green) on forks - keeping it safe to mark as required
+      # without blocking outside contributors.
+      - name: Check for Snyk token
+        id: token
+        run: |
+          if [ -n "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SNYK_TOKEN not configured (or fork PR); skipping dependency scan."
+          fi
+
+      - name: Install pnpm
+        if: steps.token.outputs.present == 'true'
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.token.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Snyk dependency test (fails on high or critical)
+        if: steps.token.outputs.present == 'true'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: pnpm dlx snyk@latest test --severity-threshold=high
