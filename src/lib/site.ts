@@ -1,5 +1,5 @@
 /** Canonical production origin. Single source for metadata, sitemap, robots. */
-export const SITE_URL = "https://tnhiking.club";
+export const SITE_URL = "https://www.tnhiking.club";
 
 /** The club's public Facebook group (community hub and a source of photos). */
 export const FACEBOOK_GROUP_URL =
