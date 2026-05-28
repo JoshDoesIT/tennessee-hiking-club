@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
@@ -14,11 +14,12 @@ import {
   type LengthBucket,
 } from "@/lib/trails/filter";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Trails",
   description:
     "Browse Tennessee hiking trails by region, difficulty, and length.",
-};
+  path: "/trails",
+});
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 

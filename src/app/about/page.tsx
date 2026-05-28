@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "About the club",
   description:
     "The Tennessee Hiking Club is a free, open-source, community project mapping the Volunteer State's best trails.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

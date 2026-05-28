@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
+import { pageMetadata } from "@/lib/page-metadata";
 import { MyHikes } from "@/components/hikes/my-hikes";
 import { Challenges } from "@/components/hikes/challenges";
 import { LogTransfer } from "@/components/hikes/log-transfer";
@@ -10,12 +10,13 @@ import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "My hikes",
   description:
     "Your logged hikes across Tennessee, kept privately on your device.",
-  robots: { index: false },
-};
+  path: "/hikes",
+  noindex: true,
+});
 
 export default function MyHikesPage() {
   const trails = getAllTrails();

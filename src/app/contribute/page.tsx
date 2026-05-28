@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Contribute a trail",
   description:
     "Help build Tennessee's most complete community trail map: contribute a trail.",
-};
+  path: "/contribute",
+});
 
 const REPO = "https://github.com/JoshDoesIT/tennessee-hiking-club";
 const NEW_TRAIL_ISSUE = `${REPO}/issues/new?template=new_trail.yml`;

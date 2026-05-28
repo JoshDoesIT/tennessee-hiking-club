@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { TerrainMap } from "@/components/map/terrain-map";
 import { Container } from "@/components/ui/container";
 import { getAllTrails } from "@/lib/trails";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Explore the map",
   description:
     "An interactive 3D terrain map of Tennessee with a pin for every trail.",
-};
+  path: "/explore",
+});
 
 export default function ExplorePage() {
   const trails = getAllTrails();

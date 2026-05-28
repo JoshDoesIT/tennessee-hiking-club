@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { Container } from "@/components/ui/container";
 import { StewardPledge } from "@/components/stewardship/steward-pledge";
 import { CleanupLog } from "@/components/stewardship/cleanup-log";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Leave No Trace",
   description:
     "The seven Leave No Trace principles and the Tennessee Hiking Club steward pledge.",
-};
+  path: "/leave-no-trace",
+});
 
 const PRINCIPLES: { title: string; body: string }[] = [
   {
