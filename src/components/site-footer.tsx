@@ -78,11 +78,7 @@ export function SiteFooter() {
               href: `${REPO}/issues`,
               external: true,
             },
-            {
-              label: "Leave No Trace",
-              href: "https://lnt.org",
-              external: true,
-            },
+            { label: "Leave No Trace", href: "/leave-no-trace" },
           ]}
         />
       </div>
