@@ -52,4 +52,7 @@ jobs:
         if: steps.token.outputs.present == 'true'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: pnpm dlx snyk@latest test --severity-threshold=high
+        # --all-projects: pnpm-workspace.yaml is present (declares
+        # ignoredBuiltDependencies) and Snyk requires the flag when it sees
+        # both a lockfile and a workspace file in the repo root.
+        run: pnpm dlx snyk@latest test --severity-threshold=high --all-projects
