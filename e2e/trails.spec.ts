@@ -72,6 +72,24 @@ test("filtering to dog-friendly narrows the directory and is shareable", async (
   expect(filtered).toBeLessThan(total);
 });
 
+test("filtering to kid-friendly narrows to the easy family trails", async ({
+  page,
+}) => {
+  await page.goto("/trails");
+  const total = await results(page).count();
+
+  await page.getByLabel(/kid-friendly only/i).check();
+  await page.getByRole("button", { name: /apply filters/i }).click();
+
+  await expect(page).toHaveURL(/kid=1/);
+  // Radnor Lake is flagged kid-friendly; Mount LeConte (strenuous) is not.
+  await expect(page.getByRole("link", { name: /radnor lake/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /mount leconte/i }),
+  ).toHaveCount(0);
+  expect(await results(page).count()).toBeLessThan(total);
+});
+
 test("shows an empty state when no trails match", async ({ page }) => {
   // West has no "hard" trails, so this combination is always empty.
   await page.goto("/trails?region=West&difficulty=hard");

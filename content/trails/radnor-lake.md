@@ -13,6 +13,7 @@ elevationGainFt: 213
 difficulty: easy
 routeType: loop
 dogFriendly: false
+kidFriendly: true
 feeRequired: false
 
 tags:
