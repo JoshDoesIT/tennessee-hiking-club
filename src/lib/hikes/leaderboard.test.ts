@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   rankLeaderboard,
   leaderboardEntry,
+  filterHikesByWindow,
   type LeaderboardEntry,
 } from "./leaderboard";
 import type { Trail } from "@/lib/trails/schema";
@@ -75,5 +76,24 @@ describe("leaderboardEntry", () => {
     const entry = leaderboardEntry("bob", hikes, trails);
     expect(entry.trails).toBe(1);
     expect(entry.regions).toBe(1);
+  });
+});
+
+describe("filterHikesByWindow", () => {
+  const hikes = [
+    { trailSlug: "a", hikedOn: "2026-03-01" },
+    { trailSlug: "b", hikedOn: "2025-08-01" },
+    { trailSlug: "c", hikedOn: "2026-01-15" },
+  ];
+  const now = new Date("2026-05-27T12:00:00Z");
+
+  it("returns every hike for the all-time window", () => {
+    expect(filterHikesByWindow(hikes, "all", now)).toHaveLength(3);
+  });
+
+  it("keeps only the current year's hikes for the year window", () => {
+    expect(
+      filterHikesByWindow(hikes, "year", now).map((h) => h.trailSlug),
+    ).toEqual(["a", "c"]);
   });
 });
