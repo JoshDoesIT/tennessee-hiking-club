@@ -4,17 +4,23 @@ import { eq, inArray } from "drizzle-orm";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/cn";
 import { getDb } from "@/lib/db";
-import { profiles, hikes as hikesTable } from "@/lib/db/schema";
+import {
+  profiles,
+  hikes as hikesTable,
+  cleanups as cleanupsTable,
+} from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import {
   leaderboardEntry,
   rankLeaderboard,
   filterHikesByWindow,
+  filterCleanupsByWindow,
   type LeaderboardEntry,
   type LeaderboardMetric,
   type LeaderboardWindow,
 } from "@/lib/hikes/leaderboard";
 import { rowToEntry } from "@/lib/hikes/sync";
+import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
 
 // Reads opted-in profiles at request time; never prerendered (and harmless
 // without a database, which keeps CI builds green).
@@ -30,6 +36,7 @@ const METRICS: { key: LeaderboardMetric; label: string; unit: string }[] = [
   { key: "trails", label: "Distinct trails", unit: "trails" },
   { key: "regions", label: "Grand Divisions", unit: "of 3" },
   { key: "challenges", label: "Challenges", unit: "earned" },
+  { key: "contributions", label: "Stewardship", unit: "cleanup days" },
 ];
 
 const WINDOWS: { key: LeaderboardWindow; label: string }[] = [
@@ -51,26 +58,42 @@ async function loadEntries(
     if (opted.length === 0) return [];
 
     const ids = opted.map((p) => p.userId);
-    const rows = await db
-      .select()
-      .from(hikesTable)
-      .where(inArray(hikesTable.userId, ids));
+    const [hikeRows, cleanupRows] = await Promise.all([
+      db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
+      db.select().from(cleanupsTable).where(inArray(cleanupsTable.userId, ids)),
+    ]);
 
-    const byUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
-    for (const row of rows) {
-      const list = byUser.get(row.userId) ?? [];
+    const hikesByUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
+    for (const row of hikeRows) {
+      const list = hikesByUser.get(row.userId) ?? [];
       list.push(rowToEntry(row));
-      byUser.set(row.userId, list);
+      hikesByUser.set(row.userId, list);
+    }
+
+    const cleanupsByUser = new Map<
+      string,
+      ReturnType<typeof rowToCleanup>[]
+    >();
+    for (const row of cleanupRows) {
+      const list = cleanupsByUser.get(row.userId) ?? [];
+      list.push(rowToCleanup(row));
+      cleanupsByUser.set(row.userId, list);
     }
 
     const trails = getAllTrails();
-    return opted.map((p) =>
-      leaderboardEntry(
+    return opted.map((p) => {
+      const userCleanups = filterCleanupsByWindow(
+        cleanupsByUser.get(p.userId) ?? [],
+        window,
+      );
+      const contributions = new Set(userCleanups.map((c) => c.loggedOn)).size;
+      return leaderboardEntry(
         p.displayName || "Anonymous hiker",
-        filterHikesByWindow(byUser.get(p.userId) ?? [], window),
+        filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
         trails,
-      ),
-    );
+        contributions,
+      );
+    });
   } catch {
     return [];
   }

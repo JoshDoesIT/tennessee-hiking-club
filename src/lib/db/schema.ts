@@ -45,8 +45,24 @@ export const hikes = pgTable(
   (table) => [index("hikes_user_id_idx").on(table.userId)],
 );
 
+/** A logged cleanup day, the synced counterpart of the local cleanup log.
+ *  Stewardship = distinct days, so the sync de-duplicates by day. */
+export const cleanups = pgTable(
+  "cleanups",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    loggedOn: date("logged_on").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("cleanups_user_id_idx").on(table.userId)],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
+export type CleanupRow = typeof cleanups.$inferSelect;
 
 // --- Auth.js (NextAuth) adapter tables --------------------------------------
 // Canonical Auth.js Drizzle schema. `hikes.userId` / `profiles.userId` hold

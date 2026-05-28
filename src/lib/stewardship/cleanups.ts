@@ -31,11 +31,27 @@ export function getCleanups(storage?: Storage): Cleanup[] {
   return s ? parse(s.getItem(KEY)) : EMPTY;
 }
 
+/** Log a cleanup for a day. One credit per day, so logging the same day twice
+ *  is a no-op; this keeps the stewardship count consistent with the synced,
+ *  per-day account record. Returns the new list. */
 export function logCleanup(date: string, storage?: Storage): Cleanup[] {
-  const next = [...getCleanups(storage), { loggedOn: date }];
+  const current = getCleanups(storage);
+  if (current.some((c) => c.loggedOn === date)) return current;
+  const next = [...current, { loggedOn: date }];
   store(storage)?.setItem(KEY, JSON.stringify(next));
   emit();
   return next;
+}
+
+/** Replace the entire cleanup log (used when adopting the account's merged
+ *  log on sign-in). Returns the new list. */
+export function replaceCleanups(
+  cleanups: Cleanup[],
+  storage?: Storage,
+): Cleanup[] {
+  store(storage)?.setItem(KEY, JSON.stringify(cleanups));
+  emit();
+  return cleanups;
 }
 
 // --- External-store interface for useSyncExternalStore -------------------

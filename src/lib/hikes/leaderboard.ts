@@ -1,4 +1,5 @@
 import type { Trail } from "@/lib/trails/schema";
+import type { Cleanup } from "@/lib/stewardship/cleanups";
 import type { HikeLogEntry } from "./types";
 import { computeStats } from "./stats";
 import { CHALLENGES, evaluateChallenge } from "./challenges";
@@ -35,13 +36,25 @@ export function filterHikesByWindow(
   return hikes.filter((h) => h.hikedOn.startsWith(year));
 }
 
+/** Filter a cleanup log to a time window, by each cleanup's `loggedOn` date. */
+export function filterCleanupsByWindow(
+  cleanups: Cleanup[],
+  window: LeaderboardWindow,
+  now: Date = new Date(),
+): Cleanup[] {
+  if (window === "all") return cleanups;
+  const year = String(now.getFullYear());
+  return cleanups.filter((c) => c.loggedOn.startsWith(year));
+}
+
 /** Build a leaderboard entry from a hiker's log: breadth (Grand Divisions and
- *  distinct trails) and challenges completed. Contributions are not tracked
- *  yet, so they are 0 for now. */
+ *  distinct trails) and challenges completed. `contributions` is the count of
+ *  stewardship contributions (synced cleanup days), defaulting to 0. */
 export function leaderboardEntry(
   user: string,
   hikes: HikeLogEntry[],
   trails: Trail[],
+  contributions = 0,
 ): LeaderboardEntry {
   const stats = computeStats(hikes, trails);
   const completed = hikes.map((h) => h.trailSlug);
@@ -54,7 +67,7 @@ export function leaderboardEntry(
     regions: stats.regions.length,
     trails: stats.trails,
     challenges,
-    contributions: 0,
+    contributions,
   };
 }
 
