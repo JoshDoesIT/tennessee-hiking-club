@@ -12,6 +12,7 @@ const pages = [
   { name: "my hikes", path: "/hikes" },
   { name: "credits", path: "/credits" },
   { name: "leaderboard", path: "/leaderboard" },
+  { name: "leave no trace", path: "/leave-no-trace" },
 ];
 
 for (const { name, path } of pages) {

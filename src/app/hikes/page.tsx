@@ -5,6 +5,7 @@ import { Challenges } from "@/components/hikes/challenges";
 import { LogTransfer } from "@/components/hikes/log-transfer";
 import { SyncOnSignIn } from "@/components/hikes/sync-on-signin";
 import { LeaderboardOptIn } from "@/components/hikes/leaderboard-optin";
+import { StewardBadge } from "@/components/stewardship/steward-badge";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
@@ -31,6 +32,10 @@ export default function MyHikesPage() {
         Everything you have logged, kept privately on this device. Sign-in and
         sync across devices are on the way.
       </p>
+
+      <div className="mt-4">
+        <StewardBadge />
+      </div>
 
       <div className="mt-8">
         <YourTennesseeMap data={mapData} />
