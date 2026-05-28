@@ -3,6 +3,7 @@ import {
   rankLeaderboard,
   leaderboardEntry,
   filterHikesByWindow,
+  filterCleanupsByWindow,
   type LeaderboardEntry,
 } from "./leaderboard";
 import type { Trail } from "@/lib/trails/schema";
@@ -77,6 +78,14 @@ describe("leaderboardEntry", () => {
     expect(entry.trails).toBe(1);
     expect(entry.regions).toBe(1);
   });
+
+  it("records the contributions count it is given (synced cleanup days)", () => {
+    expect(leaderboardEntry("ann", [], trails, 4).contributions).toBe(4);
+  });
+
+  it("defaults contributions to 0 when none are given", () => {
+    expect(leaderboardEntry("ann", [], trails).contributions).toBe(0);
+  });
 });
 
 describe("filterHikesByWindow", () => {
@@ -95,5 +104,24 @@ describe("filterHikesByWindow", () => {
     expect(
       filterHikesByWindow(hikes, "year", now).map((h) => h.trailSlug),
     ).toEqual(["a", "c"]);
+  });
+});
+
+describe("filterCleanupsByWindow", () => {
+  const cleanups = [
+    { loggedOn: "2026-03-01" },
+    { loggedOn: "2025-08-01" },
+    { loggedOn: "2026-01-15" },
+  ];
+  const now = new Date("2026-05-27T12:00:00Z");
+
+  it("returns every cleanup for the all-time window", () => {
+    expect(filterCleanupsByWindow(cleanups, "all", now)).toHaveLength(3);
+  });
+
+  it("keeps only the current year's cleanups for the year window", () => {
+    expect(
+      filterCleanupsByWindow(cleanups, "year", now).map((c) => c.loggedOn),
+    ).toEqual(["2026-03-01", "2026-01-15"]);
   });
 });

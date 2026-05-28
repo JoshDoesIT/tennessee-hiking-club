@@ -15,6 +15,13 @@
       "when": 1779841117356,
       "tag": "0001_panoramic_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779934511927,
+      "tag": "0002_right_starjammers",
+      "breakpoints": true
     }
   ]
 }
