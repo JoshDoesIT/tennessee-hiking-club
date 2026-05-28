@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { StewardPledge } from "@/components/stewardship/steward-pledge";
+import { CleanupLog } from "@/components/stewardship/cleanup-log";
 
 export const metadata: Metadata = {
   title: "Leave No Trace",
@@ -67,6 +68,10 @@ export default function LeaveNoTracePage() {
 
       <div className="mt-10">
         <StewardPledge />
+      </div>
+
+      <div className="mt-6">
+        <CleanupLog />
       </div>
 
       <p className="text-ink/70 mt-6 text-sm">
