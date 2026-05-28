@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import type { ReactNode } from "react";
 import { Container } from "@/components/ui/container";
 import { FACEBOOK_GROUP_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Credits",
   description:
     "Photo, map, and data attributions for the Tennessee Hiking Club.",
-};
+  path: "/credits",
+});
 
 const ISSUES_URL = "https://github.com/JoshDoesIT/tennessee-hiking-club/issues";
 

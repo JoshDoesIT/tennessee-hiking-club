@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/page-metadata";
 import { Container } from "@/components/ui/container";
 import { SignInOptions } from "@/components/auth/sign-in-options";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Sign in",
   description: "Sign in to sync your hikes across devices.",
-  robots: { index: false },
-};
+  path: "/signin",
+  noindex: true,
+});
 
 export default function SignInPage() {
   return (

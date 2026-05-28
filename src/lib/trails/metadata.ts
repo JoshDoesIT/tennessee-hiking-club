@@ -15,11 +15,27 @@ export function trailMetadata(trail: Trail): Metadata {
       title: trail.name,
       description: trail.summary,
       url: `/trails/${trail.slug}`,
+      images: [
+        {
+          url: `/trails/${trail.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${trail.name}: a ${trail.region} Tennessee trail card with length, region, and difficulty`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: trail.name,
       description: trail.summary,
+      images: [
+        {
+          url: `/trails/${trail.slug}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${trail.name}: a ${trail.region} Tennessee trail card with length, region, and difficulty`,
+        },
+      ],
     },
   };
 }

@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/page-metadata";
 import { eq, inArray } from "drizzle-orm";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/cn";
@@ -26,11 +26,12 @@ import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
 // without a database, which keeps CI builds green).
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Leaderboard",
   description:
     "A friendly, opt-in leaderboard that celebrates exploring Tennessee widely, not raw mileage.",
-};
+  path: "/leaderboard",
+});
 
 const METRICS: { key: LeaderboardMetric; label: string; unit: string }[] = [
   { key: "trails", label: "Distinct trails", unit: "trails" },
