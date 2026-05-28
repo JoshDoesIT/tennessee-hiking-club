@@ -28,6 +28,7 @@ export const trailSchema = z.object({
   difficulty: z.enum(DIFFICULTIES),
   routeType: z.enum(ROUTE_TYPES),
   dogFriendly: z.boolean().optional(),
+  kidFriendly: z.boolean().optional(),
   feeRequired: z.boolean().optional(),
   tags: z.array(z.string()).default([]),
   photos: z

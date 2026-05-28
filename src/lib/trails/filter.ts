@@ -16,6 +16,7 @@ export type TrailFilters = {
   length?: LengthBucket;
   query?: string;
   dogFriendly?: boolean;
+  kidFriendly?: boolean;
 };
 
 /** Trails matching every provided filter (an absent filter is unconstrained). */
@@ -34,6 +35,7 @@ export function filterTrails(trails: Trail[], filters: TrailFilters): Trail[] {
     }
     if (query && !trail.name.toLowerCase().includes(query)) return false;
     if (filters.dogFriendly && trail.dogFriendly !== true) return false;
+    if (filters.kidFriendly && trail.kidFriendly !== true) return false;
     return true;
   });
 }
@@ -57,10 +59,12 @@ export function parseTrailFilters(
   const length = first(params.length);
   const query = first(params.q)?.trim();
   const dog = first(params.dog);
+  const kid = first(params.kid);
 
   const filters: TrailFilters = {};
   if (query) filters.query = query;
   if (dog === "1" || dog === "true" || dog === "on") filters.dogFriendly = true;
+  if (kid === "1" || kid === "true" || kid === "on") filters.kidFriendly = true;
   if (region && (REGIONS as readonly string[]).includes(region)) {
     filters.region = region as Region;
   }

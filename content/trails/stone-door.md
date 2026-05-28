@@ -11,6 +11,7 @@ elevationGainFt: 250
 difficulty: easy
 routeType: out-and-back
 dogFriendly: true
+kidFriendly: true
 feeRequired: false
 tags: [overlook, gorge, geology, state-park]
 photos:

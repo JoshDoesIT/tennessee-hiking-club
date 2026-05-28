@@ -99,6 +99,15 @@ describe("filterTrails", () => {
     // An unset/false dogFriendly filter is unconstrained.
     expect(filterTrails(pups, {})).toHaveLength(3);
   });
+
+  it("filters to kid-friendly trails only", () => {
+    const kids: Trail[] = [
+      make({ slug: "yes", kidFriendly: true }),
+      make({ slug: "no", kidFriendly: false }),
+      make({ slug: "unset" }),
+    ];
+    expect(slugs(filterTrails(kids, { kidFriendly: true }))).toEqual(["yes"]);
+  });
 });
 
 describe("parseTrailFilters", () => {
@@ -130,6 +139,12 @@ describe("parseTrailFilters", () => {
     expect(parseTrailFilters({ dog: "1" }).dogFriendly).toBe(true);
     expect(parseTrailFilters({ dog: "0" }).dogFriendly).toBeUndefined();
     expect(parseTrailFilters({}).dogFriendly).toBeUndefined();
+  });
+
+  it("parses the kid-friendly flag only when truthy", () => {
+    expect(parseTrailFilters({ kid: "1" }).kidFriendly).toBe(true);
+    expect(parseTrailFilters({ kid: "0" }).kidFriendly).toBeUndefined();
+    expect(parseTrailFilters({}).kidFriendly).toBeUndefined();
   });
 });
 

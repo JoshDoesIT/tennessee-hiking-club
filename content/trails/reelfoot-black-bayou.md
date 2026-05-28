@@ -11,6 +11,7 @@ elevationGainFt: 20
 difficulty: easy
 routeType: loop
 dogFriendly: true
+kidFriendly: true
 feeRequired: false
 tags: [lake, birding, boardwalk, accessible, state-park]
 photos:
