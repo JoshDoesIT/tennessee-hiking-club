@@ -1,0 +1,52 @@
+name: Lighthouse
+
+# Lighthouse against the live deploy. Performance is graded as "warn" because
+# scores fluctuate with network conditions; Accessibility, Best Practices, and
+# SEO are hard-gated to >= 0.95 - they are stable across runs and a
+# regression there is a real bug.
+
+on:
+  schedule:
+    # Mondays at 13:00 UTC (~08:00 ET).
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL (default https://www.tnhiking.club)"
+        required: false
+        default: "https://www.tnhiking.club"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve base URL
+        id: base
+        run: |
+          URL="${{ inputs.base_url || 'https://www.tnhiking.club' }}"
+          {
+            echo "url=$URL"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            ${{ steps.base.outputs.url }}/
+            ${{ steps.base.outputs.url }}/trails
+            ${{ steps.base.outputs.url }}/trails/mt-leconte-alum-cave
+            ${{ steps.base.outputs.url }}/leaderboard
+            ${{ steps.base.outputs.url }}/leave-no-trace
+          configPath: ./.github/lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
