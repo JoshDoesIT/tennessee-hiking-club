@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   playwright:
-    name: Playwright
+    name: E2E
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
