@@ -1,0 +1,40 @@
+name: TruffleHog
+
+# Defence-in-depth secret scanning. GitHub's free-tier "Secret Protection"
+# covers ~200 known-provider patterns plus push protection; the entropy /
+# non-provider and validity-check sub-features are gated behind GitHub
+# Advanced Security (paid). TruffleHog fills both of those gaps in CI and
+# adds a hard merge gate on top of GitHub's async alerts.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trufflehog-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: TruffleHog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Full history so PR diff scans and main-branch range scans both
+          # have the commits TruffleHog needs to walk.
+          fetch-depth: 0
+
+      - name: Scan for verified secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          # --only-verified gates the build on findings the detector can
+          # actively confirm are live (pings the provider). Drops most
+          # false positives at the cost of missing custom/expired secrets;
+          # broaden to --results=verified,unknown if real misses show up.
+          extra_args: --only-verified
