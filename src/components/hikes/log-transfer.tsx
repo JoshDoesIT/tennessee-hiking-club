@@ -12,6 +12,7 @@ import {
   exportLogJson,
   exportLogGpx,
   importLogJson,
+  withPhotoData,
 } from "@/lib/hikes/transfer";
 import type { Trail } from "@/lib/trails/schema";
 
@@ -45,7 +46,7 @@ export function LogTransfer({ trails }: { trails: Trail[] }) {
     event.target.value = ""; // let the same file be chosen again
     if (!file) return;
     try {
-      const next = importLogJson(await file.text(), "merge");
+      const next = await importLogJson(await file.text(), "merge");
       const n = next.length;
       setStatus(`Imported. You now have ${n} hike${n === 1 ? "" : "s"} logged.`);
     } catch {
@@ -71,10 +72,10 @@ export function LogTransfer({ trails }: { trails: Trail[] }) {
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={() =>
+          onClick={async () =>
             download(
               "tennessee-hikes.json",
-              exportLogJson(log),
+              exportLogJson(await withPhotoData(log)),
               "application/json",
             )
           }

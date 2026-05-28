@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { readLog, addHike, removeTrail, isHiked } from "./local-log";
+import {
+  readLog,
+  addHike,
+  removeTrail,
+  isHiked,
+  setEntryPhotoUrl,
+} from "./local-log";
 
 function memStorage(): Storage {
   const m = new Map<string, string>();
@@ -73,5 +79,27 @@ describe("local hike log", () => {
     const entry = readLog(s)[0];
     expect(entry.note).toBeUndefined();
     expect(entry.conditions).toBeUndefined();
+  });
+
+  it("stores a photoId when provided and omits it otherwise", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoId: "ph-1" }, s);
+    addHike("b", "2026-01-02", undefined, s);
+    expect(readLog(s)[0].photoId).toBe("ph-1");
+    expect(readLog(s)[1].photoId).toBeUndefined();
+  });
+
+  it("sets the photo URL on the matching entry only", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoId: "ph-1" }, s);
+    addHike("a", "2026-02-01", { photoId: "ph-2" }, s);
+
+    setEntryPhotoUrl("a", "2026-02-01", "https://blob/p.jpg", s);
+
+    const log = readLog(s);
+    expect(log.find((e) => e.hikedOn === "2026-02-01")?.photoUrl).toBe(
+      "https://blob/p.jpg",
+    );
+    expect(log.find((e) => e.hikedOn === "2026-01-01")?.photoUrl).toBeUndefined();
   });
 });

@@ -1,8 +1,16 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MyHikes } from "./my-hikes";
 import { addHike } from "@/lib/hikes/local-log";
+import { putPhoto } from "@/lib/hikes/photo-store";
 import type { Trail } from "@/lib/trails/schema";
+
+function resetPhotos(): Promise<void> {
+  return new Promise((resolve) => {
+    const req = indexedDB.deleteDatabase("thc");
+    req.onsuccess = req.onerror = req.onblocked = () => resolve();
+  });
+}
 
 const make = (over: Partial<Trail>): Trail => ({
   slug: "x",
@@ -26,7 +34,12 @@ const trails: Trail[] = [
   make({ slug: "b", name: "Beta", region: "Middle", lengthMiles: 2 }),
 ];
 
-beforeEach(() => localStorage.clear());
+beforeEach(async () => {
+  localStorage.clear();
+  await resetPhotos();
+  URL.createObjectURL = vi.fn(() => "blob:mock");
+  URL.revokeObjectURL = vi.fn();
+});
 
 describe("MyHikes", () => {
   it("shows an empty state when nothing is logged", async () => {
@@ -54,5 +67,21 @@ describe("MyHikes", () => {
       await screen.findByText(/spring wildflowers/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/muddy/i)).toBeInTheDocument();
+  });
+
+  it("shows a thumbnail for a hike that has a photo", async () => {
+    await putPhoto("ph-1", new Blob(["img"], { type: "image/jpeg" }));
+    addHike("a", "2026-01-01", { photoId: "ph-1" });
+    render(<MyHikes trails={trails} />);
+    const img = await screen.findByRole("img");
+    expect(img).toHaveAttribute("src", "blob:mock");
+    expect(img).toHaveAccessibleName(/Alpha/i);
+  });
+
+  it("shows no image when no hike has a photo", async () => {
+    addHike("a", "2026-01-01");
+    render(<MyHikes trails={trails} />);
+    await screen.findByRole("link", { name: /Alpha/i });
+    expect(screen.queryByRole("img")).toBeNull();
   });
 });
