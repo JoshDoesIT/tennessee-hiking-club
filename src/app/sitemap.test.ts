@@ -18,6 +18,13 @@ describe("sitemap", () => {
     expect(urls).toContain(`${SITE_URL}/explore`);
   });
 
+  it("includes the community content pages", () => {
+    const urls = sitemap().map((e) => e.url);
+    expect(urls).toContain(`${SITE_URL}/leaderboard`);
+    expect(urls).toContain(`${SITE_URL}/credits`);
+    expect(urls).toContain(`${SITE_URL}/leave-no-trace`);
+  });
+
   it("uses absolute URLs for every entry", () => {
     for (const entry of sitemap()) {
       expect(entry.url.startsWith("https://")).toBe(true);

@@ -29,8 +29,8 @@ export default function MyHikesPage() {
         My hikes
       </h1>
       <p className="text-ink/70 mt-4 max-w-xl text-lg leading-relaxed">
-        Everything you have logged, kept privately on this device. Sign-in and
-        sync across devices are on the way.
+        Everything you have logged, kept on this device by default. Sign in to
+        sync it across your devices.
       </p>
 
       <div className="mt-4">
