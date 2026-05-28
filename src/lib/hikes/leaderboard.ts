@@ -20,6 +20,21 @@ export type LeaderboardMetric =
 
 export type RankedEntry = LeaderboardEntry & { rank: number };
 
+/** Leaderboard time window: all-time, or the current calendar year. */
+export type LeaderboardWindow = "all" | "year";
+
+/** Filter a hike log to a time window. `hikedOn` is an ISO `yyyy-mm-dd` date,
+ *  so the year window keeps hikes whose date is in `now`'s calendar year. */
+export function filterHikesByWindow(
+  hikes: HikeLogEntry[],
+  window: LeaderboardWindow,
+  now: Date = new Date(),
+): HikeLogEntry[] {
+  if (window === "all") return hikes;
+  const year = String(now.getFullYear());
+  return hikes.filter((h) => h.hikedOn.startsWith(year));
+}
+
 /** Build a leaderboard entry from a hiker's log: breadth (Grand Divisions and
  *  distinct trails) and challenges completed. Contributions are not tracked
  *  yet, so they are 0 for now. */

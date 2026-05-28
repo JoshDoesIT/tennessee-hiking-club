@@ -9,8 +9,10 @@ import { getAllTrails } from "@/lib/trails";
 import {
   leaderboardEntry,
   rankLeaderboard,
+  filterHikesByWindow,
   type LeaderboardEntry,
   type LeaderboardMetric,
+  type LeaderboardWindow,
 } from "@/lib/hikes/leaderboard";
 import { rowToEntry } from "@/lib/hikes/sync";
 
@@ -30,9 +32,16 @@ const METRICS: { key: LeaderboardMetric; label: string; unit: string }[] = [
   { key: "challenges", label: "Challenges", unit: "earned" },
 ];
 
+const WINDOWS: { key: LeaderboardWindow; label: string }[] = [
+  { key: "all", label: "All time" },
+  { key: "year", label: "This year" },
+];
+
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-async function loadEntries(): Promise<LeaderboardEntry[]> {
+async function loadEntries(
+  window: LeaderboardWindow,
+): Promise<LeaderboardEntry[]> {
   try {
     const db = getDb();
     const opted = await db
@@ -58,7 +67,7 @@ async function loadEntries(): Promise<LeaderboardEntry[]> {
     return opted.map((p) =>
       leaderboardEntry(
         p.displayName || "Anonymous hiker",
-        byUser.get(p.userId) ?? [],
+        filterHikesByWindow(byUser.get(p.userId) ?? [], window),
         trails,
       ),
     );
@@ -79,7 +88,12 @@ export default async function LeaderboardPage({
     : "trails";
   const unit = METRICS.find((m) => m.key === metric)!.unit;
 
-  const ranked = rankLeaderboard(await loadEntries(), metric);
+  const rawWindow = Array.isArray(params.window)
+    ? params.window[0]
+    : params.window;
+  const window: LeaderboardWindow = rawWindow === "year" ? "year" : "all";
+
+  const ranked = rankLeaderboard(await loadEntries(window), metric);
 
   return (
     <Container className="max-w-2xl py-12 sm:py-16">
@@ -103,7 +117,7 @@ export default async function LeaderboardPage({
         {METRICS.map((m) => (
           <Link
             key={m.key}
-            href={`/leaderboard?metric=${m.key}`}
+            href={`/leaderboard?metric=${m.key}&window=${window}`}
             aria-current={m.key === metric ? "page" : undefined}
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm font-medium",
@@ -113,6 +127,24 @@ export default async function LeaderboardPage({
             )}
           >
             {m.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Time window">
+        {WINDOWS.map((w) => (
+          <Link
+            key={w.key}
+            href={`/leaderboard?metric=${metric}&window=${w.key}`}
+            aria-current={w.key === window ? "page" : undefined}
+            className={cn(
+              "rounded-full border px-3 py-1 text-xs font-medium",
+              w.key === window
+                ? "border-pine bg-pine text-cream"
+                : "border-forest/15 text-ink/70 hover:bg-forest/5",
+            )}
+          >
+            {w.label}
           </Link>
         ))}
       </div>
