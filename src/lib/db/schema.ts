@@ -133,11 +133,41 @@ export const conditionSubmissions = pgTable(
   ],
 );
 
+/**
+ * An in-app photo submission (#149) for an existing trail, submitted by a
+ * signed-in member. A reviewed proposal: the image is stored privately in Blob
+ * until a maintainer approves it and curates it into the trail's `photos[]`. An
+ * approved photo earns the submitter recognition by `userId`. `alt` is required
+ * (accessibility); `credit` is optional attribution.
+ */
+export const photoSubmissions = pgTable(
+  "photo_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    trailSlug: text("trail_slug").notNull(),
+    blobUrl: text("blob_url").notNull(),
+    alt: text("alt").notNull(),
+    credit: text("credit"),
+    /** pending | approved | rejected */
+    reviewStatus: text("review_status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("photo_submissions_user_id_idx").on(table.userId),
+    index("photo_submissions_review_status_idx").on(table.reviewStatus),
+  ],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
 export type CleanupRow = typeof cleanups.$inferSelect;
 export type TrailSubmissionRow = typeof trailSubmissions.$inferSelect;
 export type ConditionSubmissionRow = typeof conditionSubmissions.$inferSelect;
+export type PhotoSubmissionRow = typeof photoSubmissions.$inferSelect;
 
 // --- Auth.js (NextAuth) adapter tables --------------------------------------
 // Canonical Auth.js Drizzle schema. `hikes.userId` / `profiles.userId` hold

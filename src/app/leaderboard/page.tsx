@@ -24,6 +24,7 @@ import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
 import { aggregateContributions } from "@/lib/trails/contributions";
 import { getApprovedSubmissionCounts } from "@/lib/contributions/submissions-server";
 import { getApprovedConditionCounts } from "@/lib/contributions/conditions-server";
+import { getApprovedPhotoCounts } from "@/lib/contributions/photos-server";
 
 // Reads opted-in profiles at request time; never prerendered (and harmless
 // without a database, which keeps CI builds green).
@@ -43,6 +44,7 @@ const METRICS: { key: LeaderboardMetric; label: string; unit: string }[] = [
   { key: "contributions", label: "Stewardship", unit: "cleanup days" },
   { key: "trailsContributed", label: "Trails contributed", unit: "trails" },
   { key: "conditionsReported", label: "Conditions reported", unit: "reports" },
+  { key: "photoCredits", label: "Photos contributed", unit: "photos" },
 ];
 
 const WINDOWS: { key: LeaderboardWindow; label: string }[] = [
@@ -64,7 +66,7 @@ async function loadEntries(
     if (opted.length === 0) return [];
 
     const ids = opted.map((p) => p.userId);
-    const [hikeRows, cleanupRows, submissionCounts, conditionCounts] =
+    const [hikeRows, cleanupRows, submissionCounts, conditionCounts, photoCounts] =
       await Promise.all([
         db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
         db
@@ -73,6 +75,7 @@ async function loadEntries(
           .where(inArray(cleanupsTable.userId, ids)),
         getApprovedSubmissionCounts(ids),
         getApprovedConditionCounts(ids),
+        getApprovedPhotoCounts(ids),
       ]);
 
     const hikesByUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
@@ -110,6 +113,8 @@ async function loadEntries(
         (counts?.trailsContributed ?? 0) + (submissionCounts.get(p.userId) ?? 0);
       const conditionsReported =
         (counts?.conditionsReported ?? 0) + (conditionCounts.get(p.userId) ?? 0);
+      const photoCredits =
+        (counts?.photoCredits ?? 0) + (photoCounts.get(p.userId) ?? 0);
       return leaderboardEntry(
         p.displayName || "Anonymous hiker",
         filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
@@ -117,6 +122,7 @@ async function loadEntries(
         contributions,
         trailsContributed,
         conditionsReported,
+        photoCredits,
       );
     });
   } catch {

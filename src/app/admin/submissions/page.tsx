@@ -9,6 +9,7 @@ import {
   profiles,
   trailSubmissions,
   conditionSubmissions,
+  photoSubmissions,
 } from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import { generateTrailContent } from "@/lib/contributions/trail-content";
@@ -21,6 +22,10 @@ import {
   ConditionReviewList,
   type PendingConditionReport,
 } from "@/components/admin/condition-review-list";
+import {
+  PhotoReviewList,
+  type PendingPhoto,
+} from "@/components/admin/photo-review-list";
 
 // Gated, request-time only, never indexed.
 export const dynamic = "force-dynamic";
@@ -139,6 +144,37 @@ async function loadPendingConditions(): Promise<PendingConditionReport[]> {
   });
 }
 
+async function loadPendingPhotos(): Promise<PendingPhoto[]> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(photoSubmissions)
+    .where(eq(photoSubmissions.reviewStatus, "pending"))
+    .orderBy(desc(photoSubmissions.createdAt));
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.map((r) => r.userId))];
+  const profileRows = await db
+    .select()
+    .from(profiles)
+    .where(inArray(profiles.userId, userIds));
+  const profileById = new Map(profileRows.map((p) => [p.userId, p]));
+  const nameBySlug = new Map(getAllTrails().map((t) => [t.slug, t.name]));
+
+  return rows.map((r) => {
+    const profile = profileById.get(r.userId);
+    return {
+      id: r.id,
+      trailSlug: r.trailSlug,
+      trailName: nameBySlug.get(r.trailSlug) || r.trailSlug,
+      alt: r.alt,
+      credit: r.credit,
+      submittedBy: profile?.displayName || profile?.githubLogin || "A member",
+      submittedOn: r.createdAt.toISOString().slice(0, 10),
+    };
+  });
+}
+
 export default async function AdminSubmissionsPage() {
   // No role system: the page only exists for configured maintainers, and is a
   // 404 for everyone else (it does not reveal that it exists).
@@ -147,9 +183,10 @@ export default async function AdminSubmissionsPage() {
   const userId = session?.user?.id;
   if (!userId || !(await isAdminUser(userId))) notFound();
 
-  const [pending, pendingConditions] = await Promise.all([
+  const [pending, pendingConditions, pendingPhotos] = await Promise.all([
     loadPending(),
     loadPendingConditions(),
+    loadPendingPhotos(),
   ]);
 
   return (
@@ -181,6 +218,16 @@ export default async function AdminSubmissionsPage() {
           Condition reports
         </h2>
         <ConditionReviewList reports={pendingConditions} />
+      </section>
+
+      <section aria-labelledby="photo-submissions-heading" className="mt-12">
+        <h2
+          id="photo-submissions-heading"
+          className="display text-forest text-2xl"
+        >
+          Photos
+        </h2>
+        <PhotoReviewList photos={pendingPhotos} />
       </section>
     </Container>
   );

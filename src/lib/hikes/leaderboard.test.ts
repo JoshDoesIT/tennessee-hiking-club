@@ -9,9 +9,9 @@ import {
 import type { Trail } from "@/lib/trails/schema";
 
 const entries: LeaderboardEntry[] = [
-  { user: "ann", regions: 3, trails: 9, challenges: 2, contributions: 0, trailsContributed: 1, conditionsReported: 0 },
-  { user: "bob", regions: 3, trails: 5, challenges: 4, contributions: 1, trailsContributed: 3, conditionsReported: 2 },
-  { user: "cy", regions: 2, trails: 5, challenges: 1, contributions: 5, trailsContributed: 0, conditionsReported: 4 },
+  { user: "ann", regions: 3, trails: 9, challenges: 2, contributions: 0, trailsContributed: 1, conditionsReported: 0, photoCredits: 5 },
+  { user: "bob", regions: 3, trails: 5, challenges: 4, contributions: 1, trailsContributed: 3, conditionsReported: 2, photoCredits: 1 },
+  { user: "cy", regions: 2, trails: 5, challenges: 1, contributions: 5, trailsContributed: 0, conditionsReported: 4, photoCredits: 0 },
 ];
 
 const make = (slug: string, region: Trail["region"]): Trail => ({
@@ -46,6 +46,10 @@ describe("rankLeaderboard", () => {
   it("ranks by trails contributed and by conditions reported", () => {
     expect(rankLeaderboard(entries, "trailsContributed")[0].user).toBe("bob");
     expect(rankLeaderboard(entries, "conditionsReported")[0].user).toBe("cy");
+  });
+
+  it("ranks by photo credits", () => {
+    expect(rankLeaderboard(entries, "photoCredits")[0].user).toBe("ann");
   });
 
   it("does not mutate the input", () => {
@@ -94,16 +98,18 @@ describe("leaderboardEntry", () => {
     expect(leaderboardEntry("ann", [], trails).contributions).toBe(0);
   });
 
-  it("records trails-contributed and conditions-reported counts it is given", () => {
-    const entry = leaderboardEntry("ann", [], trails, 0, 3, 2);
+  it("records trails-contributed, conditions-reported, and photo-credit counts", () => {
+    const entry = leaderboardEntry("ann", [], trails, 0, 3, 2, 4);
     expect(entry.trailsContributed).toBe(3);
     expect(entry.conditionsReported).toBe(2);
+    expect(entry.photoCredits).toBe(4);
   });
 
   it("defaults the contribution counts to 0", () => {
     const entry = leaderboardEntry("ann", [], trails);
     expect(entry.trailsContributed).toBe(0);
     expect(entry.conditionsReported).toBe(0);
+    expect(entry.photoCredits).toBe(0);
   });
 });
 

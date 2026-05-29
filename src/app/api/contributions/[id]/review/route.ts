@@ -3,7 +3,11 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/auth";
 import { isAdminUser } from "@/lib/auth/admin-server";
 import { getDb } from "@/lib/db";
-import { conditionSubmissions, trailSubmissions } from "@/lib/db/schema";
+import {
+  conditionSubmissions,
+  photoSubmissions,
+  trailSubmissions,
+} from "@/lib/db/schema";
 import { publishOnApproval } from "@/lib/contributions/publish";
 
 type Context = { params: Promise<{ id: string }> };
@@ -35,7 +39,7 @@ export async function POST(req: Request, { params }: Context) {
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   }
-  if (type !== "trail" && type !== "condition") {
+  if (type !== "trail" && type !== "condition" && type !== "photo") {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
 
@@ -49,6 +53,11 @@ export async function POST(req: Request, { params }: Context) {
       .update(conditionSubmissions)
       .set({ reviewStatus: status, reviewedAt })
       .where(eq(conditionSubmissions.id, id));
+  } else if (type === "photo") {
+    await db
+      .update(photoSubmissions)
+      .set({ reviewStatus: status, reviewedAt })
+      .where(eq(photoSubmissions.id, id));
   } else {
     await db
       .update(trailSubmissions)
@@ -58,9 +67,10 @@ export async function POST(req: Request, { params }: Context) {
 
   // On approval, try to open a content PR (#155). The decision and recognition
   // are already recorded above, so a GitHub failure (or no token) just falls
-  // back to the manual content in the admin UI.
+  // back to the manual content in the admin UI. Photo auto-publish is tracked
+  // separately (#157), so it is not published here.
   let prUrl: string | null = null;
-  if (action === "approve") {
+  if (action === "approve" && type !== "photo") {
     try {
       const published = await publishOnApproval({ type, id });
       prUrl = published?.url ?? null;

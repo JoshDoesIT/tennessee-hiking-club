@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   trails: [] as unknown[],
   approvedCount: 0,
   conditionCount: 0,
+  photoCount: 0,
 }));
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
@@ -20,6 +21,9 @@ vi.mock("@/lib/contributions/submissions-server", () => ({
 }));
 vi.mock("@/lib/contributions/conditions-server", () => ({
   getApprovedConditionCount: async () => mocks.conditionCount,
+}));
+vi.mock("@/lib/contributions/photos-server", () => ({
+  getApprovedPhotoCount: async () => mocks.photoCount,
 }));
 
 import { getContributionCountForUser } from "./contributions-server";
@@ -38,6 +42,7 @@ beforeEach(() => {
   mocks.trails = [];
   mocks.approvedCount = 0;
   mocks.conditionCount = 0;
+  mocks.photoCount = 0;
 });
 
 describe("getContributionCountForUser", () => {
@@ -61,6 +66,13 @@ describe("getContributionCountForUser", () => {
     mocks.approvedCount = 1;
     mocks.conditionCount = 2;
     expect(await getContributionCountForUser("u1")).toBe(3);
+  });
+
+  it("adds approved in-app photos to the badge total", async () => {
+    mocks.profileRows = [{ githubLogin: null }];
+    mocks.trails = [];
+    mocks.photoCount = 2;
+    expect(await getContributionCountForUser("u1")).toBe(2);
   });
 
   it("returns 0 when there is no database", async () => {
