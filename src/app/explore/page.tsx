@@ -3,6 +3,7 @@ import Link from "next/link";
 import { TerrainMap } from "@/components/map/terrain-map";
 import { Container } from "@/components/ui/container";
 import { getAllTrails } from "@/lib/trails";
+import { highestAlertLevel, ALERT_LABEL } from "@/lib/trails/conditions";
 
 export const metadata = pageMetadata({
   title: "Explore the map",
@@ -18,6 +19,7 @@ export default function ExplorePage() {
     name: trail.name,
     region: trail.region,
     coordinates: trail.coordinates,
+    alert: highestAlertLevel(trail.alerts) ?? undefined,
   }));
 
   return (
@@ -41,22 +43,30 @@ export default function ExplorePage() {
           All trails
         </h2>
         <ul className="mt-4 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-          {trails.map((trail) => (
-            <li
-              key={trail.slug}
-              className="border-forest/5 flex items-baseline justify-between gap-3 border-b py-1.5"
-            >
-              <Link
-                href={`/trails/${trail.slug}`}
-                className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
+          {trails.map((trail) => {
+            const alertLevel = highestAlertLevel(trail.alerts);
+            return (
+              <li
+                key={trail.slug}
+                className="border-forest/5 flex items-baseline justify-between gap-3 border-b py-1.5"
               >
-                {trail.name}
-              </Link>
-              <span className="text-ink/70 shrink-0 text-sm">
-                {trail.region} TN
-              </span>
-            </li>
-          ))}
+                <Link
+                  href={`/trails/${trail.slug}`}
+                  className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
+                >
+                  {trail.name}
+                </Link>
+                <span className="text-ink/70 shrink-0 text-sm">
+                  {alertLevel ? (
+                    <span className="text-amber-700 font-medium">
+                      {ALERT_LABEL[alertLevel]} ·{" "}
+                    </span>
+                  ) : null}
+                  {trail.region} TN
+                </span>
+              </li>
+            );
+          })}
         </ul>
       </section>
     </Container>

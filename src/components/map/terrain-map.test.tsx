@@ -157,4 +157,22 @@ describe("TerrainMap", () => {
       expect(label).toContain(trail.region);
     }
   });
+
+  it("notes an alert in a pin's accessible label", async () => {
+    render(
+      <TerrainMap
+        trails={[
+          {
+            slug: "c",
+            name: "Closed Trail",
+            region: "East",
+            coordinates: { lat: 35.6, lng: -83.4 },
+            alert: "closure",
+          },
+        ]}
+      />,
+    );
+    await waitFor(() => expect(mocks.Marker).toHaveBeenCalledTimes(1));
+    expect(markerElements()[0].getAttribute("aria-label")).toContain("Closure");
+  });
 });

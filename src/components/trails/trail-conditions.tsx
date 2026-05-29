@@ -2,14 +2,9 @@ import {
   isStaleReport,
   sortReportsByDateDesc,
   conditionReportUrl,
+  ALERT_LABEL,
 } from "@/lib/trails/conditions";
 import type { TrailAlert, ConditionReport } from "@/lib/trails/schema";
-
-const LEVEL_LABEL: Record<TrailAlert["level"], string> = {
-  info: "Notice",
-  caution: "Caution",
-  closure: "Closure",
-};
 
 /**
  * Pinned official alerts plus recent, community-sourced condition reports for a
@@ -54,7 +49,7 @@ export function TrailConditions({
                   <span
                     className={`font-semibold ${strong ? "text-amber-700" : "text-olive"}`}
                   >
-                    {LEVEL_LABEL[alert.level]}
+                    {ALERT_LABEL[alert.level]}
                   </span>
                   <span className="text-ink/40"> &middot; </span>
                   <time dateTime={alert.date} className="text-ink/60">

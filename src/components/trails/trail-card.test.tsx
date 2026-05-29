@@ -35,4 +35,24 @@ describe("TrailCard", () => {
     render(<TrailCard trail={trail} />);
     expect(screen.getByAltText(/Ridge at golden hour/i)).toBeInTheDocument();
   });
+
+  it("shows an alert badge for the most severe alert", () => {
+    render(
+      <TrailCard
+        trail={{
+          ...trail,
+          alerts: [
+            { level: "caution", message: "Muddy", date: "2026-05-01" },
+            { level: "closure", message: "Bridge out", date: "2026-05-01" },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getByText(/^closure$/i)).toBeInTheDocument();
+  });
+
+  it("shows no alert badge when there are no alerts", () => {
+    render(<TrailCard trail={trail} />);
+    expect(screen.queryByText(/closure|caution|notice/i)).toBeNull();
+  });
 });
