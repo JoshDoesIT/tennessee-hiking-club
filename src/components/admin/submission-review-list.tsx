@@ -1,0 +1,146 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
+export type PendingSubmission = {
+  id: string;
+  name: string;
+  region: string;
+  area: string;
+  lat: number;
+  lng: number;
+  description: string;
+  lengthMiles?: number | null;
+  elevationGainFt?: number | null;
+  difficulty?: string | null;
+  routeType?: string | null;
+  links?: string | null;
+  submittedBy: string;
+  submittedOn: string;
+};
+
+type Decision = "approved" | "rejected";
+
+/**
+ * Maintainer review queue for in-app trail submissions (#146). Approve or reject
+ * each pending proposal; the decision is recorded via the review route. Approving
+ * credits the submitter; the maintainer then adds the trail content file (the
+ * curated publish step) separately.
+ */
+export function SubmissionReviewList({
+  submissions,
+}: {
+  submissions: PendingSubmission[];
+}) {
+  const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+
+  if (submissions.length === 0) {
+    return (
+      <p className="border-forest/15 text-ink/70 mt-6 rounded-2xl border border-dashed p-10 text-center">
+        Nothing to review right now.
+      </p>
+    );
+  }
+
+  async function review(id: string, action: "approve" | "reject") {
+    setBusy(id);
+    try {
+      const res = await fetch(`/api/contributions/${id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (res.ok) {
+        setDecisions((prev) => ({
+          ...prev,
+          [id]: action === "approve" ? "approved" : "rejected",
+        }));
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <ul className="mt-6 space-y-4">
+      {submissions.map((s) => {
+        const decided = decisions[s.id];
+        return (
+          <li
+            key={s.id}
+            className="border-forest/10 bg-cream-50 rounded-2xl border p-5"
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-forest text-lg font-semibold">{s.name}</h2>
+              <span className="text-ink/70 text-xs">
+                {s.submittedBy} · {s.submittedOn}
+              </span>
+            </div>
+            <p className="text-ink/70 mt-1 text-sm">
+              {s.region} Tennessee · {s.area} · {s.lat.toFixed(4)},{" "}
+              {s.lng.toFixed(4)}
+            </p>
+            <p className="text-ink/80 mt-2 text-sm leading-relaxed">
+              {s.description}
+            </p>
+            {(s.lengthMiles || s.elevationGainFt || s.difficulty || s.routeType) && (
+              <p className="text-ink/70 mt-2 text-xs">
+                {[
+                  s.lengthMiles ? `${s.lengthMiles} mi` : null,
+                  s.elevationGainFt ? `${s.elevationGainFt} ft gain` : null,
+                  s.difficulty,
+                  s.routeType,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            )}
+            {s.links && (
+              <p className="mt-2 text-xs">
+                <a
+                  href={s.links}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-pine hover:text-forest underline underline-offset-4"
+                >
+                  {s.links}
+                </a>
+              </p>
+            )}
+
+            {decided ? (
+              <p className="text-pine mt-4 text-sm font-medium" role="status">
+                Marked {decided}.
+              </p>
+            ) : (
+              <div className="mt-4 flex gap-3">
+                <Button
+                  type="button"
+                  variant="accent"
+                  size="sm"
+                  disabled={busy === s.id}
+                  aria-label={`Approve ${s.name}`}
+                  onClick={() => review(s.id, "approve")}
+                >
+                  Approve
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={busy === s.id}
+                  aria-label={`Reject ${s.name}`}
+                  onClick={() => review(s.id, "reject")}
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

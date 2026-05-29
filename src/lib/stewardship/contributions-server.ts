@@ -6,11 +6,14 @@ import {
   aggregateContributions,
   contributionCountFor,
 } from "@/lib/trails/contributions";
+import { getApprovedSubmissionCount } from "@/lib/contributions/submissions-server";
 
 /**
- * Recognized contribution count for a signed-in user, matched via their
- * captured GitHub login. Returns 0 when there is no database, no login, or on
- * error, so callers (the Trail Steward badge) stay resilient.
+ * Recognized contribution count for a signed-in user. Earned two ways, summed:
+ * curated content attributed to their verified GitHub login, and approved in-app
+ * submissions (#146) credited by userId, so a non-GitHub contributor is still
+ * recognized. Returns 0 when there is no database or on error, so callers (the
+ * Trail Steward badge) stay resilient.
  */
 export async function getContributionCountForUser(
   userId: string,
@@ -24,8 +27,11 @@ export async function getContributionCountForUser(
       .where(eq(profiles.userId, userId))
       .limit(1);
     const handle = row?.githubLogin;
-    if (!handle) return 0;
-    return contributionCountFor(aggregateContributions(getAllTrails()), handle);
+    const fromContent = handle
+      ? contributionCountFor(aggregateContributions(getAllTrails()), handle)
+      : 0;
+    const fromSubmissions = await getApprovedSubmissionCount(userId);
+    return fromContent + fromSubmissions;
   } catch {
     return 0;
   }

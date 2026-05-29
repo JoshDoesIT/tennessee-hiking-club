@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { TrailSubmissionForm } from "@/components/contribute/trail-submission-form";
 
 export const metadata = pageMetadata({
   title: "Contribute a trail",
@@ -33,17 +34,23 @@ export default function ContributePage() {
         <p className="eyebrow text-olive">Quickest</p>
         <h2 className="display text-forest mt-2 text-2xl">Suggest a trail</h2>
         <p className="text-ink/75 mt-2 leading-relaxed">
-          Fill in the New Trail form with the name, region, and a rough
-          location, and a maintainer will take it from there. No git required.
+          Signed in? Suggest a trail right here, no git required. A maintainer
+          reviews every suggestion before it goes on the map, and you are
+          credited as a contributor once it is approved.
         </p>
-        <Link
-          href={NEW_TRAIL_ISSUE}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn(buttonVariants({ variant: "accent" }), "mt-4")}
-        >
-          Open the new-trail form
-        </Link>
+        <TrailSubmissionForm />
+        <p className="text-ink/70 mt-4 text-sm leading-relaxed">
+          Prefer GitHub? You can also open the{" "}
+          <Link
+            href={NEW_TRAIL_ISSUE}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-pine hover:text-forest underline underline-offset-4"
+          >
+            new-trail issue form
+          </Link>
+          .
+        </p>
       </section>
 
       <section className="mt-8">
