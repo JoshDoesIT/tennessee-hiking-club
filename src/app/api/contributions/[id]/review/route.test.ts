@@ -23,7 +23,11 @@ vi.mock("@/lib/db", () => ({
 }));
 
 import { POST } from "./route";
-import { trailSubmissions, conditionSubmissions } from "@/lib/db/schema";
+import {
+  trailSubmissions,
+  conditionSubmissions,
+  photoSubmissions,
+} from "@/lib/db/schema";
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 function reviewReq(action: unknown, type?: string) {
@@ -91,8 +95,17 @@ describe("POST /api/contributions/[id]/review", () => {
     expect(patch.reviewedAt).toBeInstanceOf(Date);
   });
 
+  it("reviews a photo submission against the photo table without auto-publishing", async () => {
+    const res = await POST(reviewReq("approve", "photo"), ctx("p1"));
+    expect(res.status).toBe(200);
+    expect(mocks.update).toHaveBeenCalledWith(photoSubmissions);
+    expect((mocks.set as Mock).mock.calls[0][0].reviewStatus).toBe("approved");
+    // Photo auto-publish is tracked separately (#157).
+    expect(mocks.publishOnApproval).not.toHaveBeenCalled();
+  });
+
   it("returns 400 for an unknown submission type", async () => {
-    const res = await POST(reviewReq("approve", "photo"), ctx("sub1"));
+    const res = await POST(reviewReq("approve", "video"), ctx("sub1"));
     expect(res.status).toBe(400);
     expect(mocks.set).not.toHaveBeenCalled();
   });
