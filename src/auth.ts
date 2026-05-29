@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { getDb } from "@/lib/db";
 import { users, accounts, sessions, verificationTokens } from "@/lib/db/schema";
+import { captureGithubLogin } from "@/lib/auth/capture-login";
 
 /**
  * Auth.js (NextAuth v5) with Google and GitHub. Providers read their own
@@ -35,6 +36,17 @@ function buildConfig(): NextAuthConfig {
       sessionsTable: sessions,
       verificationTokensTable: verificationTokens,
     });
+    // Record a GitHub user's login at sign-in so their contributions can be
+    // recognized. Best-effort: failures must not block sign-in.
+    config.events = {
+      async signIn(message) {
+        try {
+          await captureGithubLogin(message, getDb());
+        } catch {
+          // ignore
+        }
+      },
+    };
   }
 
   return config;

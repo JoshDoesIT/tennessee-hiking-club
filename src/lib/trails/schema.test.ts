@@ -127,4 +127,23 @@ describe("trailSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("accepts contributor attribution on the trail, reports, and photos", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        contributors: ["octocat"],
+        conditionReports: [{ date: "2026-05-20", status: "Open", by: "octocat" }],
+        photos: [
+          { src: "/p.jpg", alt: "x", credit: "Octocat, CC0", by: "octocat" },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects an empty contributor handle", () => {
+    expect(
+      trailSchema.safeParse({ ...validTrail, contributors: [""] }).success,
+    ).toBe(false);
+  });
 });

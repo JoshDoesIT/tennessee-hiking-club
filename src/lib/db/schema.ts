@@ -23,6 +23,11 @@ export const profiles = pgTable("profiles", {
   userId: text("user_id").primaryKey(),
   displayName: text("display_name"),
   isPublic: boolean("is_public").notNull().default(false),
+  /** GitHub login captured at sign-in. Recognition is earned, not claimed: a
+   *  user is credited for curated contributions (trails, condition reports,
+   *  photos) attributed to this verified login. Future in-app contribution
+   *  features will record contributions against the account directly. */
+  githubLogin: text("github_login"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
