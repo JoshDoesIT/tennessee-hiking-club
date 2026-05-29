@@ -5,13 +5,22 @@ import { pageMetadata } from "@/lib/page-metadata";
 import { auth } from "@/auth";
 import { isAdminUser } from "@/lib/auth/admin-server";
 import { getDb } from "@/lib/db";
-import { profiles, trailSubmissions } from "@/lib/db/schema";
+import {
+  profiles,
+  trailSubmissions,
+  conditionSubmissions,
+} from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import { generateTrailContent } from "@/lib/contributions/trail-content";
+import { generateConditionEntry } from "@/lib/contributions/condition";
 import {
   SubmissionReviewList,
   type PendingSubmission,
 } from "@/components/admin/submission-review-list";
+import {
+  ConditionReviewList,
+  type PendingConditionReport,
+} from "@/components/admin/condition-review-list";
 
 // Gated, request-time only, never indexed.
 export const dynamic = "force-dynamic";
@@ -90,6 +99,46 @@ async function loadPending(): Promise<PendingSubmission[]> {
   });
 }
 
+async function loadPendingConditions(): Promise<PendingConditionReport[]> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(conditionSubmissions)
+    .where(eq(conditionSubmissions.reviewStatus, "pending"))
+    .orderBy(desc(conditionSubmissions.createdAt));
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.map((r) => r.userId))];
+  const profileRows = await db
+    .select()
+    .from(profiles)
+    .where(inArray(profiles.userId, userIds));
+  const profileById = new Map(profileRows.map((p) => [p.userId, p]));
+  const nameBySlug = new Map(getAllTrails().map((t) => [t.slug, t.name]));
+
+  return rows.map((r) => {
+    const profile = profileById.get(r.userId);
+    const handle = profile?.githubLogin || profile?.displayName || null;
+    const entry = generateConditionEntry({
+      date: r.reportDate,
+      status: r.status,
+      note: r.note,
+      by: handle,
+    });
+    return {
+      id: r.id,
+      trailSlug: r.trailSlug,
+      trailName: nameBySlug.get(r.trailSlug) || r.trailSlug,
+      status: r.status,
+      note: r.note,
+      reportDate: r.reportDate,
+      submittedBy: profile?.displayName || profile?.githubLogin || "A member",
+      submittedOn: r.createdAt.toISOString().slice(0, 10),
+      entry: { yaml: entry.yaml, valid: entry.valid },
+    };
+  });
+}
+
 export default async function AdminSubmissionsPage() {
   // No role system: the page only exists for configured maintainers, and is a
   // 404 for everyone else (it does not reveal that it exists).
@@ -98,7 +147,10 @@ export default async function AdminSubmissionsPage() {
   const userId = session?.user?.id;
   if (!userId || !(await isAdminUser(userId))) notFound();
 
-  const pending = await loadPending();
+  const [pending, pendingConditions] = await Promise.all([
+    loadPending(),
+    loadPendingConditions(),
+  ]);
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
@@ -107,10 +159,29 @@ export default async function AdminSubmissionsPage() {
         Review submissions
       </h1>
       <p className="text-ink/70 mt-4 leading-relaxed">
-        Member-submitted trails awaiting review. Approving credits the submitter;
-        add the trail content file to publish it.
+        Member-submitted contributions awaiting review. Approving credits the
+        submitter; add the generated content to publish it.
       </p>
-      <SubmissionReviewList submissions={pending} />
+
+      <section aria-labelledby="trail-submissions-heading" className="mt-10">
+        <h2
+          id="trail-submissions-heading"
+          className="display text-forest text-2xl"
+        >
+          New trails
+        </h2>
+        <SubmissionReviewList submissions={pending} />
+      </section>
+
+      <section aria-labelledby="condition-reports-heading" className="mt-12">
+        <h2
+          id="condition-reports-heading"
+          className="display text-forest text-2xl"
+        >
+          Condition reports
+        </h2>
+        <ConditionReviewList reports={pendingConditions} />
+      </section>
     </Container>
   );
 }

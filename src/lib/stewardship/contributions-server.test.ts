@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   profileRows: [] as Array<{ githubLogin: string | null }>,
   trails: [] as unknown[],
   approvedCount: 0,
+  conditionCount: 0,
 }));
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
@@ -16,6 +17,9 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/trails", () => ({ getAllTrails: () => mocks.trails }));
 vi.mock("@/lib/contributions/submissions-server", () => ({
   getApprovedSubmissionCount: async () => mocks.approvedCount,
+}));
+vi.mock("@/lib/contributions/conditions-server", () => ({
+  getApprovedConditionCount: async () => mocks.conditionCount,
 }));
 
 import { getContributionCountForUser } from "./contributions-server";
@@ -33,6 +37,7 @@ beforeEach(() => {
   mocks.profileRows = [];
   mocks.trails = [];
   mocks.approvedCount = 0;
+  mocks.conditionCount = 0;
 });
 
 describe("getContributionCountForUser", () => {
@@ -48,6 +53,14 @@ describe("getContributionCountForUser", () => {
     mocks.trails = [];
     mocks.approvedCount = 1;
     expect(await getContributionCountForUser("u1")).toBe(1);
+  });
+
+  it("adds approved in-app condition reports to the badge total", async () => {
+    mocks.profileRows = [{ githubLogin: null }];
+    mocks.trails = [];
+    mocks.approvedCount = 1;
+    mocks.conditionCount = 2;
+    expect(await getContributionCountForUser("u1")).toBe(3);
   });
 
   it("returns 0 when there is no database", async () => {

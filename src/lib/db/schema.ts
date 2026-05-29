@@ -103,10 +103,41 @@ export const trailSubmissions = pgTable(
   ],
 );
 
+/**
+ * An in-app condition report (#149) for an existing trail, submitted by a
+ * signed-in member. Like a trail submission it is a reviewed proposal, not a
+ * live edit: a maintainer approves it, then curates it into the trail's
+ * `conditionReports[]`. An approved report earns the submitter recognition on
+ * the "conditions reported" board by `userId`. `status` is the condition itself
+ * (e.g. "Muddy"); `reviewStatus` is the moderation state.
+ */
+export const conditionSubmissions = pgTable(
+  "condition_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    trailSlug: text("trail_slug").notNull(),
+    status: text("status").notNull(),
+    note: text("note"),
+    reportDate: date("report_date").notNull(),
+    /** pending | approved | rejected */
+    reviewStatus: text("review_status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("condition_submissions_user_id_idx").on(table.userId),
+    index("condition_submissions_review_status_idx").on(table.reviewStatus),
+  ],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
 export type CleanupRow = typeof cleanups.$inferSelect;
 export type TrailSubmissionRow = typeof trailSubmissions.$inferSelect;
+export type ConditionSubmissionRow = typeof conditionSubmissions.$inferSelect;
 
 // --- Auth.js (NextAuth) adapter tables --------------------------------------
 // Canonical Auth.js Drizzle schema. `hikes.userId` / `profiles.userId` hold

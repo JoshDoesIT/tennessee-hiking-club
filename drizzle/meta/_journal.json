@@ -43,6 +43,13 @@
       "when": 1780053977258,
       "tag": "0005_classy_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780089797357,
+      "tag": "0006_dry_vermin",
+      "breakpoints": true
     }
   ]
 }
