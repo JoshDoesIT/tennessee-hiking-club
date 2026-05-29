@@ -18,9 +18,31 @@ export type PendingSubmission = {
   links?: string | null;
   submittedBy: string;
   submittedOn: string;
+  /** The `content/trails/<slug>.md` generated from this submission (#150). */
+  generated: {
+    fileName: string;
+    markdown: string;
+    valid: boolean;
+    missing: string[];
+  };
 };
 
 type Decision = "approved" | "rejected";
+
+/** Download generated markdown as a file the maintainer can commit. */
+function downloadFile(fileName: string, markdown: string) {
+  if (typeof URL.createObjectURL !== "function") return;
+  const url = URL.createObjectURL(
+    new Blob([markdown], { type: "text/markdown" }),
+  );
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 /**
  * Maintainer review queue for in-app trail submissions (#146). Approve or reject
@@ -111,9 +133,46 @@ export function SubmissionReviewList({
             )}
 
             {decided ? (
-              <p className="text-pine mt-4 text-sm font-medium" role="status">
-                Marked {decided}.
-              </p>
+              <div className="mt-4">
+                <p className="text-pine text-sm font-medium" role="status">
+                  Marked {decided}.
+                </p>
+                {decided === "approved" && (
+                  <div className="border-forest/15 mt-3 rounded-xl border p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-forest text-sm font-medium">
+                        Content file:{" "}
+                        <code className="text-ink/80">
+                          content/trails/{s.generated.fileName}
+                        </code>
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        aria-label={`Download ${s.generated.fileName}`}
+                        onClick={() =>
+                          downloadFile(
+                            s.generated.fileName,
+                            s.generated.markdown,
+                          )
+                        }
+                      >
+                        Download file
+                      </Button>
+                    </div>
+                    {!s.generated.valid && (
+                      <p className="text-amber-700 mt-2 text-xs" role="note">
+                        Fill in before committing:{" "}
+                        {s.generated.missing.join(", ")}
+                      </p>
+                    )}
+                    <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
+                      {s.generated.markdown}
+                    </pre>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="mt-4 flex gap-3">
                 <Button

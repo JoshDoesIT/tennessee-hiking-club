@@ -13,6 +13,12 @@ const sub = {
   description: "Short loop to a waterfall.",
   submittedBy: "Trail Ann",
   submittedOn: "2026-05-20",
+  generated: {
+    fileName: "piney-falls.md",
+    markdown: "---\nslug: piney-falls\nname: Piney Falls\n---\n\nShort loop.",
+    valid: true,
+    missing: [],
+  },
 };
 
 function setupFetch() {
@@ -72,5 +78,39 @@ describe("SubmissionReviewList", () => {
     setupFetch();
     render(<SubmissionReviewList submissions={[]} />);
     expect(screen.getByText(/nothing to review/i)).toBeInTheDocument();
+  });
+
+  it("reveals the generated content file after approval", async () => {
+    const user = userEvent.setup();
+    setupFetch();
+    render(<SubmissionReviewList submissions={[sub]} />);
+    // Not shown before a decision.
+    expect(screen.queryByText(/piney-falls\.md/)).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: /approve/i }));
+
+    expect(await screen.findByText(/piney-falls\.md/)).toBeInTheDocument();
+    expect(screen.getByText(/slug: piney-falls/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /download/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("flags missing required fields on an incomplete generated file", async () => {
+    const user = userEvent.setup();
+    setupFetch();
+    const incomplete = {
+      ...sub,
+      generated: {
+        ...sub.generated,
+        valid: false,
+        missing: ["difficulty", "routeType"],
+      },
+    };
+    render(<SubmissionReviewList submissions={[incomplete]} />);
+    await user.click(screen.getByRole("button", { name: /approve/i }));
+
+    expect(await screen.findByText(/difficulty/i)).toBeInTheDocument();
+    expect(screen.getByText(/routeType/i)).toBeInTheDocument();
   });
 });
