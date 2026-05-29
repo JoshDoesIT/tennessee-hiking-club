@@ -5,6 +5,7 @@ import {
   boolean,
   uuid,
   integer,
+  doublePrecision,
   timestamp,
   primaryKey,
   index,
@@ -66,9 +67,46 @@ export const cleanups = pgTable(
   (table) => [index("cleanups_user_id_idx").on(table.userId)],
 );
 
+/**
+ * An in-app proposal for a new trail (#146), submitted by a signed-in member
+ * without GitHub. A maintainer reviews it before any content is published; an
+ * approved submission earns recognition for the submitter by `userId`, so a
+ * non-GitHub contributor is credited without a content handle. Optional columns
+ * mirror the optional fields of the GitHub "new trail" issue form.
+ */
+export const trailSubmissions = pgTable(
+  "trail_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    name: text("name").notNull(),
+    region: text("region").notNull(),
+    area: text("area").notNull(),
+    lat: doublePrecision("lat").notNull(),
+    lng: doublePrecision("lng").notNull(),
+    lengthMiles: doublePrecision("length_miles"),
+    elevationGainFt: integer("elevation_gain_ft"),
+    difficulty: text("difficulty"),
+    routeType: text("route_type"),
+    description: text("description").notNull(),
+    links: text("links"),
+    /** pending | approved | rejected */
+    status: text("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("trail_submissions_user_id_idx").on(table.userId),
+    index("trail_submissions_status_idx").on(table.status),
+  ],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
 export type CleanupRow = typeof cleanups.$inferSelect;
+export type TrailSubmissionRow = typeof trailSubmissions.$inferSelect;
 
 // --- Auth.js (NextAuth) adapter tables --------------------------------------
 // Canonical Auth.js Drizzle schema. `hikes.userId` / `profiles.userId` hold

@@ -22,6 +22,7 @@ import {
 import { rowToEntry } from "@/lib/hikes/sync";
 import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
 import { aggregateContributions } from "@/lib/trails/contributions";
+import { getApprovedSubmissionCounts } from "@/lib/contributions/submissions-server";
 
 // Reads opted-in profiles at request time; never prerendered (and harmless
 // without a database, which keeps CI builds green).
@@ -62,9 +63,10 @@ async function loadEntries(
     if (opted.length === 0) return [];
 
     const ids = opted.map((p) => p.userId);
-    const [hikeRows, cleanupRows] = await Promise.all([
+    const [hikeRows, cleanupRows, submissionCounts] = await Promise.all([
       db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
       db.select().from(cleanupsTable).where(inArray(cleanupsTable.userId, ids)),
+      getApprovedSubmissionCounts(ids),
     ]);
 
     const hikesByUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
@@ -93,16 +95,19 @@ async function loadEntries(
       );
       const contributions = new Set(userCleanups.map((c) => c.loggedOn)).size;
       // Contributions are attributed by the user's captured GitHub login; they
-      // are all-time (not windowed by date).
+      // are all-time (not windowed by date). Approved in-app submissions (#146)
+      // are credited by userId and count toward trails contributed.
       const counts = p.githubLogin
         ? contributionsByHandle.get(p.githubLogin.toLowerCase())
         : undefined;
+      const trailsContributed =
+        (counts?.trailsContributed ?? 0) + (submissionCounts.get(p.userId) ?? 0);
       return leaderboardEntry(
         p.displayName || "Anonymous hiker",
         filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
         trails,
         contributions,
-        counts?.trailsContributed ?? 0,
+        trailsContributed,
         counts?.conditionsReported ?? 0,
       );
     });

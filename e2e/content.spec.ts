@@ -27,12 +27,20 @@ test("home features real trails linking to their pages", async ({ page }) => {
   await expect(trailLink).toHaveAttribute("href", /^\/trails\/[a-z0-9-]+$/);
 });
 
-test("contribute page links the new-trail form and contributing guide", async ({
+test("contribute page offers in-app submission and links GitHub paths", async ({
   page,
 }) => {
   await page.goto("/contribute");
+  // In-app submission is the primary path; signed-out visitors see a prompt to
+  // sign in rather than the form.
   await expect(
-    page.getByRole("link", { name: /new-trail form/i }),
+    page.getByRole("heading", { level: 2, name: /suggest a trail/i }),
+  ).toBeVisible();
+  await expect(page.getByText(/sign in to suggest a trail/i)).toBeVisible();
+  await expect(page.getByLabel(/trail name/i)).toHaveCount(0);
+  // GitHub paths remain available.
+  await expect(
+    page.getByRole("link", { name: /new-trail issue form/i }),
   ).toHaveAttribute("href", /\/issues\/new\?template=new_trail\.yml$/);
   await expect(
     page.getByRole("link", { name: /contributing guide/i }),
