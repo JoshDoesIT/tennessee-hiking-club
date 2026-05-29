@@ -13,7 +13,7 @@ export async function getApprovedConditionCount(
   if (!process.env.DATABASE_URL) return 0;
   const db = getDb();
   const rows = await db
-    .select({ userId: conditionSubmissions.userId })
+    .select({ reviewStatus: conditionSubmissions.reviewStatus })
     .from(conditionSubmissions)
     .where(
       and(
@@ -21,7 +21,8 @@ export async function getApprovedConditionCount(
         eq(conditionSubmissions.reviewStatus, "approved"),
       ),
     );
-  return rows.length;
+  // Published reports (#153) stop counting here; the content credits them.
+  return rows.filter((r) => r.reviewStatus === "approved").length;
 }
 
 /** Approved condition-report counts for many users at once, keyed by userId. */
@@ -32,7 +33,10 @@ export async function getApprovedConditionCounts(
   if (!process.env.DATABASE_URL || userIds.length === 0) return counts;
   const db = getDb();
   const rows = await db
-    .select({ userId: conditionSubmissions.userId })
+    .select({
+      userId: conditionSubmissions.userId,
+      reviewStatus: conditionSubmissions.reviewStatus,
+    })
     .from(conditionSubmissions)
     .where(
       and(
@@ -41,6 +45,7 @@ export async function getApprovedConditionCounts(
       ),
     );
   for (const row of rows) {
+    if (row.reviewStatus !== "approved") continue;
     counts.set(row.userId, (counts.get(row.userId) ?? 0) + 1);
   }
   return counts;

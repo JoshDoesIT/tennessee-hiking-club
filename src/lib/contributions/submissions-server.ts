@@ -13,7 +13,7 @@ export async function getApprovedSubmissionCount(
   if (!process.env.DATABASE_URL) return 0;
   const db = getDb();
   const rows = await db
-    .select({ userId: trailSubmissions.userId })
+    .select({ status: trailSubmissions.status })
     .from(trailSubmissions)
     .where(
       and(
@@ -21,7 +21,9 @@ export async function getApprovedSubmissionCount(
         eq(trailSubmissions.status, "approved"),
       ),
     );
-  return rows.length;
+  // A submission whose content was published to the repo (#153) moves to
+  // "published" and stops counting here, since the content now credits it.
+  return rows.filter((r) => r.status === "approved").length;
 }
 
 /** Approved-submission counts for many users at once, keyed by userId. */
@@ -32,7 +34,7 @@ export async function getApprovedSubmissionCounts(
   if (!process.env.DATABASE_URL || userIds.length === 0) return counts;
   const db = getDb();
   const rows = await db
-    .select({ userId: trailSubmissions.userId })
+    .select({ userId: trailSubmissions.userId, status: trailSubmissions.status })
     .from(trailSubmissions)
     .where(
       and(
@@ -41,6 +43,7 @@ export async function getApprovedSubmissionCounts(
       ),
     );
   for (const row of rows) {
+    if (row.status !== "approved") continue;
     counts.set(row.userId, (counts.get(row.userId) ?? 0) + 1);
   }
   return counts;

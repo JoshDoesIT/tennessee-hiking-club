@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
     openPullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
   },
   openFilePullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
+  updateSet: vi.fn(() => ({ where: async () => undefined })),
   blobGet: vi.fn(async () => ({
     stream: new Blob(["img-bytes"]).stream(),
     blob: { contentType: "image/jpeg" },
@@ -44,6 +45,7 @@ vi.mock("@/lib/db", () => ({
         }),
       }),
     }),
+    update: () => ({ set: mocks.updateSet }),
   }),
 }));
 
@@ -152,6 +154,16 @@ describe("publishOnApproval", () => {
     const args = calls[0]?.[1] ?? { path: "" };
     expect(args.path).toBe("content/trails/piney-falls.md");
     expect(args.sha).toBeUndefined();
+    // The submitter has a GitHub login, so the published content will credit
+    // them; the submission stops counting via the submission path (#153).
+    expect(mocks.updateSet).toHaveBeenCalledWith({ status: "published" });
+  });
+
+  it("keeps an in-app-only submitter's submission counting (no github login)", async () => {
+    mocks.firstRow = trailRow;
+    mocks.profileRow = { userId: "u1", githubLogin: null, displayName: "Anon" };
+    await publishOnApproval({ type: "trail", id: "trail123-abc" });
+    expect(mocks.updateSet).not.toHaveBeenCalled();
   });
 
   it("opens a PR for an approved condition report, updating the file", async () => {
@@ -165,6 +177,7 @@ describe("publishOnApproval", () => {
     const args = calls[0]?.[1] ?? { path: "" };
     expect(args.path).toBe("content/trails/virgin-falls.md");
     expect(args.sha).toBe("filesha");
+    expect(mocks.updateSet).toHaveBeenCalledWith({ reviewStatus: "published" });
   });
 
   it("opens a PR for an approved photo, committing the image and the entry", async () => {
@@ -190,5 +203,6 @@ describe("publishOnApproval", () => {
     expect(txtArgs.path).toBe("content/trails/virgin-falls.md");
     expect(txtArgs.content).toContain("The falls in spring flow");
     expect(mocks.api.openPullRequest).toHaveBeenCalled();
+    expect(mocks.updateSet).toHaveBeenCalledWith({ reviewStatus: "published" });
   });
 });

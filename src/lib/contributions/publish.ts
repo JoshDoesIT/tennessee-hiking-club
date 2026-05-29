@@ -116,16 +116,17 @@ export function conditionPublication(
   };
 }
 
-async function loadHandle(
+async function loadSubmitter(
   db: ReturnType<typeof getDb>,
   userId: string,
-): Promise<string | null> {
+): Promise<{ handle: string | null; githubLogin: string | null }> {
   const [row] = await db
     .select()
     .from(profiles)
     .where(eq(profiles.userId, userId))
     .limit(1);
-  return row?.githubLogin || row?.displayName || null;
+  const githubLogin = row?.githubLogin ?? null;
+  return { handle: githubLogin || row?.displayName || null, githubLogin };
 }
 
 export async function publishOnApproval({
@@ -148,11 +149,23 @@ export async function publishOnApproval({
       .where(eq(trailSubmissions.id, id))
       .limit(1);
     if (!row) return null;
-    const handle = await loadHandle(db, row.userId);
+    const submitter = await loadSubmitter(db, row.userId);
     const slugs = new Set(getAllTrails().map((t) => t.slug));
-    const pub = trailPublication(row, handle, slugs);
+    const pub = trailPublication(row, submitter.handle, slugs);
     if (!pub.ok) return null;
-    return openFilePullRequest(api, { base: config.baseBranch, ...pub });
+    const result = await openFilePullRequest(api, {
+      base: config.baseBranch,
+      ...pub,
+    });
+    // The published content will credit a GitHub-login submitter by login, so
+    // stop counting the submission to avoid double recognition (#153).
+    if (submitter.githubLogin) {
+      await db
+        .update(trailSubmissions)
+        .set({ status: "published" })
+        .where(eq(trailSubmissions.id, id));
+    }
+    return result;
   }
 
   if (type === "condition") {
@@ -162,16 +175,23 @@ export async function publishOnApproval({
       .where(eq(conditionSubmissions.id, id))
       .limit(1);
     if (!row) return null;
-    const handle = await loadHandle(db, row.userId);
+    const submitter = await loadSubmitter(db, row.userId);
     const path = `content/trails/${row.trailSlug}.md`;
     const file = await api.getFile(path, config.baseBranch);
     if (!file) return null;
-    const pub = conditionPublication(row, handle, file.content);
-    return openFilePullRequest(api, {
+    const pub = conditionPublication(row, submitter.handle, file.content);
+    const result = await openFilePullRequest(api, {
       base: config.baseBranch,
       ...pub,
       sha: file.sha,
     });
+    if (submitter.githubLogin) {
+      await db
+        .update(conditionSubmissions)
+        .set({ reviewStatus: "published" })
+        .where(eq(conditionSubmissions.id, id));
+    }
+    return result;
   }
 
   // photo: commit the image and the photos[] entry on one branch, then open a
@@ -182,7 +202,7 @@ export async function publishOnApproval({
     .where(eq(photoSubmissions.id, id))
     .limit(1);
   if (!row) return null;
-  const handle = await loadHandle(db, row.userId);
+  const submitter = await loadSubmitter(db, row.userId);
 
   const image = await get(new URL(row.blobUrl).pathname.replace(/^\//, ""), {
     access: "private",
@@ -213,14 +233,21 @@ export async function publishOnApproval({
     src,
     alt: row.alt,
     credit: row.credit,
-    by: handle,
+    by: submitter.handle,
   });
   await api.putFile({ path: contentPath, content: updated, message, branch, sha: file.sha });
 
-  return api.openPullRequest({
+  const result = await api.openPullRequest({
     title: `Photo: ${row.trailSlug}`,
     body: `Adds an approved in-app photo for ${row.trailSlug}.`,
     head: branch,
     base: config.baseBranch,
   });
+  if (submitter.githubLogin) {
+    await db
+      .update(photoSubmissions)
+      .set({ reviewStatus: "published" })
+      .where(eq(photoSubmissions.id, id));
+  }
+  return result;
 }
