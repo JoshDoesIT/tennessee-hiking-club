@@ -87,7 +87,29 @@ export function SiteFooter() {
           <p>
             © {new Date().getFullYear()} Tennessee Hiking Club · MIT licensed
           </p>
-          <p>Hike responsibly · Leave No Trace · Built in the open</p>
+          <nav
+            aria-label="Legal and accessibility"
+            className="flex flex-wrap gap-x-4 gap-y-1"
+          >
+            <Link
+              href="/privacy"
+              className="hover:text-cream transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/accessibility"
+              className="hover:text-cream transition-colors"
+            >
+              Accessibility
+            </Link>
+            <Link
+              href="/leave-no-trace"
+              className="hover:text-cream transition-colors"
+            >
+              Leave No Trace
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>

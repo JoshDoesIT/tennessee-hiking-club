@@ -16,4 +16,14 @@ describe("SiteFooter", () => {
     expect(fb.getAttribute("href")).toContain("facebook.com");
     expect(fb).toHaveAttribute("target", "_blank");
   });
+
+  it("links to the privacy and accessibility pages", () => {
+    render(<SiteFooter />);
+    expect(
+      screen.getByRole("link", { name: /^privacy/i }),
+    ).toHaveAttribute("href", "/privacy");
+    expect(
+      screen.getByRole("link", { name: /^accessibility/i }),
+    ).toHaveAttribute("href", "/accessibility");
+  });
 });

@@ -42,6 +42,22 @@ test("trail detail page loads", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("privacy page loads", async ({ page }) => {
+  const res = await page.goto("/privacy");
+  expect(res?.status()).toBe(200);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /privacy/i }),
+  ).toBeVisible();
+});
+
+test("accessibility page loads", async ({ page }) => {
+  const res = await page.goto("/accessibility");
+  expect(res?.status()).toBe(200);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /accessibility/i }),
+  ).toBeVisible();
+});
+
 test("home page emits per-page Open Graph metadata", async ({ page }) => {
   await page.goto("/");
   const ogTitle = await page
