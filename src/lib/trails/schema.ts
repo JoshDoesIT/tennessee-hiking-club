@@ -24,7 +24,7 @@ const alertSchema = z.object({
 });
 
 /** A recent, community-sourced condition report curated into trail content. */
-const conditionReportSchema = z.object({
+export const conditionReportSchema = z.object({
   date: reportDate,
   status: z.string().min(1),
   note: z.string().optional(),

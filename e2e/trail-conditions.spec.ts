@@ -27,3 +27,15 @@ test("trail detail shows conditions, a pinned alert, and a report link", async (
     /template=trail_condition\.yml/,
   );
 });
+
+test("the in-app condition form is gated to signed-in members", async ({
+  page,
+}) => {
+  await page.goto("/trails/virgin-falls");
+  // Signed-out visitors keep the GitHub report link but do not see the in-app
+  // form (it renders only once a session is present).
+  await expect(
+    page.getByRole("link", { name: /report current conditions/i }),
+  ).toBeVisible();
+  await expect(page.getByLabel(/^condition$/i)).toHaveCount(0);
+});

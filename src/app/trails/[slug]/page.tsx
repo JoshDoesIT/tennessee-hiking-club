@@ -9,6 +9,7 @@ import { WeatherForecast } from "@/components/trails/weather-forecast";
 import { fetchTrailWeather } from "@/lib/weather/forecast";
 import { TrailContextMap } from "@/components/map/trail-context-map";
 import { TrailConditions } from "@/components/trails/trail-conditions";
+import { ConditionReportForm } from "@/components/trails/condition-report-form";
 import { TrailParking } from "@/components/trails/trail-parking";
 import { ElevationProfile } from "@/components/trails/elevation-profile";
 import { DownloadGpx } from "@/components/trails/download-gpx";
@@ -78,6 +79,7 @@ export default async function TrailPage({ params }: Params) {
       </dl>
 
       <TrailConditions trail={trail} />
+      <ConditionReportForm trailSlug={trail.slug} trailName={trail.name} />
 
       {trail.route && trail.route.length > 1 ? (
         <div className="mt-2">

@@ -23,6 +23,7 @@ import { rowToEntry } from "@/lib/hikes/sync";
 import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
 import { aggregateContributions } from "@/lib/trails/contributions";
 import { getApprovedSubmissionCounts } from "@/lib/contributions/submissions-server";
+import { getApprovedConditionCounts } from "@/lib/contributions/conditions-server";
 
 // Reads opted-in profiles at request time; never prerendered (and harmless
 // without a database, which keeps CI builds green).
@@ -63,11 +64,16 @@ async function loadEntries(
     if (opted.length === 0) return [];
 
     const ids = opted.map((p) => p.userId);
-    const [hikeRows, cleanupRows, submissionCounts] = await Promise.all([
-      db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
-      db.select().from(cleanupsTable).where(inArray(cleanupsTable.userId, ids)),
-      getApprovedSubmissionCounts(ids),
-    ]);
+    const [hikeRows, cleanupRows, submissionCounts, conditionCounts] =
+      await Promise.all([
+        db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
+        db
+          .select()
+          .from(cleanupsTable)
+          .where(inArray(cleanupsTable.userId, ids)),
+        getApprovedSubmissionCounts(ids),
+        getApprovedConditionCounts(ids),
+      ]);
 
     const hikesByUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
     for (const row of hikeRows) {
@@ -102,13 +108,15 @@ async function loadEntries(
         : undefined;
       const trailsContributed =
         (counts?.trailsContributed ?? 0) + (submissionCounts.get(p.userId) ?? 0);
+      const conditionsReported =
+        (counts?.conditionsReported ?? 0) + (conditionCounts.get(p.userId) ?? 0);
       return leaderboardEntry(
         p.displayName || "Anonymous hiker",
         filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
         trails,
         contributions,
         trailsContributed,
-        counts?.conditionsReported ?? 0,
+        conditionsReported,
       );
     });
   } catch {
