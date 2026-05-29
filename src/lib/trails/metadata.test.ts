@@ -16,6 +16,8 @@ const trail: Trail = {
   photos: [{ src: "/trails/placeholder.png", alt: "Ridge at golden hour" }],
   summary: "A classic climb.",
   body: "",
+  alerts: [],
+  conditionReports: [],
 };
 
 describe("trailMetadata", () => {

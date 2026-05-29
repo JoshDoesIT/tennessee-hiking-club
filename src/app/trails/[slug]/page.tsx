@@ -8,6 +8,7 @@ import { TrailGallery } from "@/components/trails/trail-gallery";
 import { WeatherForecast } from "@/components/trails/weather-forecast";
 import { fetchTrailWeather } from "@/lib/weather/forecast";
 import { TrailContextMap } from "@/components/map/trail-context-map";
+import { TrailConditions } from "@/components/trails/trail-conditions";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -72,6 +73,8 @@ export default async function TrailPage({ params }: Params) {
         <Stat label="Difficulty" value={trail.difficulty} />
         <Stat label="Route" value={trail.routeType} />
       </dl>
+
+      <TrailConditions trail={trail} />
 
       <section className="mt-8">
         <h2 className="display text-forest text-2xl">Find the trailhead</h2>

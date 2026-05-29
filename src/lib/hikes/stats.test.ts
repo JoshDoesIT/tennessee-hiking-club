@@ -17,6 +17,8 @@ const make = (over: Partial<Trail>): Trail => ({
   photos: [],
   summary: "s",
   body: "",
+  alerts: [],
+  conditionReports: [],
   ...over,
 });
 
