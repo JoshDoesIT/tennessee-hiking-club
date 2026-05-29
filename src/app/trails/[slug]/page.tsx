@@ -9,6 +9,7 @@ import { WeatherForecast } from "@/components/trails/weather-forecast";
 import { fetchTrailWeather } from "@/lib/weather/forecast";
 import { TrailContextMap } from "@/components/map/trail-context-map";
 import { TrailConditions } from "@/components/trails/trail-conditions";
+import { TrailParking } from "@/components/trails/trail-parking";
 import { ElevationProfile } from "@/components/trails/elevation-profile";
 import { DownloadGpx } from "@/components/trails/download-gpx";
 import { Container } from "@/components/ui/container";
@@ -90,7 +91,11 @@ export default async function TrailPage({ params }: Params) {
       <section className="mt-8">
         <h2 className="display text-forest text-2xl">Find the trailhead</h2>
         <div className="mt-4">
-          <TrailContextMap coordinates={trail.coordinates} name={trail.name} />
+          <TrailContextMap
+            coordinates={trail.coordinates}
+            name={trail.name}
+            parking={trail.parking}
+          />
         </div>
         <div className="mt-4">
           <a
@@ -102,6 +107,7 @@ export default async function TrailPage({ params }: Params) {
             Open in Google Maps
           </a>
         </div>
+        {trail.parking ? <TrailParking parking={trail.parking} /> : null}
       </section>
 
       <WeatherForecast weather={weather} />

@@ -16,12 +16,16 @@ const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 export function TrailContextMap({
   coordinates,
   name,
+  parking,
 }: {
   coordinates: { lat: number; lng: number };
   name: string;
+  parking?: { lat: number; lng: number };
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
+  const parkingLat = parking?.lat;
+  const parkingLng = parking?.lng;
 
   useEffect(() => {
     let map: import("maplibre-gl").Map | undefined;
@@ -77,6 +81,31 @@ export function TrailContextMap({
             boxShadow: "0 1px 4px rgba(0,0,0,.35)",
           });
           new maplibregl.Marker({ element: el }).setLngLat(center).addTo(map);
+
+          if (parkingLat != null && parkingLng != null) {
+            const pEl = document.createElement("div");
+            pEl.setAttribute("aria-hidden", "true");
+            pEl.textContent = "P";
+            Object.assign(pEl.style, {
+              display: "grid",
+              placeItems: "center",
+              width: "20px",
+              height: "20px",
+              borderRadius: "9999px",
+              background: "#475036",
+              color: "#fbf6e9",
+              border: "2px solid #fbf6e9",
+              font: "700 12px/1 sans-serif",
+              boxShadow: "0 1px 4px rgba(0,0,0,.35)",
+            });
+            new maplibregl.Marker({ element: pEl })
+              .setLngLat([parkingLng, parkingLat])
+              .addTo(map);
+
+            const bounds = new maplibregl.LngLatBounds(center, center);
+            bounds.extend([parkingLng, parkingLat]);
+            map.fitBounds(bounds, { padding: 64, maxZoom: 14, duration: 0 });
+          }
         });
       } catch {
         if (!cancelled) setFailed(true);
@@ -87,7 +116,7 @@ export function TrailContextMap({
       cancelled = true;
       map?.remove();
     };
-  }, [coordinates.lat, coordinates.lng]);
+  }, [coordinates.lat, coordinates.lng, parkingLat, parkingLng]);
 
   return (
     <div className="relative w-full">
