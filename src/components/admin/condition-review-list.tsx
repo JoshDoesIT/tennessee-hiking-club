@@ -30,6 +30,7 @@ export function ConditionReviewList({
   reports: PendingConditionReport[];
 }) {
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [prUrls, setPrUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   if (reports.length === 0) {
@@ -53,6 +54,10 @@ export function ConditionReviewList({
           ...prev,
           [id]: action === "approve" ? "approved" : "rejected",
         }));
+        const data = await res.json().catch(() => null);
+        if (data?.prUrl) {
+          setPrUrls((prev) => ({ ...prev, [id]: data.prUrl as string }));
+        }
       }
     } finally {
       setBusy(null);
@@ -88,20 +93,34 @@ export function ConditionReviewList({
                 <p className="text-pine text-sm font-medium" role="status">
                   Marked {decided}.
                 </p>
-                {decided === "approved" && (
-                  <div className="border-forest/15 mt-3 rounded-xl border p-4">
-                    <p className="text-forest text-sm font-medium">
-                      Add under <code className="text-ink/80">conditionReports:</code>{" "}
-                      in{" "}
-                      <code className="text-ink/80">
-                        content/trails/{r.trailSlug}.md
-                      </code>
+                {decided === "approved" &&
+                  (prUrls[r.id] ? (
+                    <p className="text-ink/80 mt-3 text-sm">
+                      Opened a{" "}
+                      <a
+                        href={prUrls[r.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pine hover:text-forest underline underline-offset-4"
+                      >
+                        pull request
+                      </a>{" "}
+                      with this report. Merge it to go live.
                     </p>
-                    <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
-                      {r.entry.yaml}
-                    </pre>
-                  </div>
-                )}
+                  ) : (
+                    <div className="border-forest/15 mt-3 rounded-xl border p-4">
+                      <p className="text-forest text-sm font-medium">
+                        Add under{" "}
+                        <code className="text-ink/80">conditionReports:</code> in{" "}
+                        <code className="text-ink/80">
+                          content/trails/{r.trailSlug}.md
+                        </code>
+                      </p>
+                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
+                        {r.entry.yaml}
+                      </pre>
+                    </div>
+                  ))}
               </div>
             ) : (
               <div className="mt-4 flex gap-3">

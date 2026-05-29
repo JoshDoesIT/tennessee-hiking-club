@@ -18,7 +18,7 @@ const report = {
   },
 };
 
-function setupFetch() {
+function setupFetch({ prUrl = null }: { prUrl?: string | null } = {}) {
   const calls: Array<{ url: string; body: { action?: string; type?: string } | null }> =
     [];
   const f = vi.fn(async (url: string, init?: RequestInit) => {
@@ -26,7 +26,10 @@ function setupFetch() {
       url: String(url),
       body: init?.body ? JSON.parse(String(init.body)) : null,
     });
-    return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
+    return {
+      ok: true,
+      json: async () => ({ ok: true, prUrl }),
+    } as unknown as Response;
   });
   vi.stubGlobal("fetch", f as unknown as typeof fetch);
   return { calls };
@@ -69,6 +72,15 @@ describe("ConditionReviewList", () => {
     expect(
       await screen.findByText(/status: "Muddy near the base"/),
     ).toBeInTheDocument();
+  });
+
+  it("links the opened PR when approval auto-publishes", async () => {
+    const user = userEvent.setup();
+    setupFetch({ prUrl: "https://github.com/o/r/pull/13" });
+    render(<ConditionReviewList reports={[report]} />);
+    await user.click(screen.getByRole("button", { name: /approve/i }));
+    const link = await screen.findByRole("link", { name: /pull request/i });
+    expect(link).toHaveAttribute("href", "https://github.com/o/r/pull/13");
   });
 
   it("rejects a report", async () => {

@@ -56,6 +56,7 @@ export function SubmissionReviewList({
   submissions: PendingSubmission[];
 }) {
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [prUrls, setPrUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   if (submissions.length === 0) {
@@ -79,6 +80,10 @@ export function SubmissionReviewList({
           ...prev,
           [id]: action === "approve" ? "approved" : "rejected",
         }));
+        const data = await res.json().catch(() => null);
+        if (data?.prUrl) {
+          setPrUrls((prev) => ({ ...prev, [id]: data.prUrl as string }));
+        }
       }
     } finally {
       setBusy(null);
@@ -137,41 +142,55 @@ export function SubmissionReviewList({
                 <p className="text-pine text-sm font-medium" role="status">
                   Marked {decided}.
                 </p>
-                {decided === "approved" && (
-                  <div className="border-forest/15 mt-3 rounded-xl border p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-forest text-sm font-medium">
-                        Content file:{" "}
-                        <code className="text-ink/80">
-                          content/trails/{s.generated.fileName}
-                        </code>
-                      </p>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        aria-label={`Download ${s.generated.fileName}`}
-                        onClick={() =>
-                          downloadFile(
-                            s.generated.fileName,
-                            s.generated.markdown,
-                          )
-                        }
+                {decided === "approved" &&
+                  (prUrls[s.id] ? (
+                    <p className="text-ink/80 mt-3 text-sm">
+                      Opened a{" "}
+                      <a
+                        href={prUrls[s.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pine hover:text-forest underline underline-offset-4"
                       >
-                        Download file
-                      </Button>
+                        pull request
+                      </a>{" "}
+                      to publish this trail. Merge it to go live.
+                    </p>
+                  ) : (
+                    <div className="border-forest/15 mt-3 rounded-xl border p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-forest text-sm font-medium">
+                          Content file:{" "}
+                          <code className="text-ink/80">
+                            content/trails/{s.generated.fileName}
+                          </code>
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          aria-label={`Download ${s.generated.fileName}`}
+                          onClick={() =>
+                            downloadFile(
+                              s.generated.fileName,
+                              s.generated.markdown,
+                            )
+                          }
+                        >
+                          Download file
+                        </Button>
+                      </div>
+                      {!s.generated.valid && (
+                        <p className="text-amber-700 mt-2 text-xs" role="note">
+                          Fill in before committing:{" "}
+                          {s.generated.missing.join(", ")}
+                        </p>
+                      )}
+                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
+                        {s.generated.markdown}
+                      </pre>
                     </div>
-                    {!s.generated.valid && (
-                      <p className="text-amber-700 mt-2 text-xs" role="note">
-                        Fill in before committing:{" "}
-                        {s.generated.missing.join(", ")}
-                      </p>
-                    )}
-                    <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
-                      {s.generated.markdown}
-                    </pre>
-                  </div>
-                )}
+                  ))}
               </div>
             ) : (
               <div className="mt-4 flex gap-3">

@@ -21,7 +21,7 @@ const sub = {
   },
 };
 
-function setupFetch() {
+function setupFetch({ prUrl = null }: { prUrl?: string | null } = {}) {
   const calls: Array<{ url: string; body: { action?: string } | null }> = [];
   const f = vi.fn(async (url: string, init?: RequestInit) => {
     calls.push({
@@ -30,7 +30,7 @@ function setupFetch() {
     });
     return {
       ok: true,
-      json: async () => ({ ok: true, status: "approved" }),
+      json: async () => ({ ok: true, status: "approved", prUrl }),
     } as unknown as Response;
   });
   vi.stubGlobal("fetch", f as unknown as typeof fetch);
@@ -94,6 +94,15 @@ describe("SubmissionReviewList", () => {
     expect(
       screen.getByRole("button", { name: /download/i }),
     ).toBeInTheDocument();
+  });
+
+  it("links the opened PR when approval auto-publishes", async () => {
+    const user = userEvent.setup();
+    setupFetch({ prUrl: "https://github.com/o/r/pull/12" });
+    render(<SubmissionReviewList submissions={[sub]} />);
+    await user.click(screen.getByRole("button", { name: /approve/i }));
+    const link = await screen.findByRole("link", { name: /pull request/i });
+    expect(link).toHaveAttribute("href", "https://github.com/o/r/pull/12");
   });
 
   it("flags missing required fields on an incomplete generated file", async () => {
