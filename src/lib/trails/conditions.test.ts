@@ -4,7 +4,37 @@ import {
   isStaleReport,
   sortReportsByDateDesc,
   conditionReportUrl,
+  highestAlertLevel,
+  ALERT_LABEL,
 } from "./conditions";
+
+describe("highestAlertLevel", () => {
+  it("returns null when there are no alerts", () => {
+    expect(highestAlertLevel([])).toBeNull();
+  });
+
+  it("returns the most severe level present", () => {
+    expect(
+      highestAlertLevel([
+        { level: "info" },
+        { level: "closure" },
+        { level: "caution" },
+      ]),
+    ).toBe("closure");
+    expect(highestAlertLevel([{ level: "info" }, { level: "caution" }])).toBe(
+      "caution",
+    );
+    expect(highestAlertLevel([{ level: "info" }])).toBe("info");
+  });
+});
+
+describe("ALERT_LABEL", () => {
+  it("labels each alert level", () => {
+    expect(ALERT_LABEL.closure).toBe("Closure");
+    expect(ALERT_LABEL.caution).toBe("Caution");
+    expect(ALERT_LABEL.info).toBe("Notice");
+  });
+});
 
 describe("isStaleReport", () => {
   const now = new Date("2026-05-28T12:00:00Z");

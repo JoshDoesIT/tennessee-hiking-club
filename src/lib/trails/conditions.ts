@@ -3,7 +3,36 @@
  * live in trail front-matter; condition reports come in through a GitHub issue
  * form, and a maintainer curates them into the content.
  */
+import type { TrailAlert } from "./schema";
+
 const REPO_URL = "https://github.com/JoshDoesIT/tennessee-hiking-club";
+
+/** Human label for each alert level (shared by the detail page, the directory
+ *  badge, and the map). */
+export const ALERT_LABEL: Record<TrailAlert["level"], string> = {
+  info: "Notice",
+  caution: "Caution",
+  closure: "Closure",
+};
+
+const ALERT_SEVERITY: Record<TrailAlert["level"], number> = {
+  info: 1,
+  caution: 2,
+  closure: 3,
+};
+
+/** The most severe alert level present, or null when there are no alerts. */
+export function highestAlertLevel(
+  alerts: Pick<TrailAlert, "level">[],
+): TrailAlert["level"] | null {
+  let best: TrailAlert["level"] | null = null;
+  for (const { level } of alerts) {
+    if (best === null || ALERT_SEVERITY[level] > ALERT_SEVERITY[best]) {
+      best = level;
+    }
+  }
+  return best;
+}
 
 /** A report older than this many days is shown as out of date. */
 export const STALE_AFTER_DAYS = 30;

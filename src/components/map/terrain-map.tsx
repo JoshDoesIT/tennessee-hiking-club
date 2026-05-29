@@ -5,12 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import type { StyleSpecification } from "maplibre-gl";
 import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import { TENNESSEE_BOUNDS } from "@/lib/maps";
+import { ALERT_LABEL } from "@/lib/trails/conditions";
+import type { TrailAlert } from "@/lib/trails/schema";
 
 export type TrailPin = {
   slug: string;
   name: string;
   region: string;
   coordinates: { lat: number; lng: number };
+  /** Most severe active alert level, if any (drives a distinct pin). */
+  alert?: TrailAlert["level"];
 };
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
@@ -96,18 +100,30 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
             // trail page. The global :focus-visible ring makes the focused pin
             // obvious. (The trail list below is the always-available,
             // no-WebGL keyboard/screen-reader fallback.)
+            const alertLabel = trail.alert ? ALERT_LABEL[trail.alert] : null;
             const el = document.createElement("a");
             el.href = `/trails/${trail.slug}`;
             el.setAttribute(
               "aria-label",
-              `${trail.name}, ${trail.region} Tennessee`,
+              `${trail.name}, ${trail.region} Tennessee${
+                alertLabel ? `. ${alertLabel}.` : ""
+              }`,
             );
+            // Closures and cautions get a darker amber pin so they stand out;
+            // the popup and aria-label carry the word, so it is never colour
+            // alone.
+            const background =
+              trail.alert === "closure"
+                ? "#8a5a1c"
+                : trail.alert === "caution"
+                  ? "#c8852f"
+                  : "#e0a24c";
             Object.assign(el.style, {
               display: "block",
               width: "16px",
               height: "16px",
               borderRadius: "9999px",
-              background: "#e0a24c",
+              background,
               border: "2.5px solid #2a3623",
               cursor: "pointer",
               boxShadow: "0 1px 4px rgba(0,0,0,.35)",
@@ -125,6 +141,17 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               marginTop: "2px",
             });
             content.append(title, region);
+            if (alertLabel) {
+              const alertEl = document.createElement("div");
+              alertEl.textContent = alertLabel;
+              Object.assign(alertEl.style, {
+                fontSize: "12px",
+                fontWeight: "600",
+                color: "#8a5a1c",
+                marginTop: "2px",
+              });
+              content.append(alertEl);
+            }
 
             const popup = new maplibregl.Popup({
               offset: 16,
