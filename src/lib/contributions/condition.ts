@@ -56,3 +56,35 @@ export function generateConditionEntry(report: ConditionEntry): {
 
   return { yaml: lines.join("\n"), valid: parsed.success };
 }
+
+/**
+ * Append a condition entry to a trail Markdown file's `conditionReports[]` via a
+ * targeted text insertion (#155), so the resulting PR diff is a clean addition
+ * rather than a full front-matter re-serialization. Adds the key if absent and
+ * converts an inline empty list to block form.
+ */
+export function appendConditionReport(
+  fileText: string,
+  report: ConditionEntry,
+): string {
+  const entry = generateConditionEntry(report).yaml;
+  const match = fileText.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return fileText;
+
+  const front = match[1];
+  const lines = front.split("\n");
+  const keyIndex = lines.findIndex((line) =>
+    /^conditionReports:\s*(\[\s*\])?\s*$/.test(line),
+  );
+
+  if (keyIndex === -1) {
+    lines.push("conditionReports:", entry);
+  } else {
+    // Normalise an inline empty list to block form, then insert as the first
+    // (newest) entry under the key.
+    lines[keyIndex] = "conditionReports:";
+    lines.splice(keyIndex + 1, 0, entry);
+  }
+
+  return fileText.replace(front, lines.join("\n"));
+}

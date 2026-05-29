@@ -6,9 +6,13 @@ const mocks = vi.hoisted(() => ({
   isAdminUser: vi.fn(),
   update: vi.fn(),
   set: vi.fn(() => ({ where: async () => undefined })),
+  publishOnApproval: vi.fn(async () => null as { url: string } | null),
 }));
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/auth/admin-server", () => ({ isAdminUser: mocks.isAdminUser }));
+vi.mock("@/lib/contributions/publish", () => ({
+  publishOnApproval: mocks.publishOnApproval,
+}));
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
     update: (table: unknown) => {
@@ -34,6 +38,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.auth.mockResolvedValue({ user: { id: "admin1" } });
   mocks.isAdminUser.mockResolvedValue(true);
+  mocks.publishOnApproval.mockResolvedValue(null);
 });
 
 describe("POST /api/contributions/[id]/review", () => {
@@ -90,5 +95,33 @@ describe("POST /api/contributions/[id]/review", () => {
     const res = await POST(reviewReq("approve", "photo"), ctx("sub1"));
     expect(res.status).toBe(400);
     expect(mocks.set).not.toHaveBeenCalled();
+  });
+
+  it("returns the opened PR url when approval auto-publishes", async () => {
+    mocks.publishOnApproval.mockResolvedValue({
+      url: "https://github.com/o/r/pull/12",
+    });
+    const res = await POST(reviewReq("approve"), ctx("sub1"));
+    expect(await res.json()).toMatchObject({
+      ok: true,
+      status: "approved",
+      prUrl: "https://github.com/o/r/pull/12",
+    });
+    expect(mocks.publishOnApproval).toHaveBeenCalledWith({
+      type: "trail",
+      id: "sub1",
+    });
+  });
+
+  it("does not publish on rejection", async () => {
+    await POST(reviewReq("reject"), ctx("sub1"));
+    expect(mocks.publishOnApproval).not.toHaveBeenCalled();
+  });
+
+  it("still succeeds if auto-publish fails, falling back to manual", async () => {
+    mocks.publishOnApproval.mockRejectedValue(new Error("github down"));
+    const res = await POST(reviewReq("approve"), ctx("sub1"));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ ok: true, prUrl: null });
   });
 });

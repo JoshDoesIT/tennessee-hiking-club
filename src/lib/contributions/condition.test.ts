@@ -1,6 +1,10 @@
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
-import { validateConditionSubmission, generateConditionEntry } from "./condition";
+import {
+  validateConditionSubmission,
+  generateConditionEntry,
+  appendConditionReport,
+} from "./condition";
 
 describe("validateConditionSubmission", () => {
   const valid = { trailSlug: "virgin-falls", status: "Muddy near the base" };
@@ -51,5 +55,71 @@ describe("generateConditionEntry", () => {
     const entry = generateConditionEntry({ date: "2026-05-29", status: "Open" });
     expect(entry.yaml).not.toContain("note:");
     expect(entry.valid).toBe(true);
+  });
+});
+
+describe("appendConditionReport", () => {
+  const newReport = {
+    date: "2026-05-29",
+    status: "Muddy",
+    note: "Slick.",
+    by: "trail-ann",
+  };
+
+  it("appends to an existing conditionReports list, preserving entries", () => {
+    const file = [
+      "---",
+      "slug: virgin-falls",
+      "name: Virgin Falls",
+      "conditionReports:",
+      '  - date: "2026-05-24"',
+      "    status: Open",
+      "parking:",
+      "  lat: 35.8270",
+      "---",
+      "",
+      "Body text.",
+    ].join("\n");
+
+    const out = appendConditionReport(file, newReport);
+    const { data, content } = matter(out);
+    expect(data.conditionReports).toHaveLength(2);
+    expect(data.conditionReports).toContainEqual(
+      expect.objectContaining({ date: "2026-05-24", status: "Open" }),
+    );
+    expect(data.conditionReports).toContainEqual(
+      expect.objectContaining({
+        date: "2026-05-29",
+        status: "Muddy",
+        note: "Slick.",
+        by: "trail-ann",
+      }),
+    );
+    // Other front-matter and the body are untouched.
+    expect(data.parking).toMatchObject({ lat: 35.827 });
+    expect(content.trim()).toBe("Body text.");
+  });
+
+  it("creates the key when the trail has no condition reports yet", () => {
+    const file = ["---", "slug: x", "name: X", "---", "", "Body."].join("\n");
+    const out = appendConditionReport(file, newReport);
+    const { data } = matter(out);
+    expect(data.conditionReports).toHaveLength(1);
+    expect(data.conditionReports[0]).toMatchObject({ status: "Muddy" });
+  });
+
+  it("handles an inline empty list", () => {
+    const file = [
+      "---",
+      "slug: x",
+      "name: X",
+      "conditionReports: []",
+      "---",
+      "",
+      "Body.",
+    ].join("\n");
+    const out = appendConditionReport(file, newReport);
+    const { data } = matter(out);
+    expect(data.conditionReports).toHaveLength(1);
   });
 });
