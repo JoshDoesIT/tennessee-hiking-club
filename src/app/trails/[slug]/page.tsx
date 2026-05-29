@@ -9,6 +9,8 @@ import { WeatherForecast } from "@/components/trails/weather-forecast";
 import { fetchTrailWeather } from "@/lib/weather/forecast";
 import { TrailContextMap } from "@/components/map/trail-context-map";
 import { TrailConditions } from "@/components/trails/trail-conditions";
+import { ElevationProfile } from "@/components/trails/elevation-profile";
+import { DownloadGpx } from "@/components/trails/download-gpx";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -75,6 +77,15 @@ export default async function TrailPage({ params }: Params) {
       </dl>
 
       <TrailConditions trail={trail} />
+
+      {trail.route && trail.route.length > 1 ? (
+        <div className="mt-2">
+          <ElevationProfile route={trail.route} />
+          <div className="mt-4">
+            <DownloadGpx trail={{ name: trail.name, route: trail.route }} />
+          </div>
+        </div>
+      ) : null}
 
       <section className="mt-8">
         <h2 className="display text-forest text-2xl">Find the trailhead</h2>
