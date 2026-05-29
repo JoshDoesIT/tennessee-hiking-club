@@ -30,6 +30,14 @@ const conditionReportSchema = z.object({
   note: z.string().optional(),
 });
 
+/** An ordered point on a trail's route, used for the elevation profile and GPX
+ *  export. */
+const routePointSchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+  elevationFt: z.number(),
+});
+
 /**
  * The trail data model: the executable spec for all trail content.
  * Front-matter from `content/trails/*.md` is validated against this; invalid
@@ -69,6 +77,7 @@ export const trailSchema = z.object({
   body: z.string().default(""),
   alerts: z.array(alertSchema).default([]),
   conditionReports: z.array(conditionReportSchema).default([]),
+  route: z.array(routePointSchema).optional(),
 });
 
 export type Trail = z.infer<typeof trailSchema>;

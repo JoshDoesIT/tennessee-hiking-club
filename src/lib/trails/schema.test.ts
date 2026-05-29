@@ -83,4 +83,25 @@ describe("trailSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("accepts an optional route of elevation points", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        route: [
+          { lat: 35.6, lng: -83.45, elevationFt: 4000 },
+          { lat: 35.62, lng: -83.44, elevationFt: 4600 },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects a route point missing elevation", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        route: [{ lat: 35.6, lng: -83.45 }],
+      }).success,
+    ).toBe(false);
+  });
 });
