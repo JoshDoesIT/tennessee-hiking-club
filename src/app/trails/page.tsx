@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { TrailCard } from "@/components/trails/trail-card";
+import { TrailResults } from "@/components/trails/trail-results";
 import { cn } from "@/lib/cn";
 import { getAllTrails } from "@/lib/trails";
 import { REGIONS, DIFFICULTIES } from "@/lib/trails/schema";
@@ -162,13 +162,7 @@ export default async function TrailsPage({
             </Link>
           </div>
         ) : (
-          <ul className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {trails.map((trail) => (
-              <li key={trail.slug}>
-                <TrailCard trail={trail} />
-              </li>
-            ))}
-          </ul>
+          <TrailResults trails={trails} />
         )}
       </section>
     </Container>
