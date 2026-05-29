@@ -5,15 +5,25 @@ import matter from "gray-matter";
 const mocks = vi.hoisted(() => ({
   config: null as unknown,
   api: {
+    getBranchSha: vi.fn(async () => "base-sha"),
+    createBranch: vi.fn(async () => undefined),
     getFile: vi.fn(async () => ({ content: "", sha: "filesha" })),
+    putFile: vi.fn(async () => undefined),
+    putBinaryFile: vi.fn(async () => undefined),
+    openPullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
   },
   openFilePullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
+  blobGet: vi.fn(async () => ({
+    stream: new Blob(["img-bytes"]).stream(),
+    blob: { contentType: "image/jpeg" },
+  })),
   // publishOnApproval selects the submission row first, then the profile.
   selectCalls: 0,
   firstRow: null as Record<string, unknown> | null,
   profileRow: null as Record<string, unknown> | null,
   trails: [] as Array<{ slug: string }>,
 }));
+vi.mock("@vercel/blob", () => ({ get: mocks.blobGet }));
 vi.mock("@/lib/github/content-pr", () => ({
   githubConfigFromEnv: () => mocks.config,
   createGithubApi: () => mocks.api,
@@ -66,6 +76,16 @@ const conditionRow = {
   status: "Muddy",
   note: "Slick.",
   reportDate: "2026-05-29",
+};
+
+const photoRow = {
+  id: "photo78-qrs",
+  userId: "u1",
+  trailSlug: "virgin-falls",
+  blobUrl:
+    "https://store.private.blob.vercel-storage.com/contributions/photos/u1/x.jpg",
+  alt: "The falls in spring flow",
+  credit: "Photo by Trail Ann",
 };
 
 describe("trailPublication", () => {
@@ -145,5 +165,30 @@ describe("publishOnApproval", () => {
     const args = calls[0]?.[1] ?? { path: "" };
     expect(args.path).toBe("content/trails/virgin-falls.md");
     expect(args.sha).toBe("filesha");
+  });
+
+  it("opens a PR for an approved photo, committing the image and the entry", async () => {
+    mocks.firstRow = photoRow;
+    mocks.api.getFile = vi.fn(async () => ({
+      content: "---\nslug: virgin-falls\nname: Virgin Falls\nphotos: []\n---\n\nBody.",
+      sha: "contentsha",
+    }));
+    const res = await publishOnApproval({ type: "photo", id: "photo78-qrs" });
+    expect(res).toEqual({ url: "https://github.com/o/r/pull/9" });
+
+    const binCalls = mocks.api.putBinaryFile.mock.calls as unknown as Array<
+      [{ path: string; base64: string }]
+    >;
+    const binArgs = binCalls[0]?.[0] ?? { path: "", base64: "" };
+    expect(binArgs.path).toMatch(/^public\/trails\/contributed\/virgin-falls-/);
+    expect(typeof binArgs.base64).toBe("string");
+
+    const txtCalls = mocks.api.putFile.mock.calls as unknown as Array<
+      [{ path: string; content: string }]
+    >;
+    const txtArgs = txtCalls[0]?.[0] ?? { path: "", content: "" };
+    expect(txtArgs.path).toBe("content/trails/virgin-falls.md");
+    expect(txtArgs.content).toContain("The falls in spring flow");
+    expect(mocks.api.openPullRequest).toHaveBeenCalled();
   });
 });

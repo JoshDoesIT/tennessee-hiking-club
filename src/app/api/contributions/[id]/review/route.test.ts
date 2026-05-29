@@ -95,13 +95,15 @@ describe("POST /api/contributions/[id]/review", () => {
     expect(patch.reviewedAt).toBeInstanceOf(Date);
   });
 
-  it("reviews a photo submission against the photo table without auto-publishing", async () => {
+  it("reviews a photo submission against the photo table and auto-publishes", async () => {
     const res = await POST(reviewReq("approve", "photo"), ctx("p1"));
     expect(res.status).toBe(200);
     expect(mocks.update).toHaveBeenCalledWith(photoSubmissions);
     expect((mocks.set as Mock).mock.calls[0][0].reviewStatus).toBe("approved");
-    // Photo auto-publish is tracked separately (#157).
-    expect(mocks.publishOnApproval).not.toHaveBeenCalled();
+    expect(mocks.publishOnApproval).toHaveBeenCalledWith({
+      type: "photo",
+      id: "p1",
+    });
   });
 
   it("returns 400 for an unknown submission type", async () => {

@@ -37,6 +37,14 @@ export interface GithubApi {
     branch: string;
     sha?: string;
   }): Promise<void>;
+  /** Commit a binary file from already-base64-encoded bytes (e.g. an image). */
+  putBinaryFile(args: {
+    path: string;
+    base64: string;
+    message: string;
+    branch: string;
+    sha?: string;
+  }): Promise<void>;
   openPullRequest(args: {
     title: string;
     body: string;
@@ -94,6 +102,17 @@ export function createGithubApi(config: GithubConfig): GithubApi {
         body: JSON.stringify({
           message,
           content: Buffer.from(content, "utf8").toString("base64"),
+          branch,
+          ...(sha ? { sha } : {}),
+        }),
+      });
+    },
+    async putBinaryFile({ path, base64, message, branch, sha }) {
+      await gh(`/contents/${path}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          message,
+          content: base64,
           branch,
           ...(sha ? { sha } : {}),
         }),

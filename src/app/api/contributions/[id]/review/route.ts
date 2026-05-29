@@ -65,12 +65,12 @@ export async function POST(req: Request, { params }: Context) {
       .where(eq(trailSubmissions.id, id));
   }
 
-  // On approval, try to open a content PR (#155). The decision and recognition
-  // are already recorded above, so a GitHub failure (or no token) just falls
-  // back to the manual content in the admin UI. Photo auto-publish is tracked
-  // separately (#157), so it is not published here.
+  // On approval, try to open a content PR (#155, #157): a new trail file, a
+  // condition entry, or a photo plus its photos[] entry. The decision and
+  // recognition are already recorded above, so a GitHub failure (or no token)
+  // just falls back to the manual content in the admin UI.
   let prUrl: string | null = null;
-  if (action === "approve" && type !== "photo") {
+  if (action === "approve") {
     try {
       const published = await publishOnApproval({ type, id });
       prUrl = published?.url ?? null;

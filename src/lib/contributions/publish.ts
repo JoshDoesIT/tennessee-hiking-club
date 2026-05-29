@@ -1,13 +1,16 @@
 import { eq } from "drizzle-orm";
+import { get } from "@vercel/blob";
 import { getDb } from "@/lib/db";
 import {
   conditionSubmissions,
+  photoSubmissions,
   profiles,
   trailSubmissions,
 } from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import { generateTrailContent } from "./trail-content";
 import { appendConditionReport } from "./condition";
+import { appendPhoto } from "./photo";
 import {
   githubConfigFromEnv,
   createGithubApi,
@@ -129,7 +132,7 @@ export async function publishOnApproval({
   type,
   id,
 }: {
-  type: "trail" | "condition";
+  type: "trail" | "condition" | "photo";
   id: string;
 }): Promise<{ url: string } | null> {
   const config = githubConfigFromEnv();
@@ -152,20 +155,72 @@ export async function publishOnApproval({
     return openFilePullRequest(api, { base: config.baseBranch, ...pub });
   }
 
+  if (type === "condition") {
+    const [row] = await db
+      .select()
+      .from(conditionSubmissions)
+      .where(eq(conditionSubmissions.id, id))
+      .limit(1);
+    if (!row) return null;
+    const handle = await loadHandle(db, row.userId);
+    const path = `content/trails/${row.trailSlug}.md`;
+    const file = await api.getFile(path, config.baseBranch);
+    if (!file) return null;
+    const pub = conditionPublication(row, handle, file.content);
+    return openFilePullRequest(api, {
+      base: config.baseBranch,
+      ...pub,
+      sha: file.sha,
+    });
+  }
+
+  // photo: commit the image and the photos[] entry on one branch, then open a
+  // PR (#157). Two files, so it does not reuse the single-file helper.
   const [row] = await db
     .select()
-    .from(conditionSubmissions)
-    .where(eq(conditionSubmissions.id, id))
+    .from(photoSubmissions)
+    .where(eq(photoSubmissions.id, id))
     .limit(1);
   if (!row) return null;
   const handle = await loadHandle(db, row.userId);
-  const path = `content/trails/${row.trailSlug}.md`;
-  const file = await api.getFile(path, config.baseBranch);
+
+  const image = await get(new URL(row.blobUrl).pathname.replace(/^\//, ""), {
+    access: "private",
+  });
+  if (!image) return null;
+  const base64 = Buffer.from(
+    await new Response(image.stream).arrayBuffer(),
+  ).toString("base64");
+  const ext = (image.blob.contentType?.split("/")[1] || "jpg").replace(
+    "jpeg",
+    "jpg",
+  );
+
+  const idShort = String(row.id).slice(0, 8);
+  const imagePath = `public/trails/contributed/${row.trailSlug}-${idShort}.${ext}`;
+  const src = `/trails/contributed/${row.trailSlug}-${idShort}.${ext}`;
+  const contentPath = `content/trails/${row.trailSlug}.md`;
+  const branch = `submission/photo-${row.trailSlug}-${idShort}`;
+  const message = `content: add photo for ${row.trailSlug}`;
+
+  const baseSha = await api.getBranchSha(config.baseBranch);
+  await api.createBranch(branch, baseSha);
+  await api.putBinaryFile({ path: imagePath, base64, message, branch });
+
+  const file = await api.getFile(contentPath, config.baseBranch);
   if (!file) return null;
-  const pub = conditionPublication(row, handle, file.content);
-  return openFilePullRequest(api, {
+  const updated = appendPhoto(file.content, {
+    src,
+    alt: row.alt,
+    credit: row.credit,
+    by: handle,
+  });
+  await api.putFile({ path: contentPath, content: updated, message, branch, sha: file.sha });
+
+  return api.openPullRequest({
+    title: `Photo: ${row.trailSlug}`,
+    body: `Adds an approved in-app photo for ${row.trailSlug}.`,
+    head: branch,
     base: config.baseBranch,
-    ...pub,
-    sha: file.sha,
   });
 }
