@@ -5,8 +5,15 @@ import { Badge } from "@/components/ui/badge";
 import { highestAlertLevel, ALERT_LABEL } from "@/lib/trails/conditions";
 import type { Trail } from "@/lib/trails/schema";
 
-/** A single trail in the directory grid: thumbnail, region, difficulty, stats. */
-export function TrailCard({ trail }: { trail: Trail }) {
+/** A single trail in the directory grid: thumbnail, region, difficulty, stats.
+ *  `distanceMi` is shown when the list is sorted by distance from the user. */
+export function TrailCard({
+  trail,
+  distanceMi,
+}: {
+  trail: Trail;
+  distanceMi?: number;
+}) {
   const thumb = trail.photos[0];
   const alertLevel = highestAlertLevel(trail.alerts);
   return (
@@ -50,6 +57,11 @@ export function TrailCard({ trail }: { trail: Trail }) {
           <p className="text-ink/70 mt-1 text-sm">
             {trail.lengthMiles} mi · {trail.area}
           </p>
+          {distanceMi != null ? (
+            <p className="text-olive mt-1 text-xs font-medium">
+              {Math.round(distanceMi)} mi away
+            </p>
+          ) : null}
         </div>
       </Link>
     </Card>

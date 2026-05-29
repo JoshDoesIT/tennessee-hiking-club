@@ -55,4 +55,14 @@ describe("TrailCard", () => {
     render(<TrailCard trail={trail} />);
     expect(screen.queryByText(/closure|caution|notice/i)).toBeNull();
   });
+
+  it("shows the distance away when provided", () => {
+    render(<TrailCard trail={trail} distanceMi={12.3} />);
+    expect(screen.getByText(/12 mi away/i)).toBeInTheDocument();
+  });
+
+  it("shows no distance when none is provided", () => {
+    render(<TrailCard trail={trail} />);
+    expect(screen.queryByText(/mi away/i)).toBeNull();
+  });
 });
