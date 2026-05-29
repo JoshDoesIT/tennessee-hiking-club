@@ -3,6 +3,11 @@ import { render, waitFor } from "@testing-library/react";
 import { SyncOnSignIn } from "./sync-on-signin";
 import { addHike, readLog } from "@/lib/hikes/local-log";
 import { logCleanup, getCleanups } from "@/lib/stewardship/cleanups";
+import { getPhoto } from "@/lib/hikes/photo-store";
+import { uploadPhoto } from "@/lib/hikes/photo-upload";
+
+vi.mock("@/lib/hikes/photo-store", () => ({ getPhoto: vi.fn() }));
+vi.mock("@/lib/hikes/photo-upload", () => ({ uploadPhoto: vi.fn() }));
 
 type Resp = { ok: boolean; json: () => Promise<unknown> };
 
@@ -38,7 +43,11 @@ function setupFetch(
   };
 }
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  vi.mocked(getPhoto).mockReset();
+  vi.mocked(uploadPhoto).mockReset().mockResolvedValue(null);
+});
 afterEach(() => vi.unstubAllGlobals());
 
 describe("SyncOnSignIn", () => {
@@ -80,6 +89,48 @@ describe("SyncOnSignIn", () => {
       ).toEqual(["2026-05-01", "2026-05-02"]),
     );
     expect(getCleanupsBody()?.cleanups[0].loggedOn).toBe("2026-05-01");
+  });
+
+  it("preserves a local photoId across the sync round-trip", async () => {
+    addHike("a", "2026-01-01", { photoId: "ph-1" });
+    // Server doesn't store photoId, so its merged result lacks it.
+    setupFetch(
+      { user: { id: "u1" } },
+      { hikes: [{ trailSlug: "a", hikedOn: "2026-01-01" }] },
+    );
+
+    render(<SyncOnSignIn />);
+
+    await waitFor(() =>
+      expect(readLog().find((e) => e.trailSlug === "a")?.photoId).toBe("ph-1"),
+    );
+  });
+
+  it("uploads local-only photos after sign-in and records their URLs", async () => {
+    addHike("a", "2026-01-01", { photoId: "ph-1" });
+    vi.mocked(getPhoto).mockResolvedValue(new Blob(["x"], { type: "image/jpeg" }));
+    vi.mocked(uploadPhoto).mockResolvedValue("https://b/p.jpg");
+    const { fetchMock } = setupFetch(
+      { user: { id: "u1" } },
+      { hikes: [{ trailSlug: "a", hikedOn: "2026-01-01" }] },
+    );
+
+    render(<SyncOnSignIn />);
+
+    await waitFor(() =>
+      expect(readLog().find((e) => e.trailSlug === "a")?.photoUrl).toBe(
+        "https://b/p.jpg",
+      ),
+    );
+    expect(uploadPhoto).toHaveBeenCalledTimes(1);
+    // A second hike-sync POST persists the backfilled URL to the account.
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.filter((c) =>
+          String(c[0]).includes("/api/hikes/sync"),
+        ).length,
+      ).toBeGreaterThanOrEqual(2),
+    );
   });
 
   it("does not sync when signed out", async () => {

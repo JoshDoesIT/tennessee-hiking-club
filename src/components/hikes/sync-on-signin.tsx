@@ -1,8 +1,39 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { readLog, replaceLog } from "@/lib/hikes/local-log";
+import { readLog, replaceLog, setEntryPhotoUrl } from "@/lib/hikes/local-log";
+import { mergeHikes } from "@/lib/hikes/sync";
+import { getPhoto } from "@/lib/hikes/photo-store";
+import { uploadPhoto } from "@/lib/hikes/photo-upload";
 import { getCleanups, replaceCleanups } from "@/lib/stewardship/cleanups";
+
+async function postHikeSync() {
+  return fetch("/api/hikes/sync", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ hikes: readLog() }),
+  });
+}
+
+/**
+ * Upload any photos that exist only on this device (a local `photoId` but no
+ * synced `photoUrl`) and record their URLs, then re-sync so the account picks
+ * them up. Best-effort: a failed upload leaves the local copy in place.
+ */
+async function backfillPhotos(): Promise<void> {
+  const pending = readLog().filter((e) => e.photoId && !e.photoUrl);
+  let uploadedAny = false;
+  for (const entry of pending) {
+    const blob = await getPhoto(entry.photoId!);
+    if (!blob) continue;
+    const url = await uploadPhoto(blob);
+    if (url) {
+      setEntryPhotoUrl(entry.trailSlug, entry.hikedOn, url);
+      uploadedAny = true;
+    }
+  }
+  if (uploadedAny) await postHikeSync();
+}
 
 /**
  * When signed in, reconcile local state with the account once on mount: push
@@ -24,14 +55,16 @@ export function SyncOnSignIn() {
         const session = await (await fetch("/api/auth/session")).json();
         if (!session?.user) return;
 
-        const hikeRes = await fetch("/api/hikes/sync", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ hikes: readLog() }),
-        });
+        const before = readLog();
+        const hikeRes = await postHikeSync();
         if (hikeRes.ok) {
           const data = await hikeRes.json();
-          if (active && Array.isArray(data.hikes)) replaceLog(data.hikes);
+          if (active && Array.isArray(data.hikes)) {
+            // Re-merge with the pre-sync log so device-local photoIds (which the
+            // server doesn't store) survive the round-trip.
+            replaceLog(mergeHikes(before, data.hikes));
+            await backfillPhotos();
+          }
         }
 
         const cleanupRes = await fetch("/api/cleanups/sync", {

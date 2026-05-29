@@ -28,6 +28,8 @@ export function mergeHikes(
       ...existing,
       note: existing.note ?? entry.note,
       conditions: existing.conditions ?? entry.conditions,
+      photoId: existing.photoId ?? entry.photoId,
+      photoUrl: existing.photoUrl ?? entry.photoUrl,
     });
   }
 
@@ -39,15 +41,40 @@ export function mergeHikes(
  * account (to insert) and the full merged log to hand back to the client. Only
  * additions are made, so sync never deletes a hike.
  */
+/** A photo URL to backfill onto an existing remote hike that lacks one. */
+export type PhotoBackfill = {
+  trailSlug: string;
+  hikedOn: string;
+  photoUrl: string;
+};
+
 export function planSync(
   local: HikeLogEntry[],
   remote: HikeLogEntry[],
-): { toInsert: HikeLogEntry[]; merged: HikeLogEntry[] } {
-  const remoteKeys = new Set(remote.map(keyOf));
-  return {
-    toInsert: local.filter((e) => !remoteKeys.has(keyOf(e))),
-    merged: mergeHikes(local, remote),
-  };
+): {
+  toInsert: HikeLogEntry[];
+  toUpdate: PhotoBackfill[];
+  merged: HikeLogEntry[];
+} {
+  const remoteByKey = new Map(remote.map((e) => [keyOf(e), e]));
+  const toInsert = local.filter((e) => !remoteByKey.has(keyOf(e)));
+
+  // Backfill: the account has the hike but no photo, and this device does have
+  // one. Additive — an existing remote photoUrl is never overwritten.
+  const toUpdate: PhotoBackfill[] = [];
+  for (const entry of local) {
+    if (!entry.photoUrl) continue;
+    const remoteEntry = remoteByKey.get(keyOf(entry));
+    if (remoteEntry && !remoteEntry.photoUrl) {
+      toUpdate.push({
+        trailSlug: entry.trailSlug,
+        hikedOn: entry.hikedOn,
+        photoUrl: entry.photoUrl,
+      });
+    }
+  }
+
+  return { toInsert, toUpdate, merged: mergeHikes(local, remote) };
 }
 
 type HikeRowLike = {
@@ -55,9 +82,10 @@ type HikeRowLike = {
   hikedOn: string;
   note: string | null;
   conditions: string | null;
+  photoUrl: string | null;
 };
 
-/** A database row to a log entry (dropping null note/conditions). */
+/** A database row to a log entry (dropping null note/conditions/photoUrl). */
 export function rowToEntry(row: HikeRowLike): HikeLogEntry {
   const entry: HikeLogEntry = {
     trailSlug: row.trailSlug,
@@ -65,6 +93,7 @@ export function rowToEntry(row: HikeRowLike): HikeLogEntry {
   };
   if (row.note) entry.note = row.note;
   if (row.conditions) entry.conditions = row.conditions;
+  if (row.photoUrl) entry.photoUrl = row.photoUrl;
   return entry;
 }
 
@@ -76,5 +105,6 @@ export function entryToInsert(userId: string, entry: HikeLogEntry) {
     hikedOn: entry.hikedOn,
     note: entry.note ?? null,
     conditions: entry.conditions ?? null,
+    photoUrl: entry.photoUrl ?? null,
   };
 }

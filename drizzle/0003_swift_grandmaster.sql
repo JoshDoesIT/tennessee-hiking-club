@@ -1,0 +1,1 @@
+ALTER TABLE "hikes" ADD COLUMN "photo_url" text;

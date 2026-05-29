@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { getPhoto } from "@/lib/hikes/photo-store";
 
 /**
- * Thumbnail for a hike photo. Prefers the remote `photoUrl` (account-backed)
- * when present; otherwise loads the local blob from IndexedDB by `photoId` and
- * renders it via an object URL, revoking it on cleanup to avoid leaks. Renders
- * nothing when there is no photo.
+ * Thumbnail for a hike photo. Prefers the local IndexedDB copy (`photoId`) when
+ * present — instant and free — rendering it via an object URL that is revoked
+ * on cleanup. Otherwise (e.g. on another device after sync) it serves the
+ * private remote photo through the auth-gated view proxy, since private blobs
+ * can't be embedded by URL directly. Renders nothing when there is no photo.
  */
 export function HikePhoto({
   photoId,
@@ -23,8 +24,7 @@ export function HikePhoto({
   const [objectUrl, setObjectUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    // Remote URL or no photo: nothing to load from IndexedDB.
-    if (photoUrl || !photoId) return;
+    if (!photoId) return;
     let cancelled = false;
     let created: string | undefined;
     void getPhoto(photoId).then((blob) => {
@@ -36,9 +36,12 @@ export function HikePhoto({
       cancelled = true;
       if (created) URL.revokeObjectURL(created);
     };
-  }, [photoId, photoUrl]);
+  }, [photoId]);
 
-  const src = photoUrl ?? objectUrl;
+  const remoteSrc = photoUrl
+    ? `/api/hikes/photo?u=${encodeURIComponent(photoUrl)}`
+    : undefined;
+  const src = photoId ? objectUrl : remoteSrc;
   if (!src) return null;
 
   return (

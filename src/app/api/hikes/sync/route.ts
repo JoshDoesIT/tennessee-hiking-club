@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
@@ -13,6 +13,7 @@ const bodySchema = z.object({
       hikedOn: z.string().min(1),
       note: z.string().optional(),
       conditions: z.string().optional(),
+      photoUrl: z.string().optional(),
     }),
   ),
 });
@@ -38,10 +39,32 @@ export async function POST(req: Request) {
 
   const db = getDb();
   const rows = await db.select().from(hikes).where(eq(hikes.userId, userId));
-  const { toInsert, merged } = planSync(local, rows.map(rowToEntry));
+  const { toInsert, toUpdate, merged } = planSync(local, rows.map(rowToEntry));
 
   if (toInsert.length > 0) {
     await db.insert(hikes).values(toInsert.map((e) => entryToInsert(userId, e)));
+  }
+
+  // Backfill photo URLs onto existing hikes that don't have one yet. Guarded so
+  // a not-yet-migrated photo_url column can't fail the whole hike sync.
+  if (toUpdate.length > 0) {
+    try {
+      for (const u of toUpdate) {
+        await db
+          .update(hikes)
+          .set({ photoUrl: u.photoUrl })
+          .where(
+            and(
+              eq(hikes.userId, userId),
+              eq(hikes.trailSlug, u.trailSlug),
+              eq(hikes.hikedOn, u.hikedOn),
+              isNull(hikes.photoUrl),
+            ),
+          );
+      }
+    } catch {
+      // Best effort: photos backfill on the next sync once migrated.
+    }
   }
 
   return NextResponse.json({ hikes: merged });
