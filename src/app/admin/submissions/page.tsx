@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 import { isAdminUser } from "@/lib/auth/admin-server";
 import { getDb } from "@/lib/db";
 import { profiles, trailSubmissions } from "@/lib/db/schema";
+import { getAllTrails } from "@/lib/trails";
+import { generateTrailContent } from "@/lib/contributions/trail-content";
 import {
   SubmissionReviewList,
   type PendingSubmission,
@@ -35,26 +37,57 @@ async function loadPending(): Promise<PendingSubmission[]> {
     .select()
     .from(profiles)
     .where(inArray(profiles.userId, userIds));
-  const nameById = new Map(
-    profileRows.map((p) => [p.userId, p.displayName || p.githubLogin || null]),
-  );
+  const profileById = new Map(profileRows.map((p) => [p.userId, p]));
 
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    region: r.region,
-    area: r.area,
-    lat: r.lat,
-    lng: r.lng,
-    description: r.description,
-    lengthMiles: r.lengthMiles,
-    elevationGainFt: r.elevationGainFt,
-    difficulty: r.difficulty,
-    routeType: r.routeType,
-    links: r.links,
-    submittedBy: nameById.get(r.userId) || "A member",
-    submittedOn: r.createdAt.toISOString().slice(0, 10),
-  }));
+  // Generate each content file, deduping slugs against published trails and
+  // against files generated earlier in this same batch.
+  const slugs = new Set(getAllTrails().map((t) => t.slug));
+
+  return rows.map((r) => {
+    const profile = profileById.get(r.userId);
+    const handle = profile?.githubLogin || profile?.displayName || null;
+    const generated = generateTrailContent(
+      {
+        name: r.name,
+        region: r.region,
+        area: r.area,
+        lat: r.lat,
+        lng: r.lng,
+        description: r.description,
+        lengthMiles: r.lengthMiles,
+        elevationGainFt: r.elevationGainFt,
+        difficulty: r.difficulty,
+        routeType: r.routeType,
+        links: r.links,
+        submitterHandle: handle,
+      },
+      slugs,
+    );
+    slugs.add(generated.slug);
+
+    return {
+      id: r.id,
+      name: r.name,
+      region: r.region,
+      area: r.area,
+      lat: r.lat,
+      lng: r.lng,
+      description: r.description,
+      lengthMiles: r.lengthMiles,
+      elevationGainFt: r.elevationGainFt,
+      difficulty: r.difficulty,
+      routeType: r.routeType,
+      links: r.links,
+      submittedBy: profile?.displayName || profile?.githubLogin || "A member",
+      submittedOn: r.createdAt.toISOString().slice(0, 10),
+      generated: {
+        fileName: generated.fileName,
+        markdown: generated.markdown,
+        valid: generated.valid,
+        missing: generated.missing,
+      },
+    };
+  });
 }
 
 export default async function AdminSubmissionsPage() {
