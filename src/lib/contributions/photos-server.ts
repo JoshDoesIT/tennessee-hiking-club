@@ -11,7 +11,7 @@ export async function getApprovedPhotoCount(userId: string): Promise<number> {
   if (!process.env.DATABASE_URL) return 0;
   const db = getDb();
   const rows = await db
-    .select({ userId: photoSubmissions.userId })
+    .select({ reviewStatus: photoSubmissions.reviewStatus })
     .from(photoSubmissions)
     .where(
       and(
@@ -19,7 +19,8 @@ export async function getApprovedPhotoCount(userId: string): Promise<number> {
         eq(photoSubmissions.reviewStatus, "approved"),
       ),
     );
-  return rows.length;
+  // Published photos (#153) stop counting here; the content credits them.
+  return rows.filter((r) => r.reviewStatus === "approved").length;
 }
 
 /** Approved photo counts for many users at once, keyed by userId. */
@@ -30,7 +31,10 @@ export async function getApprovedPhotoCounts(
   if (!process.env.DATABASE_URL || userIds.length === 0) return counts;
   const db = getDb();
   const rows = await db
-    .select({ userId: photoSubmissions.userId })
+    .select({
+      userId: photoSubmissions.userId,
+      reviewStatus: photoSubmissions.reviewStatus,
+    })
     .from(photoSubmissions)
     .where(
       and(
@@ -39,6 +43,7 @@ export async function getApprovedPhotoCounts(
       ),
     );
   for (const row of rows) {
+    if (row.reviewStatus !== "approved") continue;
     counts.set(row.userId, (counts.get(row.userId) ?? 0) + 1);
   }
   return counts;
