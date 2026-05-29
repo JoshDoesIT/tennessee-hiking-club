@@ -16,6 +16,9 @@ test("filtering by region narrows the trail directory", async ({ page }) => {
 
   // Filter is reflected in the URL (shareable) and the list is narrowed.
   await expect(page).toHaveURL(/region=East/);
+  // Wait for the navigated, server-filtered list to render before counting:
+  // count() does not auto-retry, so gate it on a web-first assertion.
+  await expect(results(page).first()).toBeVisible();
   const filtered = await results(page).count();
   expect(filtered).toBeGreaterThan(0);
   expect(filtered).toBeLessThan(total);
@@ -42,6 +45,7 @@ test("searching by name narrows the directory and is shareable", async ({
   await page.getByRole("button", { name: /apply filters/i }).click();
 
   await expect(page).toHaveURL(/q=falls/);
+  await expect(results(page).first()).toBeVisible();
   const filtered = await results(page).count();
   expect(filtered).toBeGreaterThan(0);
   expect(filtered).toBeLessThan(total);
@@ -67,6 +71,7 @@ test("filtering to dog-friendly narrows the directory and is shareable", async (
   await page.getByRole("button", { name: /apply filters/i }).click();
 
   await expect(page).toHaveURL(/dog=1/);
+  await expect(results(page).first()).toBeVisible();
   const filtered = await results(page).count();
   expect(filtered).toBeGreaterThan(0);
   expect(filtered).toBeLessThan(total);
