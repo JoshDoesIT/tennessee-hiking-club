@@ -1,5 +1,6 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { FACEBOOK_GROUP_URL } from "@/lib/site";
 
@@ -32,7 +33,15 @@ export default function CreditsPage() {
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">Credits</h1>
       <p className="text-ink/75 mt-4 text-lg leading-relaxed">
         This site runs on open data and community generosity. Thank you to
-        everyone who shares their photos, and to the open projects below.
+        everyone who shares their photos, and to the open projects below. See
+        the people who add trails and reports on the{" "}
+        <Link
+          href="/contributors"
+          className="text-pine hover:text-forest underline underline-offset-4"
+        >
+          contributors page
+        </Link>
+        .
       </p>
 
       <section aria-labelledby="photos-heading" className="mt-10">

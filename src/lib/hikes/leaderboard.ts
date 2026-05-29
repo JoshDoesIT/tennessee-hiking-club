@@ -10,6 +10,8 @@ export type LeaderboardEntry = {
   trails: number;
   challenges: number;
   contributions: number;
+  trailsContributed: number;
+  conditionsReported: number;
 };
 
 /** Breadth- and stewardship-oriented metrics only (never distance or speed). */
@@ -17,7 +19,9 @@ export type LeaderboardMetric =
   | "regions"
   | "trails"
   | "challenges"
-  | "contributions";
+  | "contributions"
+  | "trailsContributed"
+  | "conditionsReported";
 
 export type RankedEntry = LeaderboardEntry & { rank: number };
 
@@ -55,6 +59,8 @@ export function leaderboardEntry(
   hikes: HikeLogEntry[],
   trails: Trail[],
   contributions = 0,
+  trailsContributed = 0,
+  conditionsReported = 0,
 ): LeaderboardEntry {
   const stats = computeStats(hikes, trails);
   const completed = hikes.map((h) => h.trailSlug);
@@ -68,6 +74,8 @@ export function leaderboardEntry(
     trails: stats.trails,
     challenges,
     contributions,
+    trailsContributed,
+    conditionsReported,
   };
 }
 

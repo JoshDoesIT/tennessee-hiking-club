@@ -28,6 +28,8 @@ const conditionReportSchema = z.object({
   date: reportDate,
   status: z.string().min(1),
   note: z.string().optional(),
+  /** Contributor handle of the reporter, for recognition (provider-agnostic). */
+  by: z.string().min(1).optional(),
 });
 
 /** An ordered point on a trail's route, used for the elevation profile and GPX
@@ -81,6 +83,8 @@ export const trailSchema = z.object({
         src: z.string().min(1),
         alt: z.string().min(1),
         credit: z.string().optional(),
+        /** Contributor handle of the photographer, for recognition. */
+        by: z.string().min(1).optional(),
       }),
     )
     .default([]),
@@ -93,6 +97,8 @@ export const trailSchema = z.object({
   conditionReports: z.array(conditionReportSchema).default([]),
   route: z.array(routePointSchema).optional(),
   parking: parkingSchema.optional(),
+  /** Contributor handles of people who contributed this trail, for recognition. */
+  contributors: z.array(z.string().min(1)).optional(),
 });
 
 export type Trail = z.infer<typeof trailSchema>;

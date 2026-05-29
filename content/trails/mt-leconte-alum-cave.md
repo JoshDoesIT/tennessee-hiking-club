@@ -24,6 +24,7 @@ route:
   - { lat: 35.6400, lng: -83.4440, elevationFt: 4950 }
   - { lat: 35.6480, lng: -83.4430, elevationFt: 5800 }
   - { lat: 35.6539, lng: -83.4413, elevationFt: 6593 }
+contributors: [JoshDoesIT]
 ---
 
 One of the most beloved hikes in the Smokies. The Alum Cave Trail climbs steadily past Arch Rock and the Alum Cave Bluffs, then traces a string of cliffside overlooks before topping out near LeConte Lodge. Expect steel cables on the exposed sections, crowds in summer and fall, and weather that turns fast near the summit; pack layers and start early. A parking tag is required park-wide.

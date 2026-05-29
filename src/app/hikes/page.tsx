@@ -11,6 +11,8 @@ import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { SITE_URL } from "@/lib/site";
 import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
+import { auth } from "@/auth";
+import { getContributionCountForUser } from "@/lib/stewardship/contributions-server";
 
 export const metadata = pageMetadata({
   title: "My hikes",
@@ -20,9 +22,13 @@ export const metadata = pageMetadata({
   noindex: true,
 });
 
-export default function MyHikesPage() {
+export default async function MyHikesPage() {
   const trails = getAllTrails();
   const mapData = tennesseeMapData(trails);
+  const session = await auth();
+  const contributionCount = session?.user?.id
+    ? await getContributionCountForUser(session.user.id)
+    : 0;
 
   return (
     <Container className="py-12 sm:py-16">
@@ -37,7 +43,7 @@ export default function MyHikesPage() {
       </p>
 
       <div className="mt-4">
-        <StewardBadge />
+        <StewardBadge contributionCount={contributionCount} />
       </div>
 
       <div className="mt-8">

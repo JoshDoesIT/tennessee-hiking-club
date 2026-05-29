@@ -16,4 +16,14 @@ describe("StewardBadge", () => {
     render(<StewardBadge />);
     expect(await screen.findByText(/trail steward/i)).toBeInTheDocument();
   });
+
+  it("renders the badge for a contributor even without a pledge", () => {
+    render(<StewardBadge contributionCount={1} />);
+    expect(screen.getByText(/trail steward/i)).toBeInTheDocument();
+  });
+
+  it("renders nothing with no pledge and no contributions", () => {
+    render(<StewardBadge contributionCount={0} />);
+    expect(screen.queryByText(/trail steward/i)).toBeNull();
+  });
 });

@@ -21,6 +21,7 @@ import {
 } from "@/lib/hikes/leaderboard";
 import { rowToEntry } from "@/lib/hikes/sync";
 import { rowToCleanup } from "@/lib/stewardship/cleanups-sync";
+import { aggregateContributions } from "@/lib/trails/contributions";
 
 // Reads opted-in profiles at request time; never prerendered (and harmless
 // without a database, which keeps CI builds green).
@@ -38,6 +39,8 @@ const METRICS: { key: LeaderboardMetric; label: string; unit: string }[] = [
   { key: "regions", label: "Grand Divisions", unit: "of 3" },
   { key: "challenges", label: "Challenges", unit: "earned" },
   { key: "contributions", label: "Stewardship", unit: "cleanup days" },
+  { key: "trailsContributed", label: "Trails contributed", unit: "trails" },
+  { key: "conditionsReported", label: "Conditions reported", unit: "reports" },
 ];
 
 const WINDOWS: { key: LeaderboardWindow; label: string }[] = [
@@ -82,17 +85,25 @@ async function loadEntries(
     }
 
     const trails = getAllTrails();
+    const contributionsByHandle = aggregateContributions(trails);
     return opted.map((p) => {
       const userCleanups = filterCleanupsByWindow(
         cleanupsByUser.get(p.userId) ?? [],
         window,
       );
       const contributions = new Set(userCleanups.map((c) => c.loggedOn)).size;
+      // Contributions are attributed by the user's captured GitHub login; they
+      // are all-time (not windowed by date).
+      const counts = p.githubLogin
+        ? contributionsByHandle.get(p.githubLogin.toLowerCase())
+        : undefined;
       return leaderboardEntry(
         p.displayName || "Anonymous hiker",
         filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
         trails,
         contributions,
+        counts?.trailsContributed ?? 0,
+        counts?.conditionsReported ?? 0,
       );
     });
   } catch {

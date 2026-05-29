@@ -26,11 +26,13 @@ conditionReports:
   - date: "2026-05-24"
     status: Open
     note: Trail muddy but passable; falls flowing strong after spring rain.
+    by: JoshDoesIT
 parking:
   lat: 35.8270
   lng: -85.2855
   note: Free gravel lot at the trailhead; fills on fall weekends, so arrive early.
   seasonal: The access road is rough but passable for 2WD vehicles in dry conditions.
+contributors: [JoshDoesIT]
 ---
 
 A Cumberland Plateau classic. The trail descends through hardwood forest past several falls before reaching Virgin Falls itself, where an underground stream bursts from a cave, drops 110 feet, and disappears into a sinkhole at the base. The full loop is long, rugged, and often muddy; wear sturdy boots and carry water. Backcountry camping is allowed at designated sites.
