@@ -104,4 +104,27 @@ describe("trailSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("accepts optional parking with notes", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        parking: {
+          lat: 35.83,
+          lng: -85.29,
+          note: "Gravel lot, ~20 spaces, no fee. 2WD ok.",
+          seasonal: "Access road gated dusk to dawn.",
+        },
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects parking outside Tennessee", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        parking: { lat: 33.7, lng: -84.4 },
+      }).success,
+    ).toBe(false);
+  });
 });

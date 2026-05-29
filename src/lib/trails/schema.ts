@@ -38,6 +38,20 @@ const routePointSchema = z.object({
   elevationFt: z.number(),
 });
 
+/** The trailhead parking area: where to actually leave the car. `note` covers
+ *  fee, capacity, gate hours, and surface (2WD/4WD); `seasonal` covers seasonal
+ *  road closures or accessibility. */
+const parkingSchema = z
+  .object({
+    lat: z.number(),
+    lng: z.number(),
+    note: z.string().optional(),
+    seasonal: z.string().optional(),
+  })
+  .refine(isWithinTennessee, {
+    message: "parking coordinates must be within Tennessee",
+  });
+
 /**
  * The trail data model: the executable spec for all trail content.
  * Front-matter from `content/trails/*.md` is validated against this; invalid
@@ -78,6 +92,7 @@ export const trailSchema = z.object({
   alerts: z.array(alertSchema).default([]),
   conditionReports: z.array(conditionReportSchema).default([]),
   route: z.array(routePointSchema).optional(),
+  parking: parkingSchema.optional(),
 });
 
 export type Trail = z.infer<typeof trailSchema>;
@@ -85,3 +100,4 @@ export type Region = (typeof REGIONS)[number];
 export type Difficulty = (typeof DIFFICULTIES)[number];
 export type TrailAlert = z.infer<typeof alertSchema>;
 export type ConditionReport = z.infer<typeof conditionReportSchema>;
+export type TrailParking = z.infer<typeof parkingSchema>;
