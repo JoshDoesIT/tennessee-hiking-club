@@ -61,29 +61,86 @@ describe("planSync", () => {
     const remote: HikeLogEntry[] = [{ trailSlug: "a", hikedOn: "2026-01-01" }];
     expect(planSync(local, remote).toInsert).toEqual([]);
   });
+
+  it("backfills a photoUrl for a remote hike that is missing one", () => {
+    const local: HikeLogEntry[] = [
+      { trailSlug: "a", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" },
+    ];
+    const remote: HikeLogEntry[] = [{ trailSlug: "a", hikedOn: "2026-01-01" }];
+    expect(planSync(local, remote).toUpdate).toEqual([
+      { trailSlug: "a", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" },
+    ]);
+  });
+
+  it("does not backfill when the remote already has a photoUrl", () => {
+    const local: HikeLogEntry[] = [
+      { trailSlug: "a", hikedOn: "2026-01-01", photoUrl: "https://b/new.jpg" },
+    ];
+    const remote: HikeLogEntry[] = [
+      { trailSlug: "a", hikedOn: "2026-01-01", photoUrl: "https://b/old.jpg" },
+    ];
+    expect(planSync(local, remote).toUpdate).toEqual([]);
+  });
+
+  it("does not backfill a hike the account does not have yet", () => {
+    const local: HikeLogEntry[] = [
+      { trailSlug: "a", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" },
+    ];
+    expect(planSync(local, []).toUpdate).toEqual([]);
+  });
+});
+
+describe("mergeHikes photo fields", () => {
+  it("fills a missing photoUrl without overwriting an existing one", () => {
+    const filled = mergeHikes(
+      [{ trailSlug: "x", hikedOn: "2026-01-01" }],
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" }],
+    );
+    expect(filled[0].photoUrl).toBe("https://b/p.jpg");
+
+    const kept = mergeHikes(
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/keep.jpg" }],
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/other.jpg" }],
+    );
+    expect(kept[0].photoUrl).toBe("https://b/keep.jpg");
+  });
+
+  it("carries a local photoId through the merge", () => {
+    const merged = mergeHikes(
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoId: "ph-1" }],
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" }],
+    );
+    expect(merged[0]).toMatchObject({ photoId: "ph-1", photoUrl: "https://b/p.jpg" });
+  });
 });
 
 describe("row mappers", () => {
-  it("rowToEntry drops null note and conditions", () => {
+  it("rowToEntry drops null note, conditions, and photoUrl", () => {
     expect(
       rowToEntry({
         trailSlug: "a",
         hikedOn: "2026-01-01",
         note: null,
         conditions: null,
+        photoUrl: null,
       }),
     ).toEqual({ trailSlug: "a", hikedOn: "2026-01-01" });
   });
 
-  it("rowToEntry keeps a note and conditions when present", () => {
+  it("rowToEntry keeps a note, conditions, and photoUrl when present", () => {
     expect(
       rowToEntry({
         trailSlug: "a",
         hikedOn: "2026-01-01",
         note: "great",
         conditions: "Dry",
+        photoUrl: "https://b/p.jpg",
       }),
-    ).toMatchObject({ note: "great", conditions: "Dry" });
+    ).toMatchObject({
+      note: "great",
+      conditions: "Dry",
+      photoUrl: "https://b/p.jpg",
+    });
   });
 
   it("entryToInsert sets the user id and nulls absent fields", () => {
@@ -94,7 +151,18 @@ describe("row mappers", () => {
         hikedOn: "2026-01-01",
         note: null,
         conditions: null,
+        photoUrl: null,
       },
     );
+  });
+
+  it("entryToInsert carries a photoUrl when present", () => {
+    expect(
+      entryToInsert("u1", {
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        photoUrl: "https://b/p.jpg",
+      }).photoUrl,
+    ).toBe("https://b/p.jpg");
   });
 });

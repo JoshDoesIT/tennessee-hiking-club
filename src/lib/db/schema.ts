@@ -38,6 +38,7 @@ export const hikes = pgTable(
     hikedOn: date("hiked_on").notNull(),
     note: text("note"),
     conditions: text("conditions"),
+    photoUrl: text("photo_url"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

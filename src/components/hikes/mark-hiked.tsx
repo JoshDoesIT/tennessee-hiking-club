@@ -8,9 +8,11 @@ import {
   getServerLogSnapshot,
   addHike,
   removeTrail,
+  setEntryPhotoUrl,
 } from "@/lib/hikes/local-log";
 import { compressImage } from "@/lib/hikes/image";
 import { putPhoto } from "@/lib/hikes/photo-store";
+import { uploadPhoto, deleteRemotePhoto } from "@/lib/hikes/photo-upload";
 import { HIKE_CONDITIONS } from "@/lib/hikes/types";
 
 /** Local-first "mark as hiked" toggle for a trail, with an optional note and
@@ -30,30 +32,45 @@ export function MarkHiked({ slug }: { slug: string }) {
   const [photo, setPhoto] = useState<File | null>(null);
   const detailsId = useId();
 
+  function unlogHike() {
+    // Delete any account-backed photos for this trail before dropping the
+    // entries (removeTrail also GCs the local IndexedDB copies). Best-effort.
+    const remoteUrls = log
+      .filter((e) => e.trailSlug === slug && e.photoUrl)
+      .map((e) => e.photoUrl!);
+    removeTrail(slug);
+    for (const url of remoteUrls) void deleteRemotePhoto(url);
+  }
+
   if (hiked) {
     return (
-      <Button variant="primary" aria-pressed onClick={() => removeTrail(slug)}>
+      <Button variant="primary" aria-pressed onClick={unlogHike}>
         Hiked
       </Button>
     );
   }
 
   async function logHike() {
+    const date = new Date().toISOString().slice(0, 10);
     let photoId: string | undefined;
+    let blob: Blob | undefined;
     if (photo) {
-      const blob = await compressImage(photo);
+      blob = await compressImage(photo);
       photoId = crypto.randomUUID();
       await putPhoto(photoId, blob);
     }
-    addHike(slug, new Date().toISOString().slice(0, 10), {
-      note,
-      conditions,
-      photoId,
-    });
+    addHike(slug, date, { note, conditions, photoId });
     setNote("");
     setConditions("");
     setPhoto(null);
     setShowDetails(false);
+
+    // Best-effort: when signed in, upload to the account and record the URL so
+    // the photo syncs across devices. Stays local-only if signed out/offline.
+    if (blob) {
+      const url = await uploadPhoto(blob);
+      if (url) setEntryPhotoUrl(slug, date, url);
+    }
   }
 
   return (

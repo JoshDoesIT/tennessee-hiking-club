@@ -12,10 +12,15 @@ beforeEach(() => {
 });
 
 describe("HikePhoto", () => {
-  it("renders a remote photoUrl directly without touching IndexedDB", () => {
-    render(<HikePhoto photoUrl="https://blob/p.jpg" alt="My hike photo" />);
+  it("serves a remote (private) photoUrl through the auth-gated view proxy", () => {
+    render(
+      <HikePhoto photoUrl="https://store.private.blob/hikes/u1/p.jpg" alt="My hike photo" />,
+    );
     const img = screen.getByRole("img", { name: "My hike photo" });
-    expect(img).toHaveAttribute("src", "https://blob/p.jpg");
+    expect(img).toHaveAttribute(
+      "src",
+      `/api/hikes/photo?u=${encodeURIComponent("https://store.private.blob/hikes/u1/p.jpg")}`,
+    );
     expect(getPhoto).not.toHaveBeenCalled();
   });
 
@@ -29,6 +34,16 @@ describe("HikePhoto", () => {
 
     unmount();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock");
+  });
+
+  it("prefers the local copy when both a photoId and photoUrl are present", async () => {
+    vi.mocked(getPhoto).mockResolvedValue(new Blob(["x"], { type: "image/jpeg" }));
+    render(
+      <HikePhoto photoId="p1" photoUrl="https://store.private.blob/hikes/u1/p.jpg" alt="Both" />,
+    );
+    const img = await screen.findByRole("img", { name: "Both" });
+    expect(img).toHaveAttribute("src", "blob:mock");
+    expect(getPhoto).toHaveBeenCalledWith("p1");
   });
 
   it("renders nothing when there is no photo", () => {

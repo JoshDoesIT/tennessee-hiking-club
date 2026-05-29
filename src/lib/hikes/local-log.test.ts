@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   readLog,
   addHike,
@@ -6,6 +6,9 @@ import {
   isHiked,
   setEntryPhotoUrl,
 } from "./local-log";
+import { deletePhoto } from "./photo-store";
+
+vi.mock("./photo-store", () => ({ deletePhoto: vi.fn() }));
 
 function memStorage(): Storage {
   const m = new Map<string, string>();
@@ -87,6 +90,20 @@ describe("local hike log", () => {
     addHike("b", "2026-01-02", undefined, s);
     expect(readLog(s)[0].photoId).toBe("ph-1");
     expect(readLog(s)[1].photoId).toBeUndefined();
+  });
+
+  it("garbage-collects local photos when a trail is removed", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoId: "ph-1" }, s);
+    addHike("a", "2026-02-01", { photoId: "ph-2" }, s);
+    addHike("b", "2026-03-01", { photoId: "keep" }, s);
+    vi.mocked(deletePhoto).mockClear();
+
+    removeTrail("a", s);
+
+    expect(deletePhoto).toHaveBeenCalledWith("ph-1");
+    expect(deletePhoto).toHaveBeenCalledWith("ph-2");
+    expect(deletePhoto).not.toHaveBeenCalledWith("keep");
   });
 
   it("sets the photo URL on the matching entry only", () => {
