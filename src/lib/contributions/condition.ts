@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { conditionReportSchema } from "@/lib/trails/schema";
+import { yamlScalar, appendListItem } from "./frontmatter";
 
 /**
  * An in-app condition report (#149) for an existing trail. Validation is pure so
@@ -16,12 +17,6 @@ export type ConditionSubmissionInput = z.infer<typeof conditionSubmissionSchema>
 
 export function validateConditionSubmission(input: unknown) {
   return conditionSubmissionSchema.safeParse(input);
-}
-
-/** Double-quote a scalar so it round-trips as a string (and never as a YAML
- *  date) when a maintainer pastes the entry into trail content. */
-function yamlScalar(value: string): string {
-  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 }
 
 export type ConditionEntry = {
@@ -67,24 +62,9 @@ export function appendConditionReport(
   fileText: string,
   report: ConditionEntry,
 ): string {
-  const entry = generateConditionEntry(report).yaml;
-  const match = fileText.match(/^---\n([\s\S]*?)\n---/);
-  if (!match) return fileText;
-
-  const front = match[1];
-  const lines = front.split("\n");
-  const keyIndex = lines.findIndex((line) =>
-    /^conditionReports:\s*(\[\s*\])?\s*$/.test(line),
+  return appendListItem(
+    fileText,
+    "conditionReports",
+    generateConditionEntry(report).yaml,
   );
-
-  if (keyIndex === -1) {
-    lines.push("conditionReports:", entry);
-  } else {
-    // Normalise an inline empty list to block form, then insert as the first
-    // (newest) entry under the key.
-    lines[keyIndex] = "conditionReports:";
-    lines.splice(keyIndex + 1, 0, entry);
-  }
-
-  return fileText.replace(front, lines.join("\n"));
 }

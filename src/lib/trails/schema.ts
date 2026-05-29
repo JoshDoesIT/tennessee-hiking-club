@@ -23,6 +23,15 @@ const alertSchema = z.object({
   source: z.url().optional(),
 });
 
+/** A photo on a trail. `alt` is required for accessibility; `by` is the
+ *  photographer's contributor handle, for recognition. */
+export const photoItemSchema = z.object({
+  src: z.string().min(1),
+  alt: z.string().min(1),
+  credit: z.string().optional(),
+  by: z.string().min(1).optional(),
+});
+
 /** A recent, community-sourced condition report curated into trail content. */
 export const conditionReportSchema = z.object({
   date: reportDate,
@@ -77,17 +86,7 @@ export const trailSchema = z.object({
   kidFriendly: z.boolean().optional(),
   feeRequired: z.boolean().optional(),
   tags: z.array(z.string()).default([]),
-  photos: z
-    .array(
-      z.object({
-        src: z.string().min(1),
-        alt: z.string().min(1),
-        credit: z.string().optional(),
-        /** Contributor handle of the photographer, for recognition. */
-        by: z.string().min(1).optional(),
-      }),
-    )
-    .default([]),
+  photos: z.array(photoItemSchema).default([]),
   externalLinks: z
     .array(z.object({ label: z.string().min(1), url: z.url() }))
     .optional(),

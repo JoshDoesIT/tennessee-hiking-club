@@ -56,6 +56,9 @@ describe("openFilePullRequest", () => {
       putFile: vi.fn(async () => {
         calls.push("putFile");
       }),
+      putBinaryFile: vi.fn(async () => {
+        calls.push("putBinaryFile");
+      }),
       openPullRequest: vi.fn(async () => {
         calls.push("openPullRequest");
         return { url: "https://github.com/o/r/pull/7" };

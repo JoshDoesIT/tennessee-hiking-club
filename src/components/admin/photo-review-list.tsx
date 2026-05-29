@@ -25,6 +25,7 @@ const viewUrl = (id: string) => `/api/contributions/photo/${id}/view`;
  */
 export function PhotoReviewList({ photos }: { photos: PendingPhoto[] }) {
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
+  const [prUrls, setPrUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
   if (photos.length === 0) {
@@ -48,6 +49,10 @@ export function PhotoReviewList({ photos }: { photos: PendingPhoto[] }) {
           ...prev,
           [id]: action === "approve" ? "approved" : "rejected",
         }));
+        const data = await res.json().catch(() => null);
+        if (data?.prUrl) {
+          setPrUrls((prev) => ({ ...prev, [id]: data.prUrl as string }));
+        }
       }
     } finally {
       setBusy(null);
@@ -87,22 +92,36 @@ export function PhotoReviewList({ photos }: { photos: PendingPhoto[] }) {
                 <p className="text-pine text-sm font-medium" role="status">
                   Marked {decided}.
                 </p>
-                {decided === "approved" && (
-                  <p className="text-ink/80 mt-2 text-sm">
-                    <a
-                      href={viewUrl(p.id)}
-                      download
-                      className="text-pine hover:text-forest underline underline-offset-4"
-                    >
-                      Download the photo
-                    </a>{" "}
-                    and add it to{" "}
-                    <code className="text-ink/80">
-                      content/trails/{p.trailSlug}.md
-                    </code>{" "}
-                    under <code className="text-ink/80">photos:</code>.
-                  </p>
-                )}
+                {decided === "approved" &&
+                  (prUrls[p.id] ? (
+                    <p className="text-ink/80 mt-2 text-sm">
+                      Opened a{" "}
+                      <a
+                        href={prUrls[p.id]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-pine hover:text-forest underline underline-offset-4"
+                      >
+                        pull request
+                      </a>{" "}
+                      with this photo. Merge it to publish.
+                    </p>
+                  ) : (
+                    <p className="text-ink/80 mt-2 text-sm">
+                      <a
+                        href={viewUrl(p.id)}
+                        download
+                        className="text-pine hover:text-forest underline underline-offset-4"
+                      >
+                        Download the photo
+                      </a>{" "}
+                      and add it to{" "}
+                      <code className="text-ink/80">
+                        content/trails/{p.trailSlug}.md
+                      </code>{" "}
+                      under <code className="text-ink/80">photos:</code>.
+                    </p>
+                  ))}
               </div>
             ) : (
               <div className="mt-4 flex gap-3">
