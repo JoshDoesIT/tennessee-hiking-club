@@ -19,6 +19,8 @@ const trails = (slugs: string[]): Trail[] =>
         photos: [],
         summary: "s",
         body: "",
+        alerts: [],
+        conditionReports: [],
       }) as Trail,
   );
 

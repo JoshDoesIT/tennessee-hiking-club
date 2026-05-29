@@ -28,6 +28,8 @@ const make = (slug: string, region: Trail["region"]): Trail => ({
   photos: [],
   summary: "s",
   body: "",
+  alerts: [],
+  conditionReports: [],
 });
 
 describe("rankLeaderboard", () => {

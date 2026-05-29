@@ -54,4 +54,33 @@ describe("trailSchema", () => {
       trailSchema.safeParse({ ...validTrail, lengthMiles: 0 }).success,
     ).toBe(false);
   });
+
+  it("accepts pinned alerts and condition reports", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        alerts: [
+          { level: "closure", message: "Footbridge out", date: "2026-05-01" },
+        ],
+        conditionReports: [
+          { date: "2026-05-20", status: "Muddy", note: "Slick near the base" },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("defaults alerts and conditionReports to empty arrays", () => {
+    const trail = trailSchema.parse(validTrail);
+    expect(trail.alerts).toEqual([]);
+    expect(trail.conditionReports).toEqual([]);
+  });
+
+  it("rejects an unknown alert level", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        alerts: [{ level: "danger", message: "x", date: "2026-05-01" }],
+      }).success,
+    ).toBe(false);
+  });
 });

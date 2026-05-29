@@ -1,0 +1,52 @@
+name: ⚠️ Trail condition report
+description: Report current conditions on a trail (mud, water, closures, downed trees)
+title: "[Conditions]: "
+labels: ["trail", "conditions"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the update! Recent, on-the-ground reports help other hikers
+        plan. A maintainer will add confirmed reports to the trail page.
+  - type: input
+    id: trail
+    attributes:
+      label: Trail
+      description: The trail you hiked.
+      placeholder: Virgin Falls
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Date hiked
+      description: When you were there (YYYY-MM-DD).
+      placeholder: "2026-05-24"
+    validations:
+      required: true
+  - type: dropdown
+    id: condition
+    attributes:
+      label: Condition
+      options:
+        - Open / good
+        - Caution (muddy, water crossings, downed trees)
+        - Partially closed
+        - Closed
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What did you encounter? Be specific about location and severity.
+      placeholder: Creek crossing at mile 1.2 was knee-deep and fast after rain.
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: This reflects conditions I personally observed on the date above.
+          required: true
