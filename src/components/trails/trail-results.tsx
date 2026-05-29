@@ -72,7 +72,7 @@ export function TrailResults({ trails }: { trails: Trail[] }) {
             {busy ? "Locating…" : "Sort by distance from me"}
           </button>
         )}
-        <p className="text-ink/60 text-xs">
+        <p className="text-ink/70 text-xs">
           Uses your device location to sort. It stays on this device and is
           never sent anywhere.
         </p>
