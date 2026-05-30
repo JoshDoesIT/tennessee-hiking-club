@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { ProviderIcon } from "./provider-icons";
 
 type ProviderInfo = { id: string; name: string };
 
@@ -49,6 +50,7 @@ export function SignInOptions() {
           variant="outline"
           onClick={() => signIn(provider.id, { callbackUrl: "/hikes" })}
         >
+          <ProviderIcon provider={provider.id} />
           Continue with {provider.name}
         </Button>
       ))}
