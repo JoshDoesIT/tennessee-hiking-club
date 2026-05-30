@@ -15,6 +15,7 @@
     "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "validate:content": "tsx scripts/validate-content.ts",
     "generate:geo": "tsx scripts/build-tn-geo.ts",
+    "enrich:parking": "tsx scripts/enrich-parking.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "prebuild": "tsx scripts/validate-content.ts",

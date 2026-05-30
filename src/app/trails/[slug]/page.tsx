@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAllTrails, getTrailBySlug } from "@/lib/trails";
+import { getAllTrails, getTrailBySlug, loadOsmParkingMap } from "@/lib/trails";
+import { resolveParking } from "@/lib/trails/osm-parking";
 import { trailMetadata, trailJsonLd } from "@/lib/trails/metadata";
 import { googleMapsDirectionsUrl } from "@/lib/maps";
 import { TrailGallery } from "@/components/trails/trail-gallery";
@@ -36,6 +37,9 @@ export default async function TrailPage({ params }: Params) {
   const { slug } = await params;
   const trail = getTrailBySlug(slug);
   if (!trail) notFound();
+
+  // Declared parking wins; otherwise fall back to the cached OSM lot (#141).
+  const resolvedParking = resolveParking(trail, loadOsmParkingMap());
 
   const weather = await fetchTrailWeather(
     trail.coordinates.lat,
@@ -98,7 +102,7 @@ export default async function TrailPage({ params }: Params) {
           <TrailContextMap
             coordinates={trail.coordinates}
             name={trail.name}
-            parking={trail.parking}
+            parking={resolvedParking?.parking}
           />
         </div>
         <div className="mt-4">
@@ -111,7 +115,12 @@ export default async function TrailPage({ params }: Params) {
             Open in Google Maps
           </a>
         </div>
-        {trail.parking ? <TrailParking parking={trail.parking} /> : null}
+        {resolvedParking ? (
+          <TrailParking
+            parking={resolvedParking.parking}
+            source={resolvedParking.source}
+          />
+        ) : null}
       </section>
 
       <WeatherForecast weather={weather} />

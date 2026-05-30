@@ -1,0 +1,49 @@
+{
+  "burgess-falls": {
+    "lat": 36.0433979,
+    "lng": -85.593518
+  },
+  "charlies-bunion": {
+    "lat": 35.6106257,
+    "lng": -83.425764
+  },
+  "fall-creek-falls": {
+    "lat": 35.6621162,
+    "lng": -85.3497143
+  },
+  "frozen-head-lookout-tower": {
+    "lat": 36.1257521,
+    "lng": -84.5035117
+  },
+  "house-mountain": {
+    "lat": 36.1048017,
+    "lng": -83.7627329
+  },
+  "laurel-snow-pocket-wilderness": {
+    "lat": 35.4983132,
+    "lng": -85.0114894,
+    "name": "Church of Christ Parking"
+  },
+  "mt-leconte-alum-cave": {
+    "lat": 35.628628,
+    "lng": -83.450878,
+    "name": "Alum Cave Bluffs Trailhead Overflow Parking"
+  },
+  "piney-falls": {
+    "lat": 35.7274502,
+    "lng": -84.8558606
+  },
+  "radnor-lake": {
+    "lat": 36.0629869,
+    "lng": -86.8100294
+  },
+  "roan-highlands-balds": {
+    "lat": 36.1064312,
+    "lng": -82.110396,
+    "name": "Carver's Gap"
+  },
+  "stone-door": {
+    "lat": 35.445209,
+    "lng": -85.6561148
+  }
+}
