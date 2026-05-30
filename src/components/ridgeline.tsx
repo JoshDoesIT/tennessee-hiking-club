@@ -3,27 +3,62 @@
  * night (#167). The sun and moon cross-fade and the ridges deepen to dusk when
  * dark mode is on. Purely ornamental; hidden from assistive tech.
  */
-// The ridgeline renders as a short band, so `slice` crops the top of the
-// viewBox on wide screens. Keep the stars in the lower sky band (cy ~170-290,
-// clear of the moon at x~1040) so they survive the crop and actually show.
+// On wide screens `slice` crops the TOP of the viewBox, so high stars only show
+// on phones (which show the full height but a narrower centre column). Hence two
+// groups: an upper field concentrated in the centre (visible high up on phones)
+// and a lower field across the width (survives the desktop crop). Both keep
+// clear of the moon, which sits at x~1040 on desktop and x~660 on phones.
 const STARS = [
-  { cx: 120, cy: 196, r: 1.6, d: "0.2s", dur: "4s" },
-  { cx: 210, cy: 252, r: 2.2, d: "1.1s", dur: "5.2s" },
-  { cx: 300, cy: 170, r: 1.3, d: "2.4s", dur: "3.6s" },
-  { cx: 380, cy: 232, r: 1.8, d: "0.8s", dur: "4.6s" },
-  { cx: 470, cy: 186, r: 2.4, d: "3.1s", dur: "5s" },
-  { cx: 560, cy: 264, r: 1.4, d: "1.7s", dur: "3.9s" },
-  { cx: 640, cy: 176, r: 1.9, d: "2.2s", dur: "4.4s" },
-  { cx: 720, cy: 244, r: 2.1, d: "0.5s", dur: "5.4s" },
-  { cx: 800, cy: 200, r: 1.5, d: "3.6s", dur: "3.7s" },
-  { cx: 880, cy: 272, r: 1.7, d: "1.3s", dur: "4.8s" },
-  { cx: 240, cy: 290, r: 1.3, d: "3.3s", dur: "4s" },
-  { cx: 660, cy: 292, r: 1.4, d: "2s", dur: "5.3s" },
-  { cx: 1190, cy: 182, r: 2.0, d: "0.9s", dur: "4.2s" },
-  { cx: 1270, cy: 248, r: 1.5, d: "2.8s", dur: "5.1s" },
-  { cx: 1340, cy: 196, r: 2.3, d: "1.9s", dur: "3.8s" },
-  { cx: 1400, cy: 258, r: 1.6, d: "0.4s", dur: "4.5s" },
+  // upper sky (shows high up on phones; crops on very wide screens)
+  { cx: 250, cy: 120, r: 1.5, d: "2.9s", dur: "4.4s" },
+  { cx: 500, cy: 150, r: 1.3, d: "1.8s", dur: "4s" },
+  { cx: 560, cy: 92, r: 1.8, d: "0.6s", dur: "4.3s" },
+  { cx: 620, cy: 140, r: 1.4, d: "2.1s", dur: "3.7s" },
+  { cx: 680, cy: 78, r: 2.1, d: "1.5s", dur: "5s" },
+  { cx: 730, cy: 150, r: 1.5, d: "3.4s", dur: "4.1s" },
+  { cx: 770, cy: 100, r: 2.3, d: "0.3s", dur: "4.9s" },
+  { cx: 850, cy: 134, r: 1.5, d: "2.6s", dur: "3.6s" },
+  { cx: 910, cy: 88, r: 1.8, d: "1s", dur: "5.3s" },
+  { cx: 1180, cy: 110, r: 1.6, d: "0.7s", dur: "4.7s" },
+  { cx: 1320, cy: 96, r: 1.5, d: "2.3s", dur: "4.2s" },
+  // lower sky (shows across the width on desktop)
+  { cx: 120, cy: 210, r: 1.6, d: "0.2s", dur: "4s" },
+  { cx: 210, cy: 262, r: 2.2, d: "1.1s", dur: "5.2s" },
+  { cx: 320, cy: 188, r: 1.4, d: "2.4s", dur: "3.6s" },
+  { cx: 430, cy: 244, r: 1.8, d: "0.8s", dur: "4.6s" },
+  { cx: 520, cy: 200, r: 2.0, d: "3.1s", dur: "5s" },
+  { cx: 820, cy: 210, r: 1.7, d: "3.6s", dur: "3.7s" },
+  { cx: 900, cy: 262, r: 1.5, d: "1.3s", dur: "4.8s" },
+  { cx: 1180, cy: 200, r: 2.0, d: "0.9s", dur: "4.2s" },
+  { cx: 1280, cy: 258, r: 1.5, d: "2.8s", dur: "5.1s" },
+  { cx: 1360, cy: 200, r: 2.3, d: "1.9s", dur: "3.8s" },
+  { cx: 1410, cy: 262, r: 1.6, d: "0.4s", dur: "4.5s" },
 ];
+
+/** The crescent moon body (glow, masked crescent + craters, warm limb glint),
+ *  drawn at x~1040. Rendered twice by `Ridgeline` at different positions for
+ *  phone vs. desktop, so the narrow mobile crop never hides it. */
+function MoonShape() {
+  return (
+    <>
+      <circle cx="1090" cy="250" r="108" fill="url(#thc-moon-glow)" />
+      <g mask="url(#thc-moon-mask)">
+        <circle cx="1040" cy="250" r="88" fill="#ece8d4" />
+        <circle cx="1102" cy="236" r="5.5" fill="#d6cfb2" opacity="0.65" />
+        <circle cx="1112" cy="264" r="4" fill="#d6cfb2" opacity="0.55" />
+        <circle cx="1090" cy="252" r="3" fill="#d6cfb2" opacity="0.5" />
+      </g>
+      <path
+        d="M1091 178 A88 88 0 0 1 1091 322"
+        fill="none"
+        stroke="#e9b870"
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity="0.4"
+      />
+    </>
+  );
+}
 
 export function Ridgeline({ className = "" }: { className?: string }) {
   return (
@@ -81,30 +116,20 @@ export function Ridgeline({ className = "" }: { className?: string }) {
         </g>
       </g>
 
-      {/* rising crescent moon (night) */}
+      {/* rising crescent moon (night). Two positions share the fade/crossfade
+          wrapper: centred for phones (so the narrow `slice` crop does not hide
+          it off to the right) and on the right at >=sm. The shifted group also
+          carries the same mask, since userSpaceOnUse masks follow the transform. */}
       <g
         data-celestial="moon"
         className="opacity-0 transition-opacity duration-700 dark:opacity-100"
       >
-        {/* soft halo, centred on the lit limb so the dark side stays dark and
-            the moon reads as a crescent rather than a faded full disc */}
-        <circle cx="1090" cy="250" r="108" fill="url(#thc-moon-glow)" />
-        {/* the lit crescent, with craters that ride only the lit limb */}
-        <g mask="url(#thc-moon-mask)">
-          <circle cx="1040" cy="250" r="88" fill="#ece8d4" />
-          <circle cx="1102" cy="236" r="5.5" fill="#d6cfb2" opacity="0.65" />
-          <circle cx="1112" cy="264" r="4" fill="#d6cfb2" opacity="0.55" />
-          <circle cx="1090" cy="252" r="3" fill="#d6cfb2" opacity="0.5" />
+        <g className="hidden sm:block">
+          <MoonShape />
         </g>
-        {/* warm amber glint along the sunlit limb (radius 88 from the centre) */}
-        <path
-          d="M1091 178 A88 88 0 0 1 1091 322"
-          fill="none"
-          stroke="#e9b870"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
+        <g className="sm:hidden" transform="translate(-380 -40)">
+          <MoonShape />
+        </g>
       </g>
 
       {/* far ridge */}
