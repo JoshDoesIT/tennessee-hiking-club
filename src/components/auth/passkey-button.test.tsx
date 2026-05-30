@@ -37,13 +37,33 @@ describe("PasskeyButton", () => {
     expect(btn.querySelector('[data-icon="passkey"]')).not.toBeNull();
   });
 
-  it("starts the WebAuthn ceremony for the passkey provider on click", async () => {
+  it("authenticates by default, passing an explicit action", async () => {
     enableWebAuthn();
     const user = userEvent.setup();
-    render(<PasskeyButton label="Add a passkey" callbackUrl="/hikes" />);
+    render(<PasskeyButton label="Sign in with a passkey" callbackUrl="/hikes" />);
     await user.click(await screen.findByRole("button", { name: /passkey/i }));
     await waitFor(() =>
       expect(signInMock).toHaveBeenCalledWith("passkey", {
+        action: "authenticate",
+        callbackUrl: "/hikes",
+      }),
+    );
+  });
+
+  it("registers when action=register (logged-in users need an explicit action)", async () => {
+    enableWebAuthn();
+    const user = userEvent.setup();
+    render(
+      <PasskeyButton
+        action="register"
+        label="Add a passkey"
+        callbackUrl="/hikes"
+      />,
+    );
+    await user.click(await screen.findByRole("button", { name: /passkey/i }));
+    await waitFor(() =>
+      expect(signInMock).toHaveBeenCalledWith("passkey", {
+        action: "register",
         callbackUrl: "/hikes",
       }),
     );
