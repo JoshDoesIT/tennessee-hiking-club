@@ -27,9 +27,23 @@ function setupFetch(session: unknown, { ok = true } = {}) {
   return { f, getPostBody: () => postBody };
 }
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.unstubAllGlobals();
+  // @ts-expect-error cleanup of the WebAuthn feature-detection global
+  delete window.PublicKeyCredential;
+});
 
 describe("TrailSubmissionForm", () => {
+  it("offers a passkey sign-in in the signed-out prompt when WebAuthn is supported", async () => {
+    // @ts-expect-error minimal stub for feature detection
+    window.PublicKeyCredential = function () {};
+    setupFetch({});
+    render(<TrailSubmissionForm />);
+    expect(
+      await screen.findByRole("button", { name: /sign in with a passkey/i }),
+    ).toBeInTheDocument();
+  });
+
   it("does not show the form when signed out", async () => {
     const { f } = setupFetch({});
     render(<TrailSubmissionForm />);

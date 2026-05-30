@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { SignInOptions } from "@/components/auth/sign-in-options";
+import { PasskeyButton } from "@/components/auth/passkey-button";
 import { REGIONS, DIFFICULTIES, ROUTE_TYPES } from "@/lib/trails/schema";
 
 /**
@@ -49,6 +50,12 @@ export function TrailSubmissionForm() {
         </p>
         <div className="mt-4 max-w-xs">
           <SignInOptions />
+          <div className="mt-3">
+            <PasskeyButton
+              label="Sign in with a passkey"
+              callbackUrl="/contribute"
+            />
+          </div>
         </div>
       </div>
     );
