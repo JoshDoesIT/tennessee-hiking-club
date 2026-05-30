@@ -108,9 +108,24 @@ export function SkyBackdrop() {
               <circle cx="68" cy="65" r="44" fill="white" />
               <circle cx="48" cy="58" r="41" fill="black" />
             </mask>
+            <filter
+              id="sky-moon-glow"
+              x="-60%"
+              y="-60%"
+              width="220%"
+              height="220%"
+            >
+              <feGaussianBlur stdDeviation="6" />
+            </filter>
           </defs>
-          {/* a clean crescent (lit disc with an offset bite), craters on the lit
-              limb, and a warm amber rim, with no halo blob behind it */}
+          {/* soft glow: the crescent shape itself, blurred, so the halo hugs the
+              crescent instead of reading as a circle behind it */}
+          <g filter="url(#sky-moon-glow)" opacity="0.55">
+            <g mask="url(#sky-moon-mask)">
+              <circle cx="68" cy="65" r="44" fill="#f4efdc" />
+            </g>
+          </g>
+          {/* the crisp crescent, craters on the lit limb, and a warm amber rim */}
           <g mask="url(#sky-moon-mask)">
             <circle cx="68" cy="65" r="44" fill="#ece8d4" />
             <circle cx="90" cy="52" r="3.5" fill="#d6cfb2" opacity="0.6" />
