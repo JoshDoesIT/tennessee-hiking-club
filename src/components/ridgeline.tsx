@@ -67,17 +67,25 @@ export function Ridgeline({ className = "" }: { className?: string }) {
         ))}
       </g>
 
-      {/* setting sun (day) */}
+      {/* setting sun (day). The opacity crossfade lives on this outer group,
+          NOT the animated one: a running `animate-sun` sets `opacity` from its
+          keyframes, which would override `dark:opacity-0` and leave the sun
+          showing at night. Wrapping keeps the fade-out a separate concern. */}
       <g
-        className="animate-sun transition-opacity duration-700 dark:opacity-0"
-        style={{ transformOrigin: "1040px 250px" }}
+        data-celestial="sun"
+        className="transition-opacity duration-700 dark:opacity-0"
       >
-        <circle cx="1040" cy="250" r="190" fill="url(#thc-sun)" />
-        <circle cx="1040" cy="250" r="94" fill="#eab35e" />
+        <g className="animate-sun" style={{ transformOrigin: "1040px 250px" }}>
+          <circle cx="1040" cy="250" r="190" fill="url(#thc-sun)" />
+          <circle cx="1040" cy="250" r="94" fill="#eab35e" />
+        </g>
       </g>
 
       {/* rising crescent moon (night) */}
-      <g className="opacity-0 transition-opacity duration-700 dark:opacity-100">
+      <g
+        data-celestial="moon"
+        className="opacity-0 transition-opacity duration-700 dark:opacity-100"
+      >
         {/* soft halo, centred on the lit limb so the dark side stays dark and
             the moon reads as a crescent rather than a faded full disc */}
         <circle cx="1090" cy="250" r="108" fill="url(#thc-moon-glow)" />
