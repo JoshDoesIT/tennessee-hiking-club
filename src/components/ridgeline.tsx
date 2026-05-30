@@ -129,7 +129,7 @@ export function Ridgeline({ className = "" }: { className?: string }) {
         </g>
         <g
           className="sm:hidden"
-          transform="translate(905 88) scale(0.66) translate(-1040 -250)"
+          transform="translate(900 52) scale(0.4) translate(-1040 -250)"
         >
           <MoonShape />
         </g>

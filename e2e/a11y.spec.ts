@@ -1,5 +1,14 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+// Sample the settled page: reduce motion so an entrance animation (e.g. the hero
+// buttons' `animate-rise`, which fades opacity 0->1) is not caught mid-flight,
+// where the half-transparent button lets the decorative ridgeline behind it show
+// through and trips a false color-contrast violation.
+async function settled(page: Page, path: string) {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(path);
+}
 
 const pages = [
   { name: "home", path: "/" },
@@ -19,7 +28,7 @@ for (const { name, path } of pages) {
   test(`${name} has no WCAG A/AA accessibility violations`, async ({
     page,
   }) => {
-    await page.goto(path);
+    await settled(page, path);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       // MapLibre injects its own (labeled) canvas/controls; the accessible
@@ -46,7 +55,7 @@ for (const { name, path } of darkPages) {
         /* ignore */
       }
     });
-    await page.goto(path);
+    await settled(page, path);
     await expect(page.locator("html.dark")).toHaveCount(1);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
