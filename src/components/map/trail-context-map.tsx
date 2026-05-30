@@ -24,10 +24,35 @@ export function TrailContextMap({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
+  const [visible, setVisible] = useState(false);
   const parkingLat = parking?.lat;
   const parkingLng = parking?.lng;
 
+  // The map sits below the fold, so defer loading MapLibre (a heavy WebGL
+  // bundle) until it scrolls near the viewport. This keeps it off the critical
+  // path and out of initial main-thread work. Falls back to loading immediately
+  // where IntersectionObserver is unavailable (e.g. jsdom in tests).
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
     let map: import("maplibre-gl").Map | undefined;
     let cancelled = false;
     const center: [number, number] = [coordinates.lng, coordinates.lat];
@@ -116,7 +141,7 @@ export function TrailContextMap({
       cancelled = true;
       map?.remove();
     };
-  }, [coordinates.lat, coordinates.lng, parkingLat, parkingLng]);
+  }, [visible, coordinates.lat, coordinates.lng, parkingLat, parkingLng]);
 
   return (
     <div className="relative w-full">
