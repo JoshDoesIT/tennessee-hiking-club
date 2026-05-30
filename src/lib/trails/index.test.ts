@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { loadTrailsFrom, getTrailBySlug } from "./index";
+import { loadTrailsFrom, getTrailBySlug, loadOsmParkingMap } from "./index";
 
 function writeTrail(
   dir: string,
@@ -98,5 +98,21 @@ describe("getTrailBySlug", () => {
 
   it("returns null for a missing slug", () => {
     expect(getTrailBySlug("does-not-exist", dir)).toBeNull();
+  });
+});
+
+describe("loadOsmParkingMap", () => {
+  it("returns an empty map when the cache file is missing", () => {
+    expect(
+      loadOsmParkingMap(path.join(os.tmpdir(), "no-such-osm-parking.json")),
+    ).toEqual({});
+  });
+
+  it("reads the cached OSM parking map", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "osm-parking-"));
+    const file = path.join(dir, "osm-parking.json");
+    fs.writeFileSync(file, JSON.stringify({ "piney-falls": { lat: 1, lng: 2 } }));
+    expect(loadOsmParkingMap(file)).toEqual({ "piney-falls": { lat: 1, lng: 2 } });
+    fs.rmSync(dir, { recursive: true, force: true });
   });
 });

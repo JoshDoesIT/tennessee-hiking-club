@@ -34,4 +34,15 @@ describe("TrailParking", () => {
       screen.getByRole("link", { name: /directions to parking/i }),
     ).toBeInTheDocument();
   });
+
+  it("attributes OpenStreetMap when the parking is OSM-sourced", () => {
+    render(<TrailParking parking={{ lat: 35.83, lng: -85.29 }} source="osm" />);
+    const link = screen.getByRole("link", { name: /openstreetmap/i });
+    expect(link.getAttribute("href") ?? "").toContain("openstreetmap.org");
+  });
+
+  it("shows no OSM attribution for declared content parking", () => {
+    render(<TrailParking parking={parking} source="content" />);
+    expect(screen.queryByRole("link", { name: /openstreetmap/i })).toBeNull();
+  });
 });
