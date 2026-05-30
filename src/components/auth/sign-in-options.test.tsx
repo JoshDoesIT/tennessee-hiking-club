@@ -66,6 +66,18 @@ describe("SignInOptions", () => {
     expect(container.querySelector('[data-icon="fallback"]')).not.toBeNull();
   });
 
+  it("does not render WebAuthn providers as OAuth buttons (passkey has its own)", async () => {
+    mockProviders({
+      github: { id: "github", name: "GitHub", type: "oauth" },
+      passkey: { id: "passkey", name: "Passkey", type: "webauthn" },
+    });
+    render(<SignInOptions />);
+    await screen.findByRole("button", { name: /continue with github/i });
+    expect(
+      screen.queryByRole("button", { name: /continue with passkey/i }),
+    ).toBeNull();
+  });
+
   it("shows a message when no providers are configured", async () => {
     mockProviders({});
     render(<SignInOptions />);

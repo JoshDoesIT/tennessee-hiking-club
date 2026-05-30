@@ -1,55 +1,9 @@
-import NextAuth, { type NextAuthConfig } from "next-auth";
-import GitHub from "next-auth/providers/github";
-import Google from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { getDb } from "@/lib/db";
-import { users, accounts, sessions, verificationTokens } from "@/lib/db/schema";
-import { captureGithubLogin } from "@/lib/auth/capture-login";
+import NextAuth from "next-auth";
+import { buildAuthConfig } from "@/lib/auth/config";
 
 /**
- * Auth.js (NextAuth v5) with Google and GitHub. Providers read their own
- * `AUTH_<PROVIDER>_ID` / `_SECRET` env vars; each is included only when its
- * credentials are present, and the Drizzle adapter is wired only when a
- * database is configured. This keeps builds working before the secrets exist
- * (e.g. CI) while lighting up sign-in in any environment that has them.
+ * Auth.js (NextAuth v5): GitHub + Google OAuth, plus passkeys (WebAuthn) when a
+ * database is configured. The config lives in `@/lib/auth/config` so it can be
+ * unit-tested without pulling in `next/server`.
  */
-function buildConfig(): NextAuthConfig {
-  const providers: NextAuthConfig["providers"] = [];
-  if (process.env.AUTH_GITHUB_ID) providers.push(GitHub);
-  if (process.env.AUTH_GOOGLE_ID) providers.push(Google);
-
-  const config: NextAuthConfig = {
-    providers,
-    trustHost: true,
-    callbacks: {
-      session({ session, user }) {
-        if (user?.id && session.user) session.user.id = user.id;
-        return session;
-      },
-    },
-  };
-
-  if (process.env.DATABASE_URL) {
-    config.adapter = DrizzleAdapter(getDb(), {
-      usersTable: users,
-      accountsTable: accounts,
-      sessionsTable: sessions,
-      verificationTokensTable: verificationTokens,
-    });
-    // Record a GitHub user's login at sign-in so their contributions can be
-    // recognized. Best-effort: failures must not block sign-in.
-    config.events = {
-      async signIn(message) {
-        try {
-          await captureGithubLogin(message, getDb());
-        } catch {
-          // ignore
-        }
-      },
-    };
-  }
-
-  return config;
-}
-
-export const { handlers, auth, signIn, signOut } = NextAuth(buildConfig());
+export const { handlers, auth, signIn, signOut } = NextAuth(buildAuthConfig());
