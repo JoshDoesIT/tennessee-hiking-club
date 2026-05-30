@@ -43,6 +43,29 @@ describe("SignInOptions", () => {
     expect(signInMock).toHaveBeenCalledWith("github", { callbackUrl: "/hikes" });
   });
 
+  it("shows a recognizable, decorative icon on each provider button", async () => {
+    mockProviders({
+      github: { id: "github", name: "GitHub" },
+      google: { id: "google", name: "Google" },
+    });
+    const { container } = render(<SignInOptions />);
+    await screen.findByRole("button", { name: /continue with github/i });
+
+    const githubIcon = container.querySelector('[data-icon="github"]');
+    const googleIcon = container.querySelector('[data-icon="google"]');
+    expect(githubIcon).not.toBeNull();
+    expect(googleIcon).not.toBeNull();
+    // Decorative: the visible text stays the accessible label.
+    expect(githubIcon).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("falls back to a generic icon for an unknown provider", async () => {
+    mockProviders({ acme: { id: "acme", name: "Acme SSO" } });
+    const { container } = render(<SignInOptions />);
+    await screen.findByRole("button", { name: /continue with acme sso/i });
+    expect(container.querySelector('[data-icon="fallback"]')).not.toBeNull();
+  });
+
   it("shows a message when no providers are configured", async () => {
     mockProviders({});
     render(<SignInOptions />);
