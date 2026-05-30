@@ -25,5 +25,5 @@ test("a trail with no declared parking shows the OSM fallback, attributed", asyn
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /openstreetmap/i }),
-  ).toHaveAttribute("href", /openstreetmap\.org/);
+  ).toHaveAttribute("href", "https://www.openstreetmap.org/copyright");
 });
