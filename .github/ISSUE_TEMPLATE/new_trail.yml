@@ -74,6 +74,16 @@ body:
     attributes:
       label: Helpful links
       placeholder: AllTrails, park website…
+  - type: input
+    id: route
+    attributes:
+      label: GPS route (optional)
+      description: >-
+        Link an official or recorded **.gpx** track and we will add the elevation
+        profile and a Download GPX button. A maintainer converts it with
+        `pnpm import:gpx` (see CONTRIBUTING). Share only tracks you have the right
+        to use; please do not hand-draw a guessed route.
+      placeholder: Link to a .gpx file…
   - type: checkboxes
     id: terms
     attributes:

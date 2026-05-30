@@ -91,6 +91,26 @@ Guidelines:
 - Run `pnpm validate:content` before opening a PR; it checks every trail file
   against the schema. CI and `pnpm build` run it too, so invalid data can't ship.
 
+### Adding a GPS route (elevation profile + GPX)
+
+A trail can carry an optional ordered `route` of `{ lat, lng, elevationFt }`
+points. When present it powers the elevation profile and the "Download GPX"
+button; when absent the page simply omits them.
+
+Supply a route from a **real GPS track**, not a hand-drawn guess: an official
+park route, or a `.gpx` you recorded or downloaded. Convert it with the importer
+and paste the result into the trail's front-matter:
+
+```sh
+pnpm import:gpx path/to/track.gpx          # prints the `route:` YAML block
+pnpm import:gpx path/to/track.gpx 120       # optional: cap the point count (default 80)
+```
+
+The importer converts elevation to feet, downsamples to keep the file small, and
+prints the route's **gain and length** so you can sanity-check them against the
+trail's stated `elevationGainFt` and `lengthMiles` before committing. Only use a
+GPX you have the right to share.
+
 ## Code style
 
 - TypeScript strict; prefer pure, testable functions in `src/lib`.

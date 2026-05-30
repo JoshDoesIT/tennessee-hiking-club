@@ -16,6 +16,7 @@
     "validate:content": "tsx scripts/validate-content.ts",
     "generate:geo": "tsx scripts/build-tn-geo.ts",
     "enrich:parking": "tsx scripts/enrich-parking.ts",
+    "import:gpx": "tsx scripts/import-gpx.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "prebuild": "tsx scripts/validate-content.ts",
