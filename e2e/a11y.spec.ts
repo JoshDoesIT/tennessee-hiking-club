@@ -29,3 +29,29 @@ for (const { name, path } of pages) {
     expect(results.violations).toEqual([]);
   });
 }
+
+// Dark mode must also meet AA contrast (#167). Cover a representative subset.
+const darkPages = pages.filter((p) =>
+  ["home", "trail directory", "trail detail", "leaderboard", "leave no trace"].includes(
+    p.name,
+  ),
+);
+
+for (const { name, path } of darkPages) {
+  test(`${name} has no WCAG A/AA violations in dark mode`, async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem("theme", "dark");
+      } catch {
+        /* ignore */
+      }
+    });
+    await page.goto(path);
+    await expect(page.locator("html.dark")).toHaveCount(1);
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .exclude(".maplibregl-map")
+      .analyze();
+    expect(results.violations).toEqual([]);
+  });
+}
