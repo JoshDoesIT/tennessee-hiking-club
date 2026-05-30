@@ -5,8 +5,14 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SkipLink } from "@/components/skip-link";
 import { SITE_URL } from "@/lib/site";
+import { shouldUseDarkTheme } from "@/lib/theme";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+
+// Apply the saved theme before paint to avoid a flash of the wrong mode. The
+// decision is the tested `shouldUseDarkTheme` (serialised here), so the site
+// defaults to light and only goes dark on an explicit opt-in.
+const themeScript = `try{if((${shouldUseDarkTheme.toString()})(localStorage.getItem('theme')))document.documentElement.classList.add('dark')}catch(e){}`;
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -70,10 +76,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#2a3623" },
-    { media: "(prefers-color-scheme: dark)", color: "#161a12" },
-  ],
+  // The app defaults to light regardless of the OS setting, so the browser
+  // chrome takes the brand forest rather than tracking `prefers-color-scheme`.
+  themeColor: "#2a3623",
 };
 
 export default function RootLayout({
@@ -86,13 +91,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Set the theme before paint to avoid a flash of the wrong mode. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{var t=localStorage.getItem('theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}",
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
