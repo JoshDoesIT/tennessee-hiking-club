@@ -10,7 +10,13 @@ const data = {
   outgoing: [],
 };
 
-function setupFetch(session: unknown) {
+function setupFetch(
+  session: unknown,
+  profile: { isPublic: boolean; displayName: string } = {
+    isPublic: false,
+    displayName: "",
+  },
+) {
   const calls: Array<{ url: string; method: string; body: unknown }> = [];
   const f = vi.fn(async (url: string, init?: RequestInit) => {
     const path = String(url);
@@ -19,6 +25,12 @@ function setupFetch(session: unknown) {
     calls.push({ url: path, method, body });
     if (path.includes("/api/auth/session")) {
       return { ok: true, json: async () => session } as unknown as Response;
+    }
+    if (path.includes("/api/profile")) {
+      if (method === "POST") {
+        return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
+      }
+      return { ok: true, json: async () => profile } as unknown as Response;
     }
     if (path.includes("/respond") || /\/api\/friends\/[^/]+$/.test(path)) {
       return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
@@ -72,6 +84,34 @@ describe("FriendsManager", () => {
             c.url.endsWith("/api/friends") &&
             c.method === "POST" &&
             (c.body as { code?: string })?.code === "anncode1",
+        ),
+      ).toBe(true),
+    );
+  });
+
+  it("sets a display name while preserving the public opt-in", async () => {
+    const user = userEvent.setup();
+    const { calls } = setupFetch(
+      { user: { id: "me" } },
+      { isPublic: true, displayName: "Old" },
+    );
+    render(<FriendsManager />);
+
+    const input = await screen.findByLabelText(/display name/i);
+    expect(input).toHaveValue("Old");
+    await user.clear(input);
+    await user.type(input, "Trail Ann");
+    await user.click(screen.getByRole("button", { name: /save name/i }));
+
+    await waitFor(() =>
+      expect(
+        calls.some(
+          (c) =>
+            c.url.includes("/api/profile") &&
+            c.method === "POST" &&
+            (c.body as { displayName?: string; isPublic?: boolean })
+              ?.displayName === "Trail Ann" &&
+            (c.body as { isPublic?: boolean })?.isPublic === true,
         ),
       ).toBe(true),
     );

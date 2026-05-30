@@ -30,6 +30,11 @@ export function FriendsManager() {
   const [state, setState] = useState<"loading" | "anon" | "ready">("loading");
   const [data, setData] = useState<FriendsData | null>(null);
   const [status, setStatus] = useState("");
+  // The viewer's own profile, so a display-name change preserves their public
+  // opt-in (#164) rather than silently turning it off.
+  const [isPublic, setIsPublic] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const [nameStatus, setNameStatus] = useState("");
 
   async function load() {
     const res = await fetch("/api/friends");
@@ -45,7 +50,18 @@ export function FriendsManager() {
           if (active) setState("anon");
           return;
         }
-        await load();
+        const [, profileRes] = await Promise.all([
+          load(),
+          fetch("/api/profile"),
+        ]);
+        if (profileRes.ok && active) {
+          const p = (await profileRes.json()) as {
+            isPublic?: boolean;
+            displayName?: string;
+          };
+          setIsPublic(Boolean(p.isPublic));
+          setDisplayName(p.displayName ?? "");
+        }
         if (active) setState("ready");
       } catch {
         if (active) setState("anon");
@@ -57,6 +73,20 @@ export function FriendsManager() {
   }, []);
 
   if (state !== "ready" || !data) return null;
+
+  async function saveName() {
+    setNameStatus("Saving…");
+    try {
+      const res = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic, displayName: displayName.trim() }),
+      });
+      setNameStatus(res.ok ? "Saved." : "Could not save.");
+    } catch {
+      setNameStatus("Could not save.");
+    }
+  }
 
   async function addFriend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -125,6 +155,34 @@ export function FriendsManager() {
           {data.code}
         </code>
       </div>
+
+      <div className="mt-4 flex flex-wrap items-end gap-2">
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="friend-display-name"
+            className="text-olive text-xs font-semibold tracking-wider uppercase"
+          >
+            Display name
+          </label>
+          <input
+            id="friend-display-name"
+            value={displayName}
+            maxLength={50}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder="How friends see you"
+            className="border-forest/20 text-ink rounded-lg border bg-white px-3 py-2 text-sm"
+          />
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={saveName}>
+          Save name
+        </Button>
+        <span role="status" aria-live="polite" className="text-pine text-sm">
+          {nameStatus}
+        </span>
+      </div>
+      <p className="text-ink/70 mt-1 text-xs">
+        Shown to friends. Setting it does not turn on the public leaderboard.
+      </p>
 
       <form onSubmit={addFriend} className="mt-4 flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
