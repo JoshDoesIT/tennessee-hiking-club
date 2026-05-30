@@ -104,19 +104,13 @@ export function SkyBackdrop() {
           className="h-24 w-24 sm:h-32 sm:w-32"
         >
           <defs>
-            <radialGradient id="sky-moon-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#f3efde" stopOpacity="0.55" />
-              <stop offset="45%" stopColor="#dfe0cf" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#cdd0c0" stopOpacity="0" />
-            </radialGradient>
             <mask id="sky-moon-mask">
               <circle cx="68" cy="65" r="44" fill="white" />
               <circle cx="48" cy="58" r="41" fill="black" />
             </mask>
           </defs>
-          {/* glow sits on the lit limb only, so the dark side stays dark and the
-              moon reads as a crescent instead of a lit-up full disc */}
-          <circle cx="106" cy="62" r="30" fill="url(#sky-moon-glow)" />
+          {/* a clean crescent (lit disc with an offset bite), craters on the lit
+              limb, and a warm amber rim, with no halo blob behind it */}
           <g mask="url(#sky-moon-mask)">
             <circle cx="68" cy="65" r="44" fill="#ece8d4" />
             <circle cx="90" cy="52" r="3.5" fill="#d6cfb2" opacity="0.6" />
