@@ -5,6 +5,7 @@ import { Challenges } from "@/components/hikes/challenges";
 import { LogTransfer } from "@/components/hikes/log-transfer";
 import { SyncOnSignIn } from "@/components/hikes/sync-on-signin";
 import { LeaderboardOptIn } from "@/components/hikes/leaderboard-optin";
+import { FriendsManager } from "@/components/hikes/friends-manager";
 import { StewardBadge } from "@/components/stewardship/steward-badge";
 import { ShareMyTennessee } from "@/components/hikes/share-my-tennessee";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
@@ -57,6 +58,8 @@ export default async function MyHikesPage() {
       <Challenges trails={trails} />
 
       <LeaderboardOptIn />
+
+      <FriendsManager />
 
       <ShareMyTennessee origin={SITE_URL} />
 

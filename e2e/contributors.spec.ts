@@ -17,3 +17,14 @@ test("the leaderboard offers the contribution boards", async ({ page }) => {
     page.getByRole("link", { name: /conditions reported/i }),
   ).toBeVisible();
 });
+
+test("the friends board is private: signed-out visitors see a sign-in prompt", async ({
+  page,
+}) => {
+  await page.goto("/leaderboard");
+  // Everyone / Friends scope toggle is offered.
+  await expect(page.getByRole("link", { name: /^Friends$/ })).toBeVisible();
+
+  await page.goto("/leaderboard?scope=friends");
+  await expect(page.getByText(/sign in to see your friends/i)).toBeVisible();
+});

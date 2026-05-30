@@ -3,12 +3,15 @@ import { pageMetadata } from "@/lib/page-metadata";
 import { eq, inArray } from "drizzle-orm";
 import { Container } from "@/components/ui/container";
 import { cn } from "@/lib/cn";
+import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import {
   profiles,
   hikes as hikesTable,
   cleanups as cleanupsTable,
+  type ProfileRow,
 } from "@/lib/db/schema";
+import { getFriendCircleIds } from "@/lib/friends/friends-server";
 import { getAllTrails } from "@/lib/trails";
 import {
   leaderboardEntry,
@@ -54,17 +57,16 @@ const WINDOWS: { key: LeaderboardWindow; label: string }[] = [
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-async function loadEntries(
+/** Build ranked entries for a set of profiles (public board or friends board). */
+async function buildEntries(
+  people: ProfileRow[],
   window: LeaderboardWindow,
+  fallbackName: string,
 ): Promise<LeaderboardEntry[]> {
-  try {
-    const db = getDb();
-    const opted = await db
-      .select()
-      .from(profiles)
-      .where(eq(profiles.isPublic, true));
-    if (opted.length === 0) return [];
-
+  if (people.length === 0) return [];
+  const opted = people;
+  const db = getDb();
+  {
     const ids = opted.map((p) => p.userId);
     const [hikeRows, cleanupRows, submissionCounts, conditionCounts, photoCounts] =
       await Promise.all([
@@ -116,7 +118,7 @@ async function loadEntries(
       const photoCredits =
         (counts?.photoCredits ?? 0) + (photoCounts.get(p.userId) ?? 0);
       return leaderboardEntry(
-        p.displayName || "Anonymous hiker",
+        p.displayName || fallbackName,
         filterHikesByWindow(hikesByUser.get(p.userId) ?? [], window),
         trails,
         contributions,
@@ -125,6 +127,39 @@ async function loadEntries(
         photoCredits,
       );
     });
+  }
+}
+
+/** The opt-in public board: everyone with `isPublic`. */
+async function loadPublicEntries(
+  window: LeaderboardWindow,
+): Promise<LeaderboardEntry[]> {
+  try {
+    const db = getDb();
+    const opted = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.isPublic, true));
+    return buildEntries(opted, window, "Anonymous hiker");
+  } catch {
+    return [];
+  }
+}
+
+/** The friends board: the viewer plus their accepted friends, regardless of
+ *  `isPublic` (mutual friendship is the consent). */
+async function loadFriendEntries(
+  userId: string,
+  window: LeaderboardWindow,
+): Promise<LeaderboardEntry[]> {
+  try {
+    const ids = await getFriendCircleIds(userId);
+    const db = getDb();
+    const people = await db
+      .select()
+      .from(profiles)
+      .where(inArray(profiles.userId, ids));
+    return buildEntries(people, window, "A friend");
   } catch {
     return [];
   }
@@ -147,7 +182,28 @@ export default async function LeaderboardPage({
     : params.window;
   const window: LeaderboardWindow = rawWindow === "year" ? "year" : "all";
 
-  const ranked = rankLeaderboard(await loadEntries(window), metric);
+  const rawScope = Array.isArray(params.scope) ? params.scope[0] : params.scope;
+  const scope: "public" | "friends" =
+    rawScope === "friends" ? "friends" : "public";
+
+  let entries: LeaderboardEntry[] = [];
+  let needsSignIn = false;
+  if (scope === "friends") {
+    const session = await auth();
+    if (!session?.user?.id) needsSignIn = true;
+    else entries = await loadFriendEntries(session.user.id, window);
+  } else {
+    entries = await loadPublicEntries(window);
+  }
+  const ranked = rankLeaderboard(entries, metric);
+
+  const link = (over: { metric?: string; window?: string; scope?: string }) =>
+    `/leaderboard?metric=${over.metric ?? metric}&window=${over.window ?? window}&scope=${over.scope ?? scope}`;
+
+  const SCOPES = [
+    { key: "public", label: "Everyone" },
+    { key: "friends", label: "Friends" },
+  ] as const;
 
   return (
     <Container className="max-w-2xl py-12 sm:py-16">
@@ -167,11 +223,29 @@ export default async function LeaderboardPage({
         .
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2" aria-label="Ranking metric">
+      <div className="mt-6 flex flex-wrap gap-2" aria-label="Board scope">
+        {SCOPES.map((s) => (
+          <Link
+            key={s.key}
+            href={link({ scope: s.key })}
+            aria-current={s.key === scope ? "page" : undefined}
+            className={cn(
+              "rounded-full border px-4 py-1.5 text-sm font-semibold",
+              s.key === scope
+                ? "border-amber-600 bg-amber/10 text-amber-700"
+                : "border-forest/20 text-forest hover:bg-forest/5",
+            )}
+          >
+            {s.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2" aria-label="Ranking metric">
         {METRICS.map((m) => (
           <Link
             key={m.key}
-            href={`/leaderboard?metric=${m.key}&window=${window}`}
+            href={link({ metric: m.key })}
             aria-current={m.key === metric ? "page" : undefined}
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm font-medium",
@@ -189,7 +263,7 @@ export default async function LeaderboardPage({
         {WINDOWS.map((w) => (
           <Link
             key={w.key}
-            href={`/leaderboard?metric=${metric}&window=${w.key}`}
+            href={link({ window: w.key })}
             aria-current={w.key === window ? "page" : undefined}
             className={cn(
               "rounded-full border px-3 py-1 text-xs font-medium",
@@ -203,11 +277,31 @@ export default async function LeaderboardPage({
         ))}
       </div>
 
-      {ranked.length === 0 ? (
+      {needsSignIn ? (
         <div className="border-forest/15 mt-8 rounded-2xl border border-dashed p-10 text-center">
-          <p className="text-forest font-medium">No hikers on the board yet.</p>
+          <p className="text-forest font-medium">Sign in to see your friends.</p>
           <p className="text-ink/70 mt-1 text-sm">
-            Sign in from My hikes and switch on the leaderboard to be the first.
+            The friends board is private to you. Sign in and add friends from{" "}
+            <Link
+              href="/hikes"
+              className="text-pine hover:text-forest underline underline-offset-4"
+            >
+              My hikes
+            </Link>
+            .
+          </p>
+        </div>
+      ) : ranked.length === 0 ? (
+        <div className="border-forest/15 mt-8 rounded-2xl border border-dashed p-10 text-center">
+          <p className="text-forest font-medium">
+            {scope === "friends"
+              ? "No friends on your board yet."
+              : "No hikers on the board yet."}
+          </p>
+          <p className="text-ink/70 mt-1 text-sm">
+            {scope === "friends"
+              ? "Add friends from My hikes; you will see each other here once they accept."
+              : "Sign in from My hikes and switch on the leaderboard to be the first."}
           </p>
         </div>
       ) : (

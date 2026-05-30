@@ -9,6 +9,7 @@ import {
   timestamp,
   primaryKey,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -29,6 +30,9 @@ export const profiles = pgTable("profiles", {
    *  photos) attributed to this verified login. Future in-app contribution
    *  features will record contributions against the account directly. */
   githubLogin: text("github_login"),
+  /** Non-guessable code a user shares so a friend can send them a friend
+   *  request (#147). Lazily generated; there is no public user directory. */
+  friendCode: text("friend_code").unique(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -162,9 +166,37 @@ export const photoSubmissions = pgTable(
   ],
 );
 
+/**
+ * A friendship between two members (#147). Mutual by design: one row per
+ * relationship, created by `requesterId` toward `addresseeId` as `pending`;
+ * the addressee accepts (`accepted`) or declines (the row is deleted). An
+ * accepted friendship is what scopes the friends leaderboard and is the
+ * two-way consent that lets friends see each other regardless of `isPublic`.
+ */
+export const friendships = pgTable(
+  "friendships",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    requesterId: text("requester_id").notNull(),
+    addresseeId: text("addressee_id").notNull(),
+    /** pending | accepted */
+    status: text("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("friendships_pair_idx").on(table.requesterId, table.addresseeId),
+    index("friendships_addressee_idx").on(table.addresseeId),
+    index("friendships_requester_idx").on(table.requesterId),
+  ],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
 export type CleanupRow = typeof cleanups.$inferSelect;
+export type FriendshipRow = typeof friendships.$inferSelect;
 export type TrailSubmissionRow = typeof trailSubmissions.$inferSelect;
 export type ConditionSubmissionRow = typeof conditionSubmissions.$inferSelect;
 export type PhotoSubmissionRow = typeof photoSubmissions.$inferSelect;
