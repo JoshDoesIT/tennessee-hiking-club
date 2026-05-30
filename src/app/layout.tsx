@@ -70,7 +70,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2a3623",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#2a3623" },
+    { media: "(prefers-color-scheme: dark)", color: "#161a12" },
+  ],
 };
 
 export default function RootLayout({
@@ -80,7 +83,17 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${hanken.variable} ${fraunces.variable} h-full`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Set the theme before paint to avoid a flash of the wrong mode. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('theme');var d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}",
+          }}
+        />
+      </head>
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
         <SiteHeader />

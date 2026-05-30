@@ -37,7 +37,7 @@ function FooterCol({
 
 export function SiteFooter() {
   return (
-    <footer className="bg-forest text-cream/90">
+    <footer className="footer-night bg-forest text-cream/90">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <Logo tone="light" size={48} />

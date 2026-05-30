@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Logo } from "./logo";
 import { buttonVariants } from "./ui/button";
 import { AuthControl } from "./auth/auth-control";
+import { ThemeToggle } from "./theme-toggle";
 
 const NAV = [
   { href: "/explore", label: "Explore" },
@@ -56,10 +57,13 @@ export function SiteHeader() {
             Open the map
           </Link>
           <AuthControl />
+          <ThemeToggle />
         </nav>
 
-        <button
-          ref={toggleRef}
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            ref={toggleRef}
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
@@ -85,7 +89,8 @@ export function SiteHeader() {
               />
             )}
           </svg>
-        </button>
+          </button>
+        </div>
       </div>
 
       {open ? (

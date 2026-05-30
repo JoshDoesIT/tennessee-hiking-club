@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Dark mode is toggled by a `.dark` class on <html> (set before paint by the
+ * no-flash script in the layout). It is dusk turning to night: the same warm,
+ * earthy identity after sundown, not a cold inverted theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ------------------------------------------------------------------ *
  *  Tennessee Hiking Club: design tokens
  *  Palette sampled directly from the badge logo.
@@ -28,6 +33,38 @@
 
   --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-sun: sun-glow 7s ease-in-out infinite;
+  --animate-twinkle: twinkle 4.5s ease-in-out infinite;
+}
+
+/* Night palette: the same token names re-valued, so every `bg-cream`,
+ * `text-ink`, `text-forest`, etc. across the site shifts to dusk without
+ * touching components. Deep warm forest-black ground, moonlit-cream ink,
+ * light "forest" for headings/primary, amber accents brightened for contrast. */
+.dark {
+  color-scheme: dark;
+  --color-cream: #161a12; /* page background: deep forest night */
+  --color-cream-50: #1e2318; /* raised surfaces / cards */
+  --color-parchment: #262c1d;
+  --color-ink: #ebe6d6; /* body text: warm moonlit off-white */
+  --color-forest: #eef1e3; /* headings, primary, rings -> light */
+  --color-pine: #bcc4a0; /* secondary text / links -> light sage-green */
+  --color-olive: #9aa178;
+  --color-sage: #aab07e;
+  --color-sage-100: #39402a; /* subtle borders / fills -> dark */
+  --color-amber: #eab35e; /* accent stays warm, a touch brighter */
+  --color-amber-600: #e0a24c;
+  --color-amber-700: #edb86a; /* amber text readable on the night ground */
+}
+
+/* The footer is already a dark "night" panel by day; keep it constant in dark
+ * mode by restoring the light-theme token values within it, so its forest
+ * ground and cream text stay as designed instead of inverting. */
+.dark .footer-night {
+  --color-forest: #2a3623;
+  --color-cream: #fbf6e9;
+  --color-cream-50: #fefcf5;
+  --color-parchment: #f1e9d6;
+  --color-sage-100: #c6c680;
 }
 
 @keyframes rise {
@@ -53,6 +90,16 @@
   }
 }
 
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 html {
   color-scheme: light;
 }
@@ -62,6 +109,10 @@ body {
   background-color: var(--color-cream);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  /* Gentle dusk/dawn cross-fade when the theme toggles. */
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease;
 }
 
 /* Fraunces display face: optical sizing + a touch of its "soft" character */
@@ -93,6 +144,12 @@ body::after {
   opacity: 0.04;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* On the night ground, multiply would crush the grain; let it glint instead. */
+.dark body::after {
+  opacity: 0.05;
+  mix-blend-mode: screen;
 }
 
 ::selection {
