@@ -25,8 +25,14 @@ import { captureGithubLogin } from "@/lib/auth/capture-login";
  */
 export function buildAuthConfig(): NextAuthConfig {
   const providers: NextAuthConfig["providers"] = [];
-  if (process.env.AUTH_GITHUB_ID) providers.push(GitHub);
-  if (process.env.AUTH_GOOGLE_ID) providers.push(Google);
+  // Link a GitHub and a Google login that share the same email to one account,
+  // instead of failing with OAuthAccountNotLinked when a member signs in with
+  // their "other" provider. Safe here because both providers only return
+  // verified emails.
+  if (process.env.AUTH_GITHUB_ID)
+    providers.push(GitHub({ allowDangerousEmailAccountLinking: true }));
+  if (process.env.AUTH_GOOGLE_ID)
+    providers.push(Google({ allowDangerousEmailAccountLinking: true }));
 
   const config: NextAuthConfig = {
     providers,

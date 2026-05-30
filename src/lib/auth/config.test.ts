@@ -8,10 +8,13 @@ vi.mock("@auth/drizzle-adapter", () => ({ DrizzleAdapter: () => ({}) }));
 import { buildAuthConfig } from "./config";
 import type { NextAuthConfig } from "next-auth";
 
-const ORIGINAL = process.env.DATABASE_URL;
+const ENV_KEYS = ["DATABASE_URL", "AUTH_GITHUB_ID", "AUTH_GOOGLE_ID"] as const;
+const ORIGINAL = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
 afterEach(() => {
-  if (ORIGINAL === undefined) delete process.env.DATABASE_URL;
-  else process.env.DATABASE_URL = ORIGINAL;
+  for (const k of ENV_KEYS) {
+    if (ORIGINAL[k] === undefined) delete process.env[k];
+    else process.env[k] = ORIGINAL[k];
+  }
 });
 
 function providerIds(cfg: NextAuthConfig): string[] {
@@ -27,6 +30,24 @@ describe("buildAuthConfig", () => {
     const cfg = buildAuthConfig();
     expect(cfg.experimental?.enableWebAuthn).toBe(true);
     expect(providerIds(cfg)).toContain("passkey");
+  });
+
+  it("links GitHub and Google accounts that share a verified email", () => {
+    process.env.AUTH_GITHUB_ID = "gh";
+    process.env.AUTH_GOOGLE_ID = "go";
+    const cfg = buildAuthConfig();
+    const provs = (cfg.providers ?? []).map((p) =>
+      typeof p === "function" ? p({}) : p,
+    ) as Array<{
+      id: string;
+      options?: { allowDangerousEmailAccountLinking?: boolean };
+    }>;
+    for (const id of ["github", "google"]) {
+      expect(
+        provs.find((p) => p.id === id)?.options
+          ?.allowDangerousEmailAccountLinking,
+      ).toBe(true);
+    }
   });
 
   it("omits WebAuthn when no database is configured (e.g. the CI build)", () => {
