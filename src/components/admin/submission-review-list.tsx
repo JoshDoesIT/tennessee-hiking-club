@@ -186,7 +186,7 @@ export function SubmissionReviewList({
                           {s.generated.missing.join(", ")}
                         </p>
                       )}
-                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
+                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-cream-50 p-3 text-xs">
                         {s.generated.markdown}
                       </pre>
                     </div>

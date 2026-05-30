@@ -72,7 +72,7 @@ export default function Home() {
       </section>
 
       {/* -------------------------- MISSION ----------------------------- */}
-      <section className="bg-forest text-cream">
+      <section className="night-panel bg-forest text-cream">
         <Container className="grid gap-10 py-16 sm:grid-cols-3 sm:py-20">
           <Value
             title="Explore"
@@ -226,7 +226,7 @@ export default function Home() {
       </section>
 
       {/* ------------------------- CONTRIBUTE --------------------------- */}
-      <section className="bg-forest text-cream">
+      <section className="night-panel bg-forest text-cream">
         <Container className="flex max-w-4xl flex-col items-center py-20 text-center sm:py-24">
           <h2 className="display text-cream text-3xl sm:text-4xl">
             Help map the Volunteer State

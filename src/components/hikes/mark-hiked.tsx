@@ -106,7 +106,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               id={`${detailsId}-cond`}
               value={conditions}
               onChange={(e) => setConditions(e.target.value)}
-              className="border-forest/20 text-ink rounded-lg border bg-white px-3 py-2 text-sm"
+              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
             >
               <option value="">Not noted</option>
               {HIKE_CONDITIONS.map((c) => (
@@ -129,7 +129,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. busy lot, bring bug spray"
-              className="border-forest/20 text-ink rounded-lg border bg-white px-3 py-2 text-sm"
+              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
             />
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">
@@ -144,7 +144,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               type="file"
               accept="image/*"
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium"
+              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
             />
             <p className="text-ink/50 text-xs">
               Stays on this device until you sign in.
