@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import { Container } from "@/components/ui/container";
 import { SignInOptions } from "@/components/auth/sign-in-options";
+import { PasskeyButton } from "@/components/auth/passkey-button";
 
 export const metadata = pageMetadata({
   title: "Sign in",
@@ -21,6 +22,11 @@ export default function SignInPage() {
       </p>
       <div className="mt-8">
         <SignInOptions />
+      </div>
+      {/* Passkeys work independently of the OAuth providers, so this is shown on
+          its own. The button hides itself where WebAuthn is unsupported. */}
+      <div className="mt-3">
+        <PasskeyButton label="Sign in with a passkey" callbackUrl="/hikes" />
       </div>
     </Container>
   );
