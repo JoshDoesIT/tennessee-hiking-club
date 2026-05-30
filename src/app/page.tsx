@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Ridgeline } from "@/components/ridgeline";
+import { SkyBackdrop } from "@/components/sky-backdrop";
 import { Container } from "@/components/ui/container";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,8 @@ export default function Home() {
     <>
       {/* ----------------------------- HERO ----------------------------- */}
       <section className="relative overflow-hidden">
-        <div className="from-cream-50 via-cream to-parchment absolute inset-0 -z-10 bg-gradient-to-b" />
+        <div className="from-cream-50 via-cream to-parchment absolute inset-0 -z-20 bg-gradient-to-b" />
+        <SkyBackdrop />
         <Ridgeline className="absolute inset-x-0 bottom-0 -z-10 h-80 w-full sm:h-96" />
 
         <Container className="flex max-w-4xl flex-col items-center pt-16 pb-48 text-center sm:pt-24">
