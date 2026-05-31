@@ -5,6 +5,7 @@ import {
   npsSegments,
   overpassSegments,
   combineNamedSegments,
+  clipBetween,
 } from "./route-geometry";
 
 const p = (lat: number, lng: number) => ({ lat, lng });
@@ -119,5 +120,36 @@ describe("combineNamedSegments", () => {
       ["loop", "missing"],
     );
     expect(segs).toHaveLength(2);
+  });
+});
+
+describe("clipBetween", () => {
+  // A straight west-east line of points.
+  const line = [p(0, 0), p(0, 1), p(0, 2), p(0, 3), p(0, 4)];
+
+  it("returns the slice between the points nearest start and end", () => {
+    expect(clipBetween(line, p(0, 1.1), p(0, 3.1))).toEqual([
+      p(0, 1),
+      p(0, 2),
+      p(0, 3),
+    ]);
+  });
+
+  it("orients the slice to begin at the start point", () => {
+    // start is nearer the east end: the result runs east -> west.
+    expect(clipBetween(line, p(0, 3.1), p(0, 1.1))).toEqual([
+      p(0, 3),
+      p(0, 2),
+      p(0, 1),
+    ]);
+  });
+
+  it("clips from a mid-line start (trailhead at a gap) to a destination", () => {
+    // start in the middle (index 2), destination near the east end (index 4).
+    expect(clipBetween(line, p(0.001, 2), p(0, 3.9))).toEqual([
+      p(0, 2),
+      p(0, 3),
+      p(0, 4),
+    ]);
   });
 });

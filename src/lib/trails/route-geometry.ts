@@ -141,3 +141,45 @@ export function combineNamedSegments(
   }
   return out;
 }
+
+/** Squared planar distance (lng scaled by latitude) for nearest-point search. */
+function sqDist(a: LatLng, b: LatLng): number {
+  const dLat = a.lat - b.lat;
+  const dLng = (a.lng - b.lng) * Math.cos((a.lat * Math.PI) / 180);
+  return dLat * dLat + dLng * dLng;
+}
+
+function nearestIndex(line: LatLng[], pt: LatLng): number {
+  let best = 0;
+  let bestD = Infinity;
+  for (let i = 0; i < line.length; i++) {
+    const d = sqDist(line[i], pt);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+/**
+ * Clip a stitched polyline to the sub-path between the points nearest `start`
+ * and `end` (#140). Used to extract a specific hike from a long through-trail
+ * (e.g. the Appalachian Trail segment from a trailhead gap to a named summit):
+ * the trailhead can sit mid-line, so this slices both directions correctly and
+ * orients the result to begin at `start`.
+ */
+export function clipBetween(
+  line: LatLng[],
+  start: LatLng,
+  end: LatLng,
+): LatLng[] {
+  if (line.length === 0) return [];
+  let a = nearestIndex(line, start);
+  let b = nearestIndex(line, end);
+  if (a > b) [a, b] = [b, a];
+  const slice = line.slice(a, b + 1);
+  return sqDist(slice[0], start) <= sqDist(slice[slice.length - 1], start)
+    ? slice
+    : slice.reverse();
+}

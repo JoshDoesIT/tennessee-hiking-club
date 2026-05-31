@@ -143,6 +143,14 @@ which you can read off the failed-match list the importer prints, or from
 are stitched and oriented from the trailhead; pick the ones that form the actual
 hike and sanity-check the printed length/gain.
 
+For a hike that follows a long through-trail to a named point (a peak reached via
+the Appalachian Trail, say), add `--to "lat,lng"` to clip the stitched line to the
+segment between the trailhead and that destination. The trailhead may sit
+mid-trail (at a gap), so the clip slices the correct direction and orients from
+the trailhead. Charlies Bunion is
+`--ways "Appalachian Trail" --to "35.639246,-83.371790" --osm-radius 9000`
+(the destination coordinate from USGS GNIS).
+
 #### Discovering waypoints along a route
 
 Once a trail has a `route`, you can pull candidate landmarks (waterfalls,
