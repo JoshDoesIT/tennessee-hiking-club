@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { Logo } from "./logo";
 import { buttonVariants } from "./ui/button";
 import { AuthControl } from "./auth/auth-control";
+import { AdminNavLink } from "./auth/admin-nav-link";
 import { ThemeToggle } from "./theme-toggle";
 
 const NAV = [
@@ -53,6 +54,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <AdminNavLink className="text-amber-700 hover:text-amber-600 text-sm font-medium transition-colors" />
           <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
@@ -111,6 +113,10 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <AdminNavLink
+              className="text-amber-700 border-forest/5 border-b py-3 text-base font-medium"
+              onNavigate={() => setOpen(false)}
+            />
             <div className="pt-3">
               <AuthControl />
             </div>
