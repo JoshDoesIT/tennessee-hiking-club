@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
  * POST never 401s.
  */
 const fieldClass =
-  "border-forest/20 text-ink w-full rounded-lg border bg-white px-3 py-2 text-sm";
+  "border-forest/20 text-ink w-full rounded-lg border bg-cream-50 px-3 py-2 text-sm";
 const labelClass = "text-olive text-xs font-semibold tracking-wider uppercase";
 
 export function ConditionReportForm({

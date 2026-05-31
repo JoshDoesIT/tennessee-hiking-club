@@ -42,7 +42,7 @@ export function TennesseeMap() {
           />
           <span
             role="tooltip"
-            className="bg-forest text-cream pointer-events-none absolute top-full left-1/2 z-10 mt-1.5 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 shadow-md transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
+            className="night-panel bg-forest text-cream pointer-events-none absolute top-full left-1/2 z-10 mt-1.5 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 shadow-md transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none"
           >
             {pin.name} · {pin.region} TN
           </span>

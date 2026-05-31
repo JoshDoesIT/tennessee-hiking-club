@@ -170,7 +170,7 @@ export function FriendsManager() {
             maxLength={50}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="How friends see you"
-            className="border-forest/20 text-ink rounded-lg border bg-white px-3 py-2 text-sm"
+            className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
           />
         </div>
         <Button type="button" variant="outline" size="sm" onClick={saveName}>
@@ -197,7 +197,7 @@ export function FriendsManager() {
             name="code"
             maxLength={16}
             placeholder="Their friend code"
-            className="border-forest/20 text-ink rounded-lg border bg-white px-3 py-2 text-sm uppercase"
+            className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm uppercase"
           />
         </div>
         <Button type="submit" variant="outline" size="sm">

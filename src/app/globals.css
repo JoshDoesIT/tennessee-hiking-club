@@ -56,15 +56,23 @@
   --color-amber-700: #edb86a; /* amber text readable on the night ground */
 }
 
-/* The footer is already a dark "night" panel by day; keep it constant in dark
- * mode by restoring the light-theme token values within it, so its forest
- * ground and cream text stay as designed instead of inverting. */
-.dark .footer-night {
-  --color-forest: #2a3623;
+/* A "day island": a surface designed as a dark forest panel by day (e.g. the
+ * footer, the hero mission/contribute bands, map tooltips) would otherwise
+ * invert to a bright light panel at night. Restore the full set of light-theme
+ * token values within it so it stays as designed instead of inverting. */
+.dark .night-panel {
   --color-cream: #fbf6e9;
   --color-cream-50: #fefcf5;
   --color-parchment: #f1e9d6;
+  --color-ink: #1e2419;
+  --color-forest: #2a3623;
+  --color-pine: #475036;
+  --color-olive: #6c724a;
+  --color-sage: #959760;
   --color-sage-100: #c6c680;
+  --color-amber: #e0a24c;
+  --color-amber-600: #c8852f;
+  --color-amber-700: #8a5a1c;
 }
 
 @keyframes rise {

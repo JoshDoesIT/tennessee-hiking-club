@@ -113,7 +113,7 @@ export function LeaderboardOptIn() {
             setDisplayName(e.target.value)
           }
           placeholder="How you appear on the board"
-          className="border-forest/20 text-ink max-w-xs rounded-lg border bg-white px-3 py-2 text-sm"
+          className="border-forest/20 text-ink max-w-xs rounded-lg border bg-cream-50 px-3 py-2 text-sm"
         />
       </div>
 

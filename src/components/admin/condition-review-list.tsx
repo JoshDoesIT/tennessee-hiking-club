@@ -116,7 +116,7 @@ export function ConditionReviewList({
                           content/trails/{r.trailSlug}.md
                         </code>
                       </p>
-                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-white p-3 text-xs">
+                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-cream-50 p-3 text-xs">
                         {r.entry.yaml}
                       </pre>
                     </div>
