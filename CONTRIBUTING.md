@@ -132,6 +132,24 @@ trail's stated values before committing.** Attribution: NPS and USGS are public
 domain; TDEC is TN open data; OSM requires an "© OpenStreetMap contributors"
 credit wherever the route is shown.
 
+#### Discovering waypoints along a route
+
+Once a trail has a `route`, you can pull candidate landmarks (waterfalls,
+viewpoints, summits, gaps, springs, campsites, arches) near the line:
+
+```sh
+pnpm discover:waypoints <trail-slug>                  # candidates within ~150 m
+pnpm discover:waypoints <trail-slug> --buffer 250     # widen the buffer (meters)
+pnpm discover:waypoints <trail-slug> --source gnis|nps|osm  # one source only
+```
+
+It fetches named features near the route from **USGS GNIS**, **NPS Public POIs**,
+and **OpenStreetMap**, keeps only those within the buffer of the route, dedupes
+across sources, orders them along the route, and prints a `waypoints:` block (with
+a `# source:` note per candidate) for you to review. **Curate before
+committing** (drop noise, fix names/types, add descriptions). Attribution: GNIS
+and NPS are public domain; OSM requires an "© OpenStreetMap contributors" credit.
+
 ## Code style
 
 - TypeScript strict; prefer pure, testable functions in `src/lib`.
