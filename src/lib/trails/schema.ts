@@ -77,7 +77,7 @@ const parkingSchema = z
   });
 
 /** A named landmark along a trail (#189): waterfalls, viewpoints, summits, etc. */
-const waypointSchema = z
+export const waypointSchema = z
   .object({
     lat: z.number(),
     lng: z.number(),

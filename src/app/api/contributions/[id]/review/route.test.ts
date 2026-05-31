@@ -27,6 +27,7 @@ import {
   trailSubmissions,
   conditionSubmissions,
   photoSubmissions,
+  waypointSubmissions,
 } from "@/lib/db/schema";
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
@@ -104,6 +105,15 @@ describe("POST /api/contributions/[id]/review", () => {
       type: "photo",
       id: "p1",
     });
+  });
+
+  it("reviews a waypoint suggestion against its table without auto-publishing", async () => {
+    const res = await POST(reviewReq("approve", "waypoint"), ctx("w1"));
+    expect(res.status).toBe(200);
+    expect(mocks.update).toHaveBeenCalledWith(waypointSubmissions);
+    expect((mocks.set as Mock).mock.calls[0][0].reviewStatus).toBe("approved");
+    // Waypoints are curated by hand; no content PR is opened on approval.
+    expect(mocks.publishOnApproval).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an unknown submission type", async () => {
