@@ -19,6 +19,7 @@ import {
   clipBetween,
   type LatLng,
 } from "../src/lib/trails/route-geometry";
+import { networkRoute, networkLoop } from "../src/lib/trails/route-network";
 import {
   downsampleRoute,
   routeFrontmatterYaml,
@@ -101,6 +102,20 @@ const NPS_TRAILS =
 const TDEC_TRAILS =
   "https://tdeconline.tn.gov/arcgis/rest/services/TDEC_Trails/FeatureServer/0";
 
+type OsmGeom = {
+  elements?: Array<{ type?: string; geometry?: Array<{ lat: number; lon: number }> }>;
+};
+
+/** Raw `out geom` for every path-like way near the trailhead (for graph routing). */
+async function fetchOsmPaths(th: LatLng, radius: number): Promise<OsmGeom> {
+  const ql =
+    `[out:json][timeout:90];way[highway~"^(path|footway|track|steps|bridleway|cycleway)$"]` +
+    `(around:${radius},${th.lat},${th.lng});out geom;`;
+  return (await safeJson(
+    await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: ql, headers: UA }),
+  )) as OsmGeom;
+}
+
 async function fetchOsm(th: LatLng, radius = 2500): Promise<Candidate[]> {
   const ql = `[out:json][timeout:60];way[highway~"^(path|footway|track|steps)$"][name](around:${radius},${th.lat},${th.lng});out geom;`;
   const json = (await safeJson(
@@ -176,6 +191,48 @@ async function main() {
     tdec: () => fetchEsri(TDEC_TRAILS, "TR_NAME", th, 0.06),
     osm: () => fetchOsm(th, osmRadius),
   };
+
+  // `--network` mode: route over the whole OSM path network (named or not) from
+  // the trailhead to a destination coordinate. Works for trails whose ways are
+  // unnamed or fragmented, where name-matching fails.
+  if (process.argv.includes("--network")) {
+    if (!clipTo) {
+      console.error('--network requires --to "lat,lng" (the destination).');
+      process.exit(1);
+    }
+    let paths: OsmGeom;
+    try {
+      paths = await fetchOsmPaths(th, osmRadius);
+    } catch (e) {
+      console.error(`OSM path fetch failed: ${(e as Error).message}`);
+      process.exit(1);
+    }
+    const snapM = Number(arg("--snap")) || 0;
+    const isLoop = process.argv.includes("--loop");
+    const line = isLoop
+      ? networkLoop(paths, th, clipTo, snapM)
+      : networkRoute(paths, th, clipTo, snapM);
+    if (line.length < 2) {
+      console.error(
+        `No on-network path found from the trailhead to ${toArg} within ${osmRadius} m. ` +
+          `Try a larger --osm-radius or --snap METERS (to bridge gaps in OSM), or ` +
+          `the trail may not be mapped in OSM.`,
+      );
+      process.exit(1);
+    }
+    const sampled = downsampleRoute(line, maxPoints);
+    const elevations = await sampleElevationFt(sampled);
+    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const profile = buildElevationProfile(route);
+    console.error(`\nSource: OSM path network (${isLoop ? "looped via" : "routed to"} ${toArg})`);
+    console.error(`Points: ${route.length} (from ${line.length} network points)`);
+    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
+    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
+    console.error(`Attribution: © OpenStreetMap contributors (ODbL)\n`);
+    console.log(routeFrontmatterYaml(route));
+    return;
+  }
 
   // `--ways` mode: pull OSM named ways near the trailhead and stitch exactly the
   // ones the maintainer listed. Curated, not guessed, so we skip name-matching

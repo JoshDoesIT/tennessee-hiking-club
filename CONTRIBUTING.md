@@ -151,6 +151,16 @@ the trailhead. Charlies Bunion is
 `--ways "Appalachian Trail" --to "35.639246,-83.371790" --osm-radius 9000`
 (the destination coordinate from USGS GNIS).
 
+When the trail's OSM ways are unnamed or fragmented, route over the whole path
+network instead with `--network --to "lat,lng"`: it builds a graph of every
+nearby path/footway/track and finds the on-trail route from the trailhead to the
+destination (a waterfall or summit node from OSM/GNIS). Add `--snap METERS`
+(e.g. 25) to bridge small gaps where adjacent ways don't quite share a node, and
+`--loop` for a loop trail (it returns out one way and back another). Fall Creek
+Falls is `--network --to "35.66609,-85.35572" --osm-radius 3500 --snap 25`. This
+only works where the trail is mapped continuously in OSM; a fragmented or
+unmapped trail still needs a recorded GPX (`pnpm import:gpx`).
+
 #### Discovering waypoints along a route
 
 Once a trail has a `route`, you can pull candidate landmarks (waterfalls,
