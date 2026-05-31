@@ -41,23 +41,57 @@ function meters(a: LatLng, b: LatLng): number {
   return 2 * R * Math.asin(Math.sqrt(x));
 }
 
+function addLink(adj: Map<string, Edge[]>, ka: string, kb: string, w: number) {
+  if (!adj.has(ka)) adj.set(ka, []);
+  if (!adj.has(kb)) adj.set(kb, []);
+  adj.get(ka)!.push({ to: kb, w });
+  adj.get(kb)!.push({ to: ka, w });
+}
+
+/**
+ * Link any two nodes within `snapMeters` of each other. Spatial-hashes the nodes
+ * into `snapMeters` cells and scans neighbor cells, so it bridges the small gaps
+ * OSM trail ways leave between adjacent ways, and stitches an unordered GPS-trace
+ * point cloud into a connected corridor. The neighbor-cell scan avoids the
+ * grid-boundary misses of plain coordinate snapping.
+ */
+function bridgeGaps(graph: Graph, snapMeters: number) {
+  const { coord, adj } = graph;
+  if (snapMeters <= 0 || coord.size === 0) return;
+  const cell = snapMeters / 111_000;
+  const buckets = new Map<string, string[]>();
+  const bucketKey = (c: LatLng) =>
+    `${Math.floor(c.lat / cell)},${Math.floor(c.lng / cell)}`;
+  for (const [k, c] of coord) {
+    const bk = bucketKey(c);
+    if (!buckets.has(bk)) buckets.set(bk, []);
+    buckets.get(bk)!.push(k);
+  }
+  for (const [k, c] of coord) {
+    const ci = Math.floor(c.lat / cell);
+    const cj = Math.floor(c.lng / cell);
+    for (let di = -1; di <= 1; di++) {
+      for (let dj = -1; dj <= 1; dj++) {
+        for (const k2 of buckets.get(`${ci + di},${cj + dj}`) ?? []) {
+          if (k2 <= k) continue;
+          const d = meters(c, coord.get(k2)!);
+          if (d > 0 && d <= snapMeters) addLink(adj, k, k2, d);
+        }
+      }
+    }
+  }
+}
+
 /** Build the routing graph from path-way geometry, bridging gaps <= `snapMeters`. */
 function buildGraph(json: OverpassGeom, snapMeters: number): Graph {
-  const coord = new Map<string, LatLng>();
-  const adj = new Map<string, Edge[]>();
-  const link = (ka: string, kb: string, w: number) => {
-    if (!adj.has(ka)) adj.set(ka, []);
-    if (!adj.has(kb)) adj.set(kb, []);
-    adj.get(ka)!.push({ to: kb, w });
-    adj.get(kb)!.push({ to: ka, w });
-  };
+  const graph: Graph = { coord: new Map(), adj: new Map() };
   const addEdge = (a: LatLng, b: LatLng) => {
     const ka = key(a.lat, a.lng);
     const kb = key(b.lat, b.lng);
     if (ka === kb) return;
-    coord.set(ka, a);
-    coord.set(kb, b);
-    link(ka, kb, meters(a, b));
+    graph.coord.set(ka, a);
+    graph.coord.set(kb, b);
+    addLink(graph.adj, ka, kb, meters(a, b));
   };
 
   for (const el of json.elements ?? []) {
@@ -70,37 +104,16 @@ function buildGraph(json: OverpassGeom, snapMeters: number): Graph {
       );
     }
   }
+  bridgeGaps(graph, snapMeters);
+  return graph;
+}
 
-  // Bridge small gaps: OSM trail ways often nearly touch without sharing a node.
-  // Spatial-hash the nodes into `snapMeters` cells and link any pair within that
-  // distance, so a route can cross the gap. The neighbor-cell scan avoids the
-  // grid-boundary misses of plain coordinate snapping.
-  if (snapMeters > 0 && coord.size > 0) {
-    const cell = snapMeters / 111_000;
-    const buckets = new Map<string, string[]>();
-    const bucketKey = (c: LatLng) =>
-      `${Math.floor(c.lat / cell)},${Math.floor(c.lng / cell)}`;
-    for (const [k, c] of coord) {
-      const bk = bucketKey(c);
-      if (!buckets.has(bk)) buckets.set(bk, []);
-      buckets.get(bk)!.push(k);
-    }
-    for (const [k, c] of coord) {
-      const ci = Math.floor(c.lat / cell);
-      const cj = Math.floor(c.lng / cell);
-      for (let di = -1; di <= 1; di++) {
-        for (let dj = -1; dj <= 1; dj++) {
-          for (const k2 of buckets.get(`${ci + di},${cj + dj}`) ?? []) {
-            if (k2 <= k) continue;
-            const d = meters(c, coord.get(k2)!);
-            if (d > 0 && d <= snapMeters) link(k, k2, d);
-          }
-        }
-      }
-    }
-  }
-
-  return { coord, adj };
+/** Build a graph from an unordered point cloud, connecting points by proximity. */
+function buildPointGraph(points: LatLng[], snapMeters: number): Graph {
+  const graph: Graph = { coord: new Map(), adj: new Map() };
+  for (const p of points) graph.coord.set(key(p.lat, p.lng), p);
+  bridgeGaps(graph, snapMeters);
+  return graph;
 }
 
 function nearestNode(coord: Map<string, LatLng>, pt: LatLng): string {
@@ -209,4 +222,25 @@ export function networkLoop(
       ? [...out, ...back.slice(1)]
       : [...out, ...[...out].reverse().slice(1)];
   return loopKeys.map((k) => graph.coord.get(k)!);
+}
+
+/**
+ * Route through an unordered cloud of GPS trace points (#140). Public OSM GPS
+ * traces are real recorded hikes but arrive as a jumbled point cloud (many
+ * uploads, no usable order). This connects points within `snapMeters` into a
+ * corridor and runs Dijkstra from the trailhead to the destination, so the
+ * shortest path follows the densest line of recorded points (the trail). Works
+ * where the OSM *map* is incomplete but people have hiked the trail with GPS.
+ */
+export function proximityRoute(
+  points: LatLng[],
+  start: LatLng,
+  end: LatLng,
+  snapMeters: number,
+): LatLng[] {
+  const graph = buildPointGraph(points, snapMeters);
+  if (graph.coord.size === 0) return [];
+  const s = nearestNode(graph.coord, start);
+  const t = nearestNode(graph.coord, end);
+  return dijkstra(graph, s, t).map((k) => graph.coord.get(k)!);
 }

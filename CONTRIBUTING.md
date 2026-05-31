@@ -158,8 +158,19 @@ destination (a waterfall or summit node from OSM/GNIS). Add `--snap METERS`
 (e.g. 25) to bridge small gaps where adjacent ways don't quite share a node, and
 `--loop` for a loop trail (it returns out one way and back another). Fall Creek
 Falls is `--network --to "35.66609,-85.35572" --osm-radius 3500 --snap 25`. This
-only works where the trail is mapped continuously in OSM; a fragmented or
-unmapped trail still needs a recorded GPX (`pnpm import:gpx`).
+only works where the trail is mapped continuously in OSM.
+
+When even the OSM map is too sparse but the trail is popular, `--traces --to
+"lat,lng"` routes through the cloud of **public OSM GPS traces** (real recorded
+hikes) between the trailhead and the destination, connecting points within
+`--snap METERS` (try 45-70). GPS traces are noisy, so always sanity-check the
+printed length/gain and smooth obvious zig-zags before committing. A trail with
+no public traces and no continuous OSM map still needs a recorded GPX
+(`pnpm import:gpx`).
+
+A wrong stored trailhead coordinate will defeat all of these (the router starts
+from an isolated point). If routing fails, first check the `coordinates` against
+the parking lot / trailhead in OSM near the actual trail.
 
 #### Discovering waypoints along a route
 

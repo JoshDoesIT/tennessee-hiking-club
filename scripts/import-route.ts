@@ -19,7 +19,11 @@ import {
   clipBetween,
   type LatLng,
 } from "../src/lib/trails/route-geometry";
-import { networkRoute, networkLoop } from "../src/lib/trails/route-network";
+import {
+  networkRoute,
+  networkLoop,
+  proximityRoute,
+} from "../src/lib/trails/route-network";
 import {
   downsampleRoute,
   routeFrontmatterYaml,
@@ -116,6 +120,25 @@ async function fetchOsmPaths(th: LatLng, radius: number): Promise<OsmGeom> {
   )) as OsmGeom;
 }
 
+/** Public OSM GPS trace points in a bbox (`minlon,minlat,maxlon,maxlat`), as a
+ *  flat cloud. These are real recorded hikes, openly licensed. */
+async function fetchOsmTraces(bbox: string, maxPages = 10): Promise<LatLng[]> {
+  const pts: LatLng[] = [];
+  for (let page = 0; page < maxPages; page++) {
+    const res = await fetch(
+      `https://api.openstreetmap.org/api/0.6/trackpoints?bbox=${bbox}&page=${page}`,
+      { headers: UA },
+    );
+    if (!res.ok) break;
+    const xml = await res.text();
+    const matches = [...xml.matchAll(/lat="([-0-9.]+)"\s+lon="([-0-9.]+)"/g)];
+    if (matches.length === 0) break;
+    for (const m of matches) pts.push({ lat: +m[1], lng: +m[2] });
+    if (matches.length < 5000) break; // a short page is the last one
+  }
+  return pts;
+}
+
 async function fetchOsm(th: LatLng, radius = 2500): Promise<Candidate[]> {
   const ql = `[out:json][timeout:60];way[highway~"^(path|footway|track|steps)$"][name](around:${radius},${th.lat},${th.lng});out geom;`;
   const json = (await safeJson(
@@ -156,7 +179,8 @@ async function main() {
   if (!slug || slug.startsWith("--")) {
     console.error(
       'Usage: pnpm import:route <trail-slug> [--source nps|tdec|osm] [--name "Official Name"]\n' +
-        '       [--ways "Trail A,Trail B"] [--to "lat,lng"] [--osm-radius METERS] [--points N]',
+        '       [--ways "Trail A,Trail B"] [--to "lat,lng"] [--network|--traces] [--loop]\n' +
+        "       [--osm-radius METERS] [--snap METERS] [--points N]",
     );
     process.exit(1);
   }
@@ -191,6 +215,49 @@ async function main() {
     tdec: () => fetchEsri(TDEC_TRAILS, "TR_NAME", th, 0.06),
     osm: () => fetchOsm(th, osmRadius),
   };
+
+  // `--traces` mode: route through the cloud of public OSM GPS trace points
+  // (real recorded hikes) from the trailhead to a destination. Works where the
+  // OSM *map* is incomplete but people have hiked the trail with a GPS.
+  if (process.argv.includes("--traces")) {
+    if (!clipTo) {
+      console.error('--traces requires --to "lat,lng" (the destination).');
+      process.exit(1);
+    }
+    const pad = 0.006;
+    const bbox =
+      `${Math.min(th.lng, clipTo.lng) - pad},${Math.min(th.lat, clipTo.lat) - pad},` +
+      `${Math.max(th.lng, clipTo.lng) + pad},${Math.max(th.lat, clipTo.lat) + pad}`;
+    let pts: LatLng[];
+    try {
+      pts = await fetchOsmTraces(bbox);
+    } catch (e) {
+      console.error(`GPS trace fetch failed: ${(e as Error).message}`);
+      process.exit(1);
+    }
+    console.error(`Fetched ${pts.length} public GPS trace points.`);
+    const snapM = Number(arg("--snap")) || 40;
+    const line = proximityRoute(pts, th, clipTo, snapM);
+    if (line.length < 2) {
+      console.error(
+        `No path through the GPS traces from the trailhead to ${toArg}. ` +
+          `Try a larger --snap METERS, or there are too few public traces here.`,
+      );
+      process.exit(1);
+    }
+    const sampled = downsampleRoute(line, maxPoints);
+    const elevations = await sampleElevationFt(sampled);
+    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const profile = buildElevationProfile(route);
+    console.error(`\nSource: OSM public GPS traces (routed to ${toArg})`);
+    console.error(`Points: ${route.length} (from ${line.length} trace points)`);
+    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
+    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
+    console.error(`Attribution: OpenStreetMap contributors' GPS traces (ODbL)\n`);
+    console.log(routeFrontmatterYaml(route));
+    return;
+  }
 
   // `--network` mode: route over the whole OSM path network (named or not) from
   // the trailhead to a destination coordinate. Works for trails whose ways are
