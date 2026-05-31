@@ -4,6 +4,7 @@ import {
   orientFromStart,
   npsSegments,
   overpassSegments,
+  combineNamedSegments,
 } from "./route-geometry";
 
 const p = (lat: number, lng: number) => ({ lat, lng });
@@ -94,5 +95,29 @@ describe("overpassSegments", () => {
       { lat: 35.6, lng: -83.45 },
       { lat: 35.61, lng: -83.44 },
     ]);
+  });
+});
+
+describe("combineNamedSegments", () => {
+  const groups = [
+    { name: "River Trail", segments: [[p(1, 1), p(1, 2)]] },
+    { name: "Ridgetop Trail", segments: [[p(1, 2), p(1, 3)]] },
+    { name: "Other Spur", segments: [[p(9, 9), p(9, 8)]] },
+  ];
+
+  it("collects the segments of the named ways, case-insensitively", () => {
+    const segs = combineNamedSegments(groups, ["river trail", "Ridgetop Trail"]);
+    expect(segs).toEqual([
+      [p(1, 1), p(1, 2)],
+      [p(1, 2), p(1, 3)],
+    ]);
+  });
+
+  it("ignores names not present and keeps every segment of a multi-segment way", () => {
+    const segs = combineNamedSegments(
+      [{ name: "Loop", segments: [[p(0, 0)], [p(1, 1)]] }],
+      ["loop", "missing"],
+    );
+    expect(segs).toHaveLength(2);
   });
 });

@@ -120,6 +120,8 @@ instead of supplying a GPX:
 pnpm import:route <trail-slug>                       # auto-match by name near the trailhead
 pnpm import:route <trail-slug> --source nps|tdec|osm  # force a source
 pnpm import:route <trail-slug> --name "Alum Cave Trail"  # pick the official trail name
+pnpm import:route <trail-slug> --ways "River Trail,Ridgetop Trail"  # assemble from named OSM ways
+pnpm import:route <trail-slug> --ways "..." --osm-radius 5000        # widen the OSM search (meters)
 ```
 
 It searches the **NPS** (national parks), **TDEC** (TN State Parks), and
@@ -131,6 +133,15 @@ re-run with `--name`/`--source`. **Verify the printed length/gain against the
 trail's stated values before committing.** Attribution: NPS and USGS are public
 domain; TDEC is TN open data; OSM requires an "© OpenStreetMap contributors"
 credit wherever the route is shown.
+
+Many destination trails (a waterfall, a clifftop overlook) have no single GIS
+feature named after the destination, but their path **is** in OpenStreetMap as
+named segments. Use `--ways` to assemble the route from the exact segment names,
+which you can read off the failed-match list the importer prints, or from
+[openstreetmap.org](https://www.openstreetmap.org). For example, Burgess Falls is
+`--ways "Upper Trail,River Trail,Ridgetop Trail,Big Falls Trail"`. The segments
+are stitched and oriented from the trailhead; pick the ones that form the actual
+hike and sanity-check the printed length/gain.
 
 #### Discovering waypoints along a route
 

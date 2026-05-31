@@ -122,3 +122,22 @@ export function overpassSegments(json: OverpassJson): LatLng[][] {
   }
   return segs;
 }
+
+/**
+ * Collect the segments of named ways (#140): given OSM ways grouped by name,
+ * return every segment whose group name is in `names` (case-insensitive). Lets a
+ * maintainer assemble a route from the exact trail segments they name
+ * (e.g. "River Trail", "Ridgetop Trail") rather than relying on a single way
+ * matching the destination's name. `stitchSegments` then orders them.
+ */
+export function combineNamedSegments(
+  groups: Array<{ name: string; segments: LatLng[][] }>,
+  names: string[],
+): LatLng[][] {
+  const wanted = new Set(names.map((n) => n.trim().toLowerCase()));
+  const out: LatLng[][] = [];
+  for (const g of groups) {
+    if (wanted.has(g.name.trim().toLowerCase())) out.push(...g.segments);
+  }
+  return out;
+}
