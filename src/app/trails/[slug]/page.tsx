@@ -12,6 +12,7 @@ import { TrailContextMap } from "@/components/map/trail-context-map";
 import { TrailConditions } from "@/components/trails/trail-conditions";
 import { ConditionReportForm } from "@/components/trails/condition-report-form";
 import { PhotoSubmissionForm } from "@/components/trails/photo-submission-form";
+import { SuggestWaypointForm } from "@/components/trails/suggest-waypoint-form";
 import { TrailParking } from "@/components/trails/trail-parking";
 import { ElevationProfile } from "@/components/trails/elevation-profile";
 import { DownloadGpx } from "@/components/trails/download-gpx";
@@ -87,6 +88,7 @@ export default async function TrailPage({ params }: Params) {
       <TrailConditions trail={trail} />
       <ConditionReportForm trailSlug={trail.slug} trailName={trail.name} />
       <PhotoSubmissionForm trailSlug={trail.slug} trailName={trail.name} />
+      <SuggestWaypointForm trailSlug={trail.slug} trailName={trail.name} />
 
       {trail.route && trail.route.length > 1 ? (
         <div className="mt-2">

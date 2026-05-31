@@ -10,10 +10,13 @@ import {
   trailSubmissions,
   conditionSubmissions,
   photoSubmissions,
+  waypointSubmissions,
 } from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import { generateTrailContent } from "@/lib/contributions/trail-content";
 import { generateConditionEntry } from "@/lib/contributions/condition";
+import { generateWaypointEntry } from "@/lib/contributions/waypoint";
+import type { WaypointType } from "@/lib/trails/schema";
 import {
   SubmissionReviewList,
   type PendingSubmission,
@@ -26,6 +29,10 @@ import {
   PhotoReviewList,
   type PendingPhoto,
 } from "@/components/admin/photo-review-list";
+import {
+  WaypointReviewList,
+  type PendingWaypoint,
+} from "@/components/admin/waypoint-review-list";
 
 // Gated, request-time only, never indexed.
 export const dynamic = "force-dynamic";
@@ -176,6 +183,51 @@ async function loadPendingPhotos(): Promise<PendingPhoto[]> {
   });
 }
 
+async function loadPendingWaypoints(): Promise<PendingWaypoint[]> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(waypointSubmissions)
+    .where(eq(waypointSubmissions.reviewStatus, "pending"))
+    .orderBy(desc(waypointSubmissions.createdAt));
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.map((r) => r.userId))];
+  const profileRows = await db
+    .select()
+    .from(profiles)
+    .where(inArray(profiles.userId, userIds));
+  const profileById = new Map(profileRows.map((p) => [p.userId, p]));
+  const nameBySlug = new Map(getAllTrails().map((t) => [t.slug, t.name]));
+
+  return rows.map((r) => {
+    const profile = profileById.get(r.userId);
+    const handle = profile?.githubLogin || profile?.displayName || null;
+    const entry = generateWaypointEntry({
+      lat: r.lat,
+      lng: r.lng,
+      name: r.name,
+      type: r.type as WaypointType,
+      description: r.description,
+      by: handle,
+    });
+    return {
+      id: r.id,
+      trailSlug: r.trailSlug,
+      trailName: nameBySlug.get(r.trailSlug) || r.trailSlug,
+      name: r.name,
+      type: r.type,
+      description: r.description,
+      lat: r.lat,
+      lng: r.lng,
+      hasPhoto: Boolean(r.photoUrl),
+      submittedBy: profile?.displayName || profile?.githubLogin || "A member",
+      submittedOn: r.createdAt.toISOString().slice(0, 10),
+      entry: { yaml: entry.yaml, valid: entry.valid },
+    };
+  });
+}
+
 export default async function AdminSubmissionsPage() {
   // No role system: the page only exists for configured maintainers, and is a
   // 404 for everyone else (it does not reveal that it exists).
@@ -184,11 +236,13 @@ export default async function AdminSubmissionsPage() {
   const userId = session?.user?.id;
   if (!userId || !(await isAdminUser(userId))) notFound();
 
-  const [pending, pendingConditions, pendingPhotos] = await Promise.all([
-    loadPending(),
-    loadPendingConditions(),
-    loadPendingPhotos(),
-  ]);
+  const [pending, pendingConditions, pendingPhotos, pendingWaypoints] =
+    await Promise.all([
+      loadPending(),
+      loadPendingConditions(),
+      loadPendingPhotos(),
+      loadPendingWaypoints(),
+    ]);
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
@@ -229,6 +283,16 @@ export default async function AdminSubmissionsPage() {
           Photos
         </h2>
         <PhotoReviewList photos={pendingPhotos} />
+      </section>
+
+      <section aria-labelledby="waypoint-submissions-heading" className="mt-12">
+        <h2
+          id="waypoint-submissions-heading"
+          className="display text-forest text-2xl"
+        >
+          Landmark suggestions
+        </h2>
+        <WaypointReviewList suggestions={pendingWaypoints} />
       </section>
     </Container>
   );

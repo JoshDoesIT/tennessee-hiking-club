@@ -169,6 +169,39 @@ export const photoSubmissions = pgTable(
 );
 
 /**
+ * An in-app waypoint/landmark suggestion (#191) for an existing trail, submitted
+ * by a signed-in member: a coordinate + name + type (+ optional description and
+ * private photo). A reviewed proposal that a maintainer curates into the trail's
+ * `waypoints[]`; never auto-published. An approved suggestion earns the
+ * submitter recognition by `userId`.
+ */
+export const waypointSubmissions = pgTable(
+  "waypoint_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    trailSlug: text("trail_slug").notNull(),
+    lat: doublePrecision("lat").notNull(),
+    lng: doublePrecision("lng").notNull(),
+    name: text("name").notNull(),
+    type: text("type").notNull(),
+    description: text("description"),
+    /** Private Blob URL of an optional photo of the landmark. */
+    photoUrl: text("photo_url"),
+    /** pending | approved | rejected */
+    reviewStatus: text("review_status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("waypoint_submissions_user_id_idx").on(table.userId),
+    index("waypoint_submissions_review_status_idx").on(table.reviewStatus),
+  ],
+);
+
+/**
  * A friendship between two members (#147). Mutual by design: one row per
  * relationship, created by `requesterId` toward `addresseeId` as `pending`;
  * the addressee accepts (`accepted`) or declines (the row is deleted). An
@@ -202,6 +235,7 @@ export type FriendshipRow = typeof friendships.$inferSelect;
 export type TrailSubmissionRow = typeof trailSubmissions.$inferSelect;
 export type ConditionSubmissionRow = typeof conditionSubmissions.$inferSelect;
 export type PhotoSubmissionRow = typeof photoSubmissions.$inferSelect;
+export type WaypointSubmissionRow = typeof waypointSubmissions.$inferSelect;
 
 // --- Auth.js (NextAuth) adapter tables --------------------------------------
 // Canonical Auth.js Drizzle schema. `hikes.userId` / `profiles.userId` hold
