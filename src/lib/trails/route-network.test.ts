@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { networkRoute, networkLoop, proximityRoute } from "./route-network";
+import {
+  networkRoute,
+  networkLoop,
+  proximityRoute,
+  proximityLoop,
+} from "./route-network";
 
 // A small network shaped like:  A - B - C - D
 //                                           \ E
@@ -139,5 +144,28 @@ describe("proximityRoute", () => {
   it("returns an empty path when the cloud is too sparse to connect", () => {
     const path = proximityRoute(cloud, { lat: 0, lng: 0 }, { lat: 0, lng: 0.004 }, 10);
     expect(path).toEqual([]);
+  });
+});
+
+describe("proximityLoop", () => {
+  // A square loop of trace points (corners), each side traced.
+  const ring = [
+    { lat: 0, lng: 0 },
+    { lat: 0, lng: 0.001 },
+    { lat: 0.001, lng: 0.001 },
+    { lat: 0.001, lng: 0 },
+  ];
+
+  it("loops through a point cloud out one side and back the other", () => {
+    const loop = proximityLoop(
+      ring,
+      { lat: 0, lng: 0 },
+      { lat: 0.001, lng: 0.001 },
+      130, // bridges the 111 m sides but not the 157 m diagonals
+    );
+    expect(loop[0]).toEqual({ lat: 0, lng: 0 });
+    expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
+    const keys = new Set(loop.map((p) => `${p.lat},${p.lng}`));
+    expect(keys.size).toBe(4); // visits all four corners
   });
 });

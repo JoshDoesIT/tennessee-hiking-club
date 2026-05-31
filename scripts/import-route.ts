@@ -23,6 +23,7 @@ import {
   networkRoute,
   networkLoop,
   proximityRoute,
+  proximityLoop,
 } from "../src/lib/trails/route-network";
 import {
   downsampleRoute,
@@ -237,7 +238,9 @@ async function main() {
     }
     console.error(`Fetched ${pts.length} public GPS trace points.`);
     const snapM = Number(arg("--snap")) || 40;
-    const line = proximityRoute(pts, th, clipTo, snapM);
+    const line = process.argv.includes("--loop")
+      ? proximityLoop(pts, th, clipTo, snapM)
+      : proximityRoute(pts, th, clipTo, snapM);
     if (line.length < 2) {
       console.error(
         `No path through the GPS traces from the trailhead to ${toArg}. ` +

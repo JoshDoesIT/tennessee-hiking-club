@@ -4,8 +4,8 @@ name: Cummins Falls
 region: Middle
 area: Cummins Falls State Park
 coordinates:
-  lat: 36.2783
-  lng: -85.5808
+  lat: 36.25298
+  lng: -85.56629
 lengthMiles: 1.5
 elevationGainFt: 100
 difficulty: moderate
