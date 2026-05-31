@@ -28,7 +28,9 @@ export function YourTennesseeMap({ data }: { data: TennesseeMapData }) {
 
   return (
     <figure className="m-0">
-      <div className="relative mx-auto w-full max-w-4xl">
+      {/* clip horizontal tooltip spill (right-edge pins) so it never causes
+          page-level horizontal scroll; vertical tooltips still show */}
+      <div className="relative mx-auto w-full max-w-4xl overflow-x-clip">
         <svg
           viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
           className="block h-auto w-full"
