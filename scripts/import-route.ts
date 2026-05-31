@@ -15,6 +15,7 @@
 import {
   stitchSegments,
   orientFromStart,
+  combineNamedSegments,
   type LatLng,
 } from "../src/lib/trails/route-geometry";
 import {
@@ -99,8 +100,8 @@ const NPS_TRAILS =
 const TDEC_TRAILS =
   "https://tdeconline.tn.gov/arcgis/rest/services/TDEC_Trails/FeatureServer/0";
 
-async function fetchOsm(th: LatLng): Promise<Candidate[]> {
-  const ql = `[out:json][timeout:60];way[highway~"^(path|footway|track)$"][name](around:2500,${th.lat},${th.lng});out geom;`;
+async function fetchOsm(th: LatLng, radius = 2500): Promise<Candidate[]> {
+  const ql = `[out:json][timeout:60];way[highway~"^(path|footway|track|steps)$"][name](around:${radius},${th.lat},${th.lng});out geom;`;
   const json = (await safeJson(
     await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: ql, headers: UA }),
   )) as { elements?: Array<{ type: string; tags?: Record<string, string>; geometry?: Array<{ lat: number; lon: number }> }> };
@@ -137,7 +138,10 @@ async function sampleElevationFt(points: LatLng[]): Promise<number[]> {
 async function main() {
   const slug = process.argv[2];
   if (!slug || slug.startsWith("--")) {
-    console.error('Usage: pnpm import:route <trail-slug> [--source nps|osm] [--name "Official Name"] [--points N]');
+    console.error(
+      'Usage: pnpm import:route <trail-slug> [--source nps|tdec|osm] [--name "Official Name"]\n' +
+        '       [--ways "Trail A,Trail B"] [--osm-radius METERS] [--points N]',
+    );
     process.exit(1);
   }
   const trail = getTrailBySlug(slug);
@@ -149,12 +153,55 @@ async function main() {
   const forced = arg("--source") as "nps" | "tdec" | "osm" | undefined;
   const forcedName = arg("--name");
   const maxPoints = Number(arg("--points")) || 70;
+  // Assemble the route from explicitly-named OSM ways (e.g. the segments that
+  // make up a trail, named after the segments rather than the destination).
+  const wantedWays = arg("--ways")
+    ?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const osmRadius = Number(arg("--osm-radius")) || 2500;
 
   const SOURCES: Record<string, () => Promise<Candidate[]>> = {
     nps: () => fetchEsri(NPS_TRAILS, "TRLNAME", th, 0.06),
     tdec: () => fetchEsri(TDEC_TRAILS, "TR_NAME", th, 0.06),
-    osm: () => fetchOsm(th),
+    osm: () => fetchOsm(th, osmRadius),
   };
+
+  // `--ways` mode: pull OSM named ways near the trailhead and stitch exactly the
+  // ones the maintainer listed. Curated, not guessed, so we skip name-matching
+  // and the length sanity-gate (the human chose the segments).
+  if (wantedWays?.length) {
+    let osm: Candidate[] = [];
+    try {
+      osm = await fetchOsm(th, osmRadius);
+    } catch (e) {
+      console.error(`OSM lookup failed: ${(e as Error).message}`);
+      process.exit(1);
+    }
+    const segments = combineNamedSegments(osm, wantedWays);
+    if (segments.length === 0) {
+      console.error(`No OSM ways near the trailhead matched --ways "${wantedWays.join(", ")}".`);
+      console.error("Named ways within range:");
+      [...new Set(osm.map((c) => c.name))]
+        .sort()
+        .forEach((n) => console.error(`  - ${n}`));
+      process.exit(1);
+    }
+    const line = orientFromStart(stitchSegments(segments), th);
+    const sampled = downsampleRoute(line, maxPoints);
+    const elevations = await sampleElevationFt(sampled);
+    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const profile = buildElevationProfile(route);
+    console.error(`\nSource: OSM — ways: ${wantedWays.join(", ")}`);
+    console.error(`Points: ${route.length} (from ${line.length} geometry points)`);
+    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
+    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
+    console.error(`Attribution: © OpenStreetMap contributors (ODbL)\n`);
+    console.log(routeFrontmatterYaml(route));
+    return;
+  }
+
   // Tag each candidate with the source it came from so we can attribute it.
   const order = forced ? [forced] : ["nps", "tdec", "osm"];
   const tagged: Array<Candidate & { source: string }> = [];
