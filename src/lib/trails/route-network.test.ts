@@ -1,0 +1,113 @@
+import { describe, it, expect } from "vitest";
+import { networkRoute, networkLoop } from "./route-network";
+
+// A small network shaped like:  A - B - C - D
+//                                           \ E
+// (deltas of 0.001 deg ~= 111 m so every vertex is a distinct node)
+const net = {
+  elements: [
+    {
+      type: "way",
+      geometry: [
+        { lat: 0, lon: 0 }, // A
+        { lat: 0, lon: 0.001 }, // B
+        { lat: 0, lon: 0.002 }, // C
+      ],
+    },
+    { type: "way", geometry: [{ lat: 0, lon: 0.002 }, { lat: 0.001, lon: 0.002 }] }, // C-D
+    { type: "way", geometry: [{ lat: 0, lon: 0.002 }, { lat: 0, lon: 0.003 }] }, // C-E
+  ],
+};
+
+describe("networkRoute", () => {
+  it("routes from the node nearest start to the node nearest end through shared junctions", () => {
+    const path = networkRoute(
+      net,
+      { lat: 0, lng: 0.0001 }, // near A
+      { lat: 0.0009, lng: 0.002 }, // near D
+    );
+    expect(path).toEqual([
+      { lat: 0, lng: 0 },
+      { lat: 0, lng: 0.001 },
+      { lat: 0, lng: 0.002 },
+      { lat: 0.001, lng: 0.002 },
+    ]);
+  });
+
+  it("takes the branch toward a different destination", () => {
+    const path = networkRoute(net, { lat: 0, lng: 0 }, { lat: 0, lng: 0.0029 });
+    expect(path[path.length - 1]).toEqual({ lat: 0, lng: 0.003 }); // E
+  });
+
+  it("returns an empty path when start and end are in disconnected components", () => {
+    const disconnected = {
+      elements: [
+        { type: "way", geometry: [{ lat: 0, lon: 0 }, { lat: 0, lon: 0.001 }] },
+        { type: "way", geometry: [{ lat: 5, lon: 5 }, { lat: 5, lon: 5.001 }] },
+      ],
+    };
+    expect(
+      networkRoute(disconnected, { lat: 0, lng: 0 }, { lat: 5, lng: 5 }),
+    ).toEqual([]);
+  });
+
+  it("returns an empty path when there are no ways", () => {
+    expect(networkRoute({ elements: [] }, { lat: 0, lng: 0 }, { lat: 1, lng: 1 })).toEqual([]);
+  });
+
+  it("bridges a small gap between ways when a snap distance is given", () => {
+    // Two ways that nearly meet: B is at (0, 0.001), B' at (0, 0.0011) ~ 11 m away.
+    const gappy = {
+      elements: [
+        { type: "way", geometry: [{ lat: 0, lon: 0 }, { lat: 0, lon: 0.001 }] },
+        { type: "way", geometry: [{ lat: 0, lon: 0.0011 }, { lat: 0, lon: 0.002 }] },
+      ],
+    };
+    // Exact keying leaves them disconnected.
+    expect(networkRoute(gappy, { lat: 0, lng: 0 }, { lat: 0, lng: 0.002 })).toEqual([]);
+    // A 25 m snap merges B and B', so the path connects end to end.
+    const path = networkRoute(gappy, { lat: 0, lng: 0 }, { lat: 0, lng: 0.002 }, 25);
+    expect(path.length).toBeGreaterThanOrEqual(3);
+    expect(path[0]).toEqual({ lat: 0, lng: 0 });
+    expect(path[path.length - 1]).toEqual({ lat: 0, lng: 0.002 });
+  });
+});
+
+describe("networkLoop", () => {
+  // A square: A-B-C-D-A (so there are two edge-disjoint ways around it).
+  const A = { lat: 0, lon: 0 };
+  const B = { lat: 0, lon: 0.001 };
+  const C = { lat: 0.001, lon: 0.001 };
+  const D = { lat: 0.001, lon: 0 };
+  const square = {
+    elements: [
+      { type: "way", geometry: [A, B] },
+      { type: "way", geometry: [B, C] },
+      { type: "way", geometry: [C, D] },
+      { type: "way", geometry: [D, A] },
+    ],
+  };
+
+  it("returns a closed loop from the trailhead out to a via point and back a different way", () => {
+    const loop = networkLoop(square, { lat: 0, lng: 0 }, { lat: 0.001, lng: 0.001 });
+    // Starts and ends at the trailhead.
+    expect(loop[0]).toEqual({ lat: 0, lng: 0 });
+    expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
+    // Visits the via point and all four corners (out one side, back the other).
+    const keys = new Set(loop.map((p) => `${p.lat},${p.lng}`));
+    expect(keys).toContain("0.001,0.001"); // C (via)
+    expect(keys).toContain("0,0.001"); // B
+    expect(keys).toContain("0.001,0"); // D
+    expect(loop.length).toBe(5); // A,B,C,D,A
+  });
+
+  it("falls back to an out-and-back when no disjoint return exists", () => {
+    // A simple spur A-B-C: there is no second way back.
+    const spur = {
+      elements: [{ type: "way", geometry: [A, B, C] }],
+    };
+    const loop = networkLoop(spur, { lat: 0, lng: 0 }, { lat: 0.001, lng: 0.001 });
+    expect(loop[0]).toEqual({ lat: 0, lng: 0 });
+    expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
+  });
+});
