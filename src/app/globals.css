@@ -180,3 +180,10 @@ body::after {
     scroll-behavior: auto !important;
   }
 }
+
+/* Dark mode: darken the interactive terrain map's tiles (the canvas only, so the
+ * amber pins and controls keep their colors). A lightness invert with a hue
+ * rotate keeps water blue and land green while turning the bright basemap dark. */
+.dark .maplibregl-canvas {
+  filter: invert(0.9) hue-rotate(180deg) brightness(1.05);
+}
