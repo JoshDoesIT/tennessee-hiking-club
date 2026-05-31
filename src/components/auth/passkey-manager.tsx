@@ -27,6 +27,7 @@ export function PasskeyManager() {
       </p>
       <div className="mt-4">
         <PasskeyButton
+          action="register"
           label="Add a passkey"
           callbackUrl="/hikes"
           variant="outline"

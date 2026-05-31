@@ -31,10 +31,14 @@ export function PasskeyButton({
   label = "Sign in with a passkey",
   callbackUrl = "/hikes",
   variant = "outline",
+  action = "authenticate",
 }: {
   label?: string;
   callbackUrl?: string;
   variant?: Variant;
+  // Auth.js requires logged-in users to send an explicit action to register; an
+  // omitted action makes the server bail (the button would silently do nothing).
+  action?: "authenticate" | "register";
 }) {
   const supported = useWebAuthnSupported();
   const [error, setError] = useState("");
@@ -45,9 +49,13 @@ export function PasskeyButton({
     setError("");
     try {
       const { signIn } = await import("next-auth/webauthn");
-      await signIn("passkey", { callbackUrl });
+      await signIn("passkey", { action, callbackUrl });
     } catch {
-      setError("Passkey sign-in could not start. Try another method.");
+      setError(
+        action === "register"
+          ? "Could not add a passkey. Please try again."
+          : "Passkey sign-in could not start. Try another method.",
+      );
     }
   }
 
