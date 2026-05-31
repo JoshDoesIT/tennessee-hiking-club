@@ -18,6 +18,7 @@
     "enrich:parking": "tsx scripts/enrich-parking.ts",
     "import:gpx": "tsx scripts/import-gpx.ts",
     "import:route": "tsx scripts/import-route.ts",
+    "discover:waypoints": "tsx scripts/discover-waypoints.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "prebuild": "tsx scripts/validate-content.ts",
