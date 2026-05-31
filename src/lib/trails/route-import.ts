@@ -59,3 +59,15 @@ export function routeFrontmatterYaml(route: RoutePoint[]): string {
   }
   return lines.join("\n");
 }
+
+/**
+ * Replace a trail file's `route:` front-matter block with new YAML in place
+ * (#137, `pnpm enrich:elevation`). Matches the `route:` key and its indented
+ * list items, stopping at the next top-level key, so the rest of the file is
+ * untouched. Returns the text unchanged if there is no route block.
+ */
+export function replaceRouteBlock(fileText: string, routeYaml: string): string {
+  const block = /^route:\n(?: {2,}.*(?:\n|$))*/m;
+  if (!block.test(fileText)) return fileText;
+  return fileText.replace(block, routeYaml.replace(/\s*$/, "") + "\n");
+}

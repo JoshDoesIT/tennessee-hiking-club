@@ -55,11 +55,13 @@ export const conditionReportSchema = z.object({
 });
 
 /** An ordered point on a trail's route, used for the elevation profile and GPX
- *  export. */
+ *  export. Elevation is optional so a route can be authored as bare lat/lng and
+ *  have elevation filled from the public DEM (#137, `pnpm enrich:elevation`); the
+ *  profile and GPX render only once every point has elevation. */
 const routePointSchema = z.object({
   lat: z.number(),
   lng: z.number(),
-  elevationFt: z.number(),
+  elevationFt: z.number().optional(),
 });
 
 /** The trailhead parking area: where to actually leave the car. `note` covers

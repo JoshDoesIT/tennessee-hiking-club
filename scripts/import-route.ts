@@ -28,9 +28,9 @@ import {
 import {
   downsampleRoute,
   routeFrontmatterYaml,
-  metersToFeet,
 } from "../src/lib/trails/route-import";
 import { buildElevationProfile } from "../src/lib/trails/elevation";
+import { sampleElevationFeet } from "../src/lib/trails/dem";
 import { getTrailBySlug } from "../src/lib/trails";
 
 type Candidate = { name: string; segments: LatLng[][] };
@@ -164,15 +164,10 @@ function distToTrailhead(c: Candidate, th: LatLng): number {
 }
 
 async function sampleElevationFt(points: LatLng[]): Promise<number[]> {
-  const locs = points.map((p) => `${p.lat},${p.lng}`).join("|");
-  const res = await fetch("https://api.opentopodata.org/v1/ned10m", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...UA },
-    body: JSON.stringify({ locations: locs, interpolation: "bilinear" }),
-  });
-  const json = await res.json();
-  if (json.status !== "OK") throw new Error("elevation lookup failed: " + JSON.stringify(json).slice(0, 200));
-  return json.results.map((r: { elevation: number }) => metersToFeet(r.elevation));
+  const ft = await sampleElevationFeet(points);
+  if (ft.some((v) => v == null))
+    throw new Error("elevation lookup failed for one or more points");
+  return ft as number[];
 }
 
 async function main() {

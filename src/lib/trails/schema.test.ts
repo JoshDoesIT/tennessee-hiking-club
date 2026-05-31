@@ -117,11 +117,23 @@ describe("trailSchema", () => {
     ).toBe(true);
   });
 
-  it("rejects a route point missing elevation", () => {
+  it("accepts a route point without elevation (filled from the DEM at build, #137)", () => {
     expect(
       trailSchema.safeParse({
         ...validTrail,
-        route: [{ lat: 35.6, lng: -83.45 }],
+        route: [
+          { lat: 35.6, lng: -83.45 },
+          { lat: 35.62, lng: -83.44 },
+        ],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects a route point missing coordinates", () => {
+    expect(
+      trailSchema.safeParse({
+        ...validTrail,
+        route: [{ lat: 35.6, elevationFt: 4000 }],
       }).success,
     ).toBe(false);
   });

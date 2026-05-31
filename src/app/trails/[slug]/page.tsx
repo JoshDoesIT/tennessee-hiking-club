@@ -15,6 +15,7 @@ import { PhotoSubmissionForm } from "@/components/trails/photo-submission-form";
 import { SuggestWaypointForm } from "@/components/trails/suggest-waypoint-form";
 import { TrailParking } from "@/components/trails/trail-parking";
 import { ElevationProfile } from "@/components/trails/elevation-profile";
+import { routeHasElevation } from "@/lib/trails/elevation";
 import { DownloadGpx } from "@/components/trails/download-gpx";
 import { TrailHighlights } from "@/components/trails/trail-highlights";
 import { Container } from "@/components/ui/container";
@@ -90,7 +91,9 @@ export default async function TrailPage({ params }: Params) {
       <PhotoSubmissionForm trailSlug={trail.slug} trailName={trail.name} />
       <SuggestWaypointForm trailSlug={trail.slug} trailName={trail.name} />
 
-      {trail.route && trail.route.length > 1 ? (
+      {trail.route &&
+      trail.route.length > 1 &&
+      routeHasElevation(trail.route) ? (
         <div className="mt-2">
           <ElevationProfile route={trail.route} />
           <div className="mt-4">
