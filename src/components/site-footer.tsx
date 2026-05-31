@@ -66,7 +66,6 @@ export function SiteFooter() {
               external: true,
             },
             { label: "Credits", href: "/credits" },
-            { label: "Shop (coming soon)", href: "/" },
           ]}
         />
         <FooterCol
