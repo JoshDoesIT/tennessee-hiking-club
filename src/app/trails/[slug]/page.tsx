@@ -15,6 +15,7 @@ import { PhotoSubmissionForm } from "@/components/trails/photo-submission-form";
 import { TrailParking } from "@/components/trails/trail-parking";
 import { ElevationProfile } from "@/components/trails/elevation-profile";
 import { DownloadGpx } from "@/components/trails/download-gpx";
+import { TrailHighlights } from "@/components/trails/trail-highlights";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -96,6 +97,8 @@ export default async function TrailPage({ params }: Params) {
         </div>
       ) : null}
 
+      <TrailHighlights waypoints={trail.waypoints} />
+
       <section className="mt-8">
         <h2 className="display text-forest text-2xl">Find the trailhead</h2>
         <div className="mt-4">
@@ -103,6 +106,7 @@ export default async function TrailPage({ params }: Params) {
             coordinates={trail.coordinates}
             name={trail.name}
             parking={resolvedParking?.parking}
+            waypoints={trail.waypoints}
           />
         </div>
         <div className="mt-4">

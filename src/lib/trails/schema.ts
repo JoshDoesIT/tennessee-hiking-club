@@ -4,6 +4,19 @@ import { isWithinTennessee } from "../maps";
 export const REGIONS = ["East", "Middle", "West"] as const;
 export const DIFFICULTIES = ["easy", "moderate", "hard", "strenuous"] as const;
 export const ROUTE_TYPES = ["loop", "out-and-back", "point-to-point"] as const;
+/** Landmark/waypoint kinds along a trail (#189). */
+export const WAYPOINT_TYPES = [
+  "waterfall",
+  "viewpoint",
+  "summit",
+  "gap",
+  "water",
+  "campsite",
+  "arch",
+  "parking",
+  "caution",
+  "landmark",
+] as const;
 export const ALERT_LEVELS = ["info", "caution", "closure"] as const;
 
 /** kebab-case: lowercase words separated by single hyphens. */
@@ -63,6 +76,19 @@ const parkingSchema = z
     message: "parking coordinates must be within Tennessee",
   });
 
+/** A named landmark along a trail (#189): waterfalls, viewpoints, summits, etc. */
+const waypointSchema = z
+  .object({
+    lat: z.number(),
+    lng: z.number(),
+    name: z.string().min(1),
+    type: z.enum(WAYPOINT_TYPES),
+    description: z.string().optional(),
+  })
+  .refine(isWithinTennessee, {
+    message: "waypoint coordinates must be within Tennessee",
+  });
+
 /**
  * The trail data model: the executable spec for all trail content.
  * Front-matter from `content/trails/*.md` is validated against this; invalid
@@ -95,6 +121,7 @@ export const trailSchema = z.object({
   alerts: z.array(alertSchema).default([]),
   conditionReports: z.array(conditionReportSchema).default([]),
   route: z.array(routePointSchema).optional(),
+  waypoints: z.array(waypointSchema).optional(),
   parking: parkingSchema.optional(),
   /** Contributor handles of people who contributed this trail, for recognition. */
   contributors: z.array(z.string().min(1)).optional(),
@@ -106,3 +133,5 @@ export type Difficulty = (typeof DIFFICULTIES)[number];
 export type TrailAlert = z.infer<typeof alertSchema>;
 export type ConditionReport = z.infer<typeof conditionReportSchema>;
 export type TrailParking = z.infer<typeof parkingSchema>;
+export type Waypoint = z.infer<typeof waypointSchema>;
+export type WaypointType = (typeof WAYPOINT_TYPES)[number];

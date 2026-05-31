@@ -24,6 +24,27 @@ route:
   - { lat: 35.6400, lng: -83.4440, elevationFt: 4950 }
   - { lat: 35.6480, lng: -83.4430, elevationFt: 5800 }
   - { lat: 35.6539, lng: -83.4413, elevationFt: 6593 }
+waypoints:
+  - lat: 35.63593
+    lng: -83.43822
+    name: Arch Rock
+    type: arch
+    description: A stone arch the trail climbs through on cable-assisted steps, about 1.3 miles in.
+  - lat: 35.65436
+    lng: -83.43672
+    name: Mount LeConte summit (High Top)
+    type: summit
+    description: The High Top at 6,593 ft, third-highest peak in the Smokies.
+  - lat: 35.65413
+    lng: -83.44392
+    name: Cliff Top
+    type: viewpoint
+    description: West-facing ledge near LeConte Lodge, the classic sunset spot.
+  - lat: 35.65331
+    lng: -83.43178
+    name: Myrtle Point
+    type: viewpoint
+    description: East-facing overlook past the lodge, prized for sunrise.
 contributors: [JoshDoesIT]
 ---
 

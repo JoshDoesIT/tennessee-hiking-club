@@ -4,6 +4,10 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useRef, useState } from "react";
 import type { StyleSpecification } from "maplibre-gl";
 import { buildTennesseeStyle, type MapStyle } from "./build-style";
+import type { WaypointType } from "@/lib/trails/schema";
+import { createWaypointMarkerEl } from "@/components/trails/waypoint-style";
+
+type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
@@ -17,16 +21,21 @@ export function TrailContextMap({
   coordinates,
   name,
   parking,
+  waypoints,
 }: {
   coordinates: { lat: number; lng: number };
   name: string;
   parking?: { lat: number; lng: number };
+  waypoints?: MapWaypoint[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
   const [visible, setVisible] = useState(false);
   const parkingLat = parking?.lat;
   const parkingLng = parking?.lng;
+  // Stable primitive dep so the marker effect re-runs only when waypoints
+  // actually change, not on every render (array identity churns each render).
+  const waypointsKey = JSON.stringify(waypoints ?? []);
 
   // The map sits below the fold, so defer loading MapLibre (a heavy WebGL
   // bundle) until it scrolls near the viewport. This keeps it off the critical
@@ -107,6 +116,9 @@ export function TrailContextMap({
           });
           new maplibregl.Marker({ element: el }).setLngLat(center).addTo(map);
 
+          const bounds = new maplibregl.LngLatBounds(center, center);
+          let hasExtra = false;
+
           if (parkingLat != null && parkingLng != null) {
             const pEl = document.createElement("div");
             pEl.setAttribute("aria-hidden", "true");
@@ -126,9 +138,21 @@ export function TrailContextMap({
             new maplibregl.Marker({ element: pEl })
               .setLngLat([parkingLng, parkingLat])
               .addTo(map);
-
-            const bounds = new maplibregl.LngLatBounds(center, center);
             bounds.extend([parkingLng, parkingLat]);
+            hasExtra = true;
+          }
+
+          const mapWaypoints: MapWaypoint[] = JSON.parse(waypointsKey);
+          for (const w of mapWaypoints) {
+            const wEl = createWaypointMarkerEl(w);
+            new maplibregl.Marker({ element: wEl })
+              .setLngLat([w.lng, w.lat])
+              .addTo(map);
+            bounds.extend([w.lng, w.lat]);
+            hasExtra = true;
+          }
+
+          if (hasExtra) {
             map.fitBounds(bounds, { padding: 64, maxZoom: 14, duration: 0 });
           }
         });
@@ -141,7 +165,14 @@ export function TrailContextMap({
       cancelled = true;
       map?.remove();
     };
-  }, [visible, coordinates.lat, coordinates.lng, parkingLat, parkingLng]);
+  }, [
+    visible,
+    coordinates.lat,
+    coordinates.lng,
+    parkingLat,
+    parkingLng,
+    waypointsKey,
+  ]);
 
   return (
     <div className="relative w-full">
