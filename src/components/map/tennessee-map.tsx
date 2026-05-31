@@ -13,7 +13,7 @@ export function TennesseeMap() {
   const { outline, pins } = tennesseeMapData(getAllTrails());
 
   return (
-    <div className="relative mx-auto w-full max-w-4xl">
+    <div className="relative mx-auto w-full max-w-4xl overflow-x-clip">
       <svg
         viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
         className="block h-auto w-full"
