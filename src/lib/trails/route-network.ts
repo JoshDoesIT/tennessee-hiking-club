@@ -199,13 +199,7 @@ export function networkRoute(
  * removed. Falls back to an out-and-back when no edge-disjoint return exists.
  * Returns `[]` when `via` is unreachable.
  */
-export function networkLoop(
-  json: OverpassGeom,
-  start: LatLng,
-  via: LatLng,
-  snapMeters = 0,
-): LatLng[] {
-  const graph = buildGraph(json, snapMeters);
+function loopOverGraph(graph: Graph, start: LatLng, via: LatLng): LatLng[] {
   if (graph.coord.size === 0) return [];
   const s = nearestNode(graph.coord, start);
   const v = nearestNode(graph.coord, via);
@@ -222,6 +216,15 @@ export function networkLoop(
       ? [...out, ...back.slice(1)]
       : [...out, ...[...out].reverse().slice(1)];
   return loopKeys.map((k) => graph.coord.get(k)!);
+}
+
+export function networkLoop(
+  json: OverpassGeom,
+  start: LatLng,
+  via: LatLng,
+  snapMeters = 0,
+): LatLng[] {
+  return loopOverGraph(buildGraph(json, snapMeters), start, via);
 }
 
 /**
@@ -243,4 +246,14 @@ export function proximityRoute(
   const s = nearestNode(graph.coord, start);
   const t = nearestNode(graph.coord, end);
   return dijkstra(graph, s, t).map((k) => graph.coord.get(k)!);
+}
+
+/** Loop through a GPS-trace point cloud: out to `via`, back a different way. */
+export function proximityLoop(
+  points: LatLng[],
+  start: LatLng,
+  via: LatLng,
+  snapMeters: number,
+): LatLng[] {
+  return loopOverGraph(buildPointGraph(points, snapMeters), start, via);
 }
