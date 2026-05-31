@@ -111,6 +111,27 @@ prints the route's **gain and length** so you can sanity-check them against the
 trail's stated `elevationGainFt` and `lengthMiles` before committing. Only use a
 GPX you have the right to share.
 
+#### Pulling a route from public data (no GPX needed)
+
+For trails on public land, you can pull the path straight from authoritative GIS
+instead of supplying a GPX:
+
+```sh
+pnpm import:route <trail-slug>                       # auto-match by name near the trailhead
+pnpm import:route <trail-slug> --source nps|tdec|osm  # force a source
+pnpm import:route <trail-slug> --name "Alum Cave Trail"  # pick the official trail name
+```
+
+It searches the **NPS** (national parks), **TDEC** (TN State Parks), and
+**OpenStreetMap** trail layers near the trailhead, stitches the segments into one
+ordered line, samples elevation from USGS 3DEP, and prints the `route:` YAML plus
+the matched source, length, and gain. It auto-picks only when a source trail name
+matches and the length is plausible; otherwise it lists nearby trails so you can
+re-run with `--name`/`--source`. **Verify the printed length/gain against the
+trail's stated values before committing.** Attribution: NPS and USGS are public
+domain; TDEC is TN open data; OSM requires an "© OpenStreetMap contributors"
+credit wherever the route is shown.
+
 ## Code style
 
 - TypeScript strict; prefer pure, testable functions in `src/lib`.
