@@ -4,8 +4,8 @@ name: Twin Falls at Rock Island
 region: Middle
 area: Rock Island State Park
 coordinates:
-  lat: 35.7257
-  lng: -85.6325
+  lat: 35.80815
+  lng: -85.63318
 lengthMiles: 0.5
 elevationGainFt: 80
 difficulty: easy

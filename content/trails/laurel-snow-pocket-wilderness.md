@@ -4,8 +4,8 @@ name: Laurel-Snow Pocket Wilderness
 region: East
 area: Laurel-Snow State Natural Area
 coordinates:
-  lat: 35.5050
-  lng: -85.0167
+  lat: 35.50286
+  lng: -85.04456
 lengthMiles: 5.5
 elevationGainFt: 700
 difficulty: moderate

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { networkRoute, networkLoop } from "./route-network";
+import { networkRoute, networkLoop, proximityRoute } from "./route-network";
 
 // A small network shaped like:  A - B - C - D
 //                                           \ E
@@ -109,5 +109,35 @@ describe("networkLoop", () => {
     const loop = networkLoop(spur, { lat: 0, lng: 0 }, { lat: 0.001, lng: 0.001 });
     expect(loop[0]).toEqual({ lat: 0, lng: 0 });
     expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
+  });
+});
+
+describe("proximityRoute", () => {
+  // An unordered cloud of points roughly along a corridor (no edges given).
+  const cloud = [
+    { lat: 0, lng: 0.002 },
+    { lat: 0, lng: 0 },
+    { lat: 0, lng: 0.004 },
+    { lat: 0.00002, lng: 0.001 }, // slight GPS noise off the line
+    { lat: 0, lng: 0.003 },
+    { lat: 5, lng: 5 }, // an unrelated stray point far away
+  ];
+
+  it("routes through a point cloud by connecting points within the snap distance", () => {
+    const path = proximityRoute(
+      cloud,
+      { lat: 0, lng: 0 },
+      { lat: 0, lng: 0.004 },
+      200, // ~200 m bridges the ~111 m point spacing
+    );
+    expect(path[0]).toEqual({ lat: 0, lng: 0 });
+    expect(path[path.length - 1]).toEqual({ lat: 0, lng: 0.004 });
+    expect(path.length).toBeGreaterThanOrEqual(4); // walks the corridor, not the stray
+    expect(path).not.toContainEqual({ lat: 5, lng: 5 });
+  });
+
+  it("returns an empty path when the cloud is too sparse to connect", () => {
+    const path = proximityRoute(cloud, { lat: 0, lng: 0 }, { lat: 0, lng: 0.004 }, 10);
+    expect(path).toEqual([]);
   });
 });
