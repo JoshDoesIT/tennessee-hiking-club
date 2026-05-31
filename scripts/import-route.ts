@@ -16,6 +16,7 @@ import {
   stitchSegments,
   orientFromStart,
   combineNamedSegments,
+  clipBetween,
   type LatLng,
 } from "../src/lib/trails/route-geometry";
 import {
@@ -140,7 +141,7 @@ async function main() {
   if (!slug || slug.startsWith("--")) {
     console.error(
       'Usage: pnpm import:route <trail-slug> [--source nps|tdec|osm] [--name "Official Name"]\n' +
-        '       [--ways "Trail A,Trail B"] [--osm-radius METERS] [--points N]',
+        '       [--ways "Trail A,Trail B"] [--to "lat,lng"] [--osm-radius METERS] [--points N]',
     );
     process.exit(1);
   }
@@ -160,6 +161,15 @@ async function main() {
     .map((s) => s.trim())
     .filter(Boolean);
   const osmRadius = Number(arg("--osm-radius")) || 2500;
+  // Clip a long through-trail (e.g. the AT) to the segment ending at this
+  // destination coordinate, starting from the trailhead.
+  const toArg = arg("--to");
+  const clipTo: LatLng | undefined = toArg
+    ? (() => {
+        const [lat, lng] = toArg.split(",").map((s) => Number(s.trim()));
+        return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined;
+      })()
+    : undefined;
 
   const SOURCES: Record<string, () => Promise<Candidate[]>> = {
     nps: () => fetchEsri(NPS_TRAILS, "TRLNAME", th, 0.06),
@@ -187,12 +197,17 @@ async function main() {
         .forEach((n) => console.error(`  - ${n}`));
       process.exit(1);
     }
-    const line = orientFromStart(stitchSegments(segments), th);
+    const stitched = stitchSegments(segments);
+    const line = clipTo
+      ? clipBetween(stitched, th, clipTo)
+      : orientFromStart(stitched, th);
     const sampled = downsampleRoute(line, maxPoints);
     const elevations = await sampleElevationFt(sampled);
     const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
     const profile = buildElevationProfile(route);
-    console.error(`\nSource: OSM — ways: ${wantedWays.join(", ")}`);
+    console.error(
+      `\nSource: OSM — ways: ${wantedWays.join(", ")}${clipTo ? ` (clipped to ${toArg})` : ""}`,
+    );
     console.error(`Points: ${route.length} (from ${line.length} geometry points)`);
     console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
     console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
