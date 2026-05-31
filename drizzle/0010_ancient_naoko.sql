@@ -1,0 +1,1 @@
+ALTER TABLE "trail_submissions" ADD COLUMN "photo_urls" text[];

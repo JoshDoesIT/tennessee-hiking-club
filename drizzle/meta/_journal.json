@@ -71,6 +71,13 @@
       "when": 1780155133448,
       "tag": "0009_optimal_magdalene",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1780233230510,
+      "tag": "0010_ancient_naoko",
+      "breakpoints": true
     }
   ]
 }

@@ -94,6 +94,8 @@ export const trailSubmissions = pgTable(
     routeType: text("route_type"),
     description: text("description").notNull(),
     links: text("links"),
+    /** private Blob URLs of photos the contributor attached (#29) */
+    photoUrls: text("photo_urls").array(),
     /** pending | approved | rejected */
     status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true })
