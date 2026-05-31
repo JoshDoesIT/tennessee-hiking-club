@@ -97,6 +97,13 @@ A trail can carry an optional ordered `route` of `{ lat, lng, elevationFt }`
 points. When present it powers the elevation profile and the "Download GPX"
 button; when absent the page simply omits them.
 
+`elevationFt` is optional. You can author a route as bare `{ lat, lng }` (a
+hand-traced path, or a GPX with no elevation) and fill the elevation from the
+public-domain USGS terrain DEM with `pnpm enrich:elevation`, which writes the
+sampled elevations back into the trail file (commit the result). The profile and
+GPX render only once every point has elevation, so a route awaiting enrichment
+degrades cleanly to no profile.
+
 Supply a route from a **real GPS track**, not a hand-drawn guess: an official
 park route, or a `.gpx` you recorded or downloaded. Convert it with the importer
 and paste the result into the trail's front-matter:

@@ -5,8 +5,44 @@ import {
   parseGpxTrack,
   downsampleRoute,
   routeFrontmatterYaml,
+  replaceRouteBlock,
 } from "./route-import";
 import type { RoutePoint } from "./elevation";
+
+describe("replaceRouteBlock", () => {
+  const md = [
+    "---",
+    "slug: x",
+    "route:",
+    "  - lat: 35.6",
+    "    lng: -83.45",
+    "  - lat: 35.62",
+    "    lng: -83.44",
+    "parking:",
+    "  lat: 35.6",
+    "  lng: -83.45",
+    "---",
+    "",
+    "Body text.",
+  ].join("\n");
+
+  it("swaps the route block for elevation-filled YAML without touching the rest", () => {
+    const filled = routeFrontmatterYaml([
+      { lat: 35.6, lng: -83.45, elevationFt: 4000 },
+      { lat: 35.62, lng: -83.44, elevationFt: 4600 },
+    ]);
+    const out = replaceRouteBlock(md, filled);
+
+    expect(out).toContain("elevationFt: 4000");
+    expect(out).toContain("parking:"); // next key intact
+    expect(out).toContain("Body text."); // body intact
+    // The old elevation-less route lines are gone.
+    expect(out).not.toMatch(/ {2}- lat: 35.6\n {4}lng: -83.45\n {2}- lat/);
+    // It still parses as one trail with a 2-point route.
+    expect(matter(out).data.route).toHaveLength(2);
+    expect(matter(out).data.route[0].elevationFt).toBe(4000);
+  });
+});
 
 describe("metersToFeet", () => {
   it("converts and rounds", () => {

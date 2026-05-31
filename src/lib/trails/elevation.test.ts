@@ -3,8 +3,29 @@ import {
   haversineMiles,
   buildElevationProfile,
   routeToGpx,
+  routeHasElevation,
   type RoutePoint,
 } from "./elevation";
+
+describe("routeHasElevation", () => {
+  it("is true when every point has elevation", () => {
+    expect(
+      routeHasElevation([
+        { lat: 1, lng: 1, elevationFt: 100 },
+        { lat: 2, lng: 2, elevationFt: 200 },
+      ]),
+    ).toBe(true);
+  });
+
+  it("is false when any point is missing elevation", () => {
+    expect(
+      routeHasElevation([
+        { lat: 1, lng: 1, elevationFt: 100 },
+        { lat: 2, lng: 2 },
+      ]),
+    ).toBe(false);
+  });
+});
 
 describe("haversineMiles", () => {
   it("is zero for the same point", () => {
