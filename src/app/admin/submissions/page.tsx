@@ -92,6 +92,7 @@ async function loadPending(): Promise<PendingSubmission[]> {
       difficulty: r.difficulty,
       routeType: r.routeType,
       links: r.links,
+      photoCount: r.photoUrls?.length ?? 0,
       submittedBy: profile?.displayName || profile?.githubLogin || "A member",
       submittedOn: r.createdAt.toISOString().slice(0, 10),
       generated: {

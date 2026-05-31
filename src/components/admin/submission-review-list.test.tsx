@@ -48,6 +48,21 @@ describe("SubmissionReviewList", () => {
     expect(screen.getByText(/Trail Ann/)).toBeInTheDocument();
   });
 
+  it("shows thumbnails for attached photos via the admin view route", () => {
+    setupFetch();
+    render(<SubmissionReviewList submissions={[{ ...sub, photoCount: 2 }]} />);
+    const imgs = screen.getAllByRole("img");
+    expect(imgs).toHaveLength(2);
+    expect(imgs[0]).toHaveAttribute(
+      "src",
+      "/api/contributions/trail/sub1/photo/0/view",
+    );
+    expect(imgs[1]).toHaveAttribute(
+      "src",
+      "/api/contributions/trail/sub1/photo/1/view",
+    );
+  });
+
   it("approves a submission via the review route", async () => {
     const user = userEvent.setup();
     const { calls } = setupFetch();

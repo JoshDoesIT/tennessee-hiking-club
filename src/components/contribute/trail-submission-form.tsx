@@ -64,34 +64,15 @@ export function TrailSubmissionForm() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    const data = new FormData(form);
-    const text = (name: string) => String(data.get(name) ?? "").trim();
-    const num = (name: string) => {
-      const value = text(name);
-      return value === "" ? undefined : Number(value);
-    };
-
-    const payload = {
-      name: text("name"),
-      region: text("region"),
-      area: text("area"),
-      lat: num("lat"),
-      lng: num("lng"),
-      description: text("description"),
-      lengthMiles: num("lengthMiles"),
-      elevationGainFt: num("elevationGainFt"),
-      difficulty: text("difficulty") || undefined,
-      routeType: text("routeType") || undefined,
-      links: text("links") || undefined,
-    };
 
     setSubmitting(true);
     setStatus("Submitting…");
     try {
+      // FormData (not JSON) so attached photos ride along; the route coerces
+      // the numeric fields and validates server-side.
       const res = await fetch("/api/contributions/trail", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: new FormData(form),
       });
       if (res.ok) {
         setStatus("Thank you. Your trail is in the queue for review.");
@@ -188,6 +169,24 @@ export function TrailSubmissionForm() {
           placeholder="What makes this trail worth the drive? Surface, highlights, anything to know."
           className={fieldClass}
         />
+      </div>
+
+      <div className="grid gap-1">
+        <label htmlFor="sub-photos" className={labelClass}>
+          Photos (optional)
+        </label>
+        <input
+          id="sub-photos"
+          name="photos"
+          type="file"
+          accept="image/*"
+          multiple
+          className="text-ink file:border-forest/20 file:bg-cream-50 file:text-pine hover:file:bg-parchment text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:px-3 file:py-2 file:text-sm file:font-medium"
+        />
+        <p className="text-ink/60 text-xs">
+          Up to 5 images, shared with reviewers. Only add photos that are yours
+          to share.
+        </p>
       </div>
 
       <details className="border-forest/10 rounded-lg border p-4">

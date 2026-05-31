@@ -16,6 +16,8 @@ export type PendingSubmission = {
   difficulty?: string | null;
   routeType?: string | null;
   links?: string | null;
+  /** Number of photos the contributor attached (#29), shown via the view route. */
+  photoCount?: number;
   submittedBy: string;
   submittedOn: string;
   /** The `content/trails/<slug>.md` generated from this submission (#150). */
@@ -136,6 +138,20 @@ export function SubmissionReviewList({
                 </a>
               </p>
             )}
+
+            {s.photoCount ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {Array.from({ length: s.photoCount }).map((_, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element -- private Blob proxy, not a static asset
+                  <img
+                    key={i}
+                    src={`/api/contributions/trail/${s.id}/photo/${i}/view`}
+                    alt={`Photo ${i + 1} submitted for ${s.name}`}
+                    className="border-forest/15 h-24 w-24 rounded-lg border object-cover"
+                  />
+                ))}
+              </div>
+            ) : null}
 
             {decided ? (
               <div className="mt-4">
