@@ -63,16 +63,13 @@ export function LeaderboardOptIn() {
   }
 
   return (
-    <section
-      aria-labelledby="leaderboard-optin-heading"
-      className="border-forest/10 mt-12 border-t pt-8"
-    >
-      <h2
+    <section aria-labelledby="leaderboard-optin-heading">
+      <h3
         id="leaderboard-optin-heading"
-        className="display text-forest text-2xl"
+        className="text-forest text-base font-semibold"
       >
         Community leaderboard
-      </h2>
+      </h3>
       <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
         Off by default. Turn it on to appear on the{" "}
         <a

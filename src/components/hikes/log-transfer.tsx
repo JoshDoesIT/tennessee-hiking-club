@@ -57,13 +57,10 @@ export function LogTransfer({ trails }: { trails: Trail[] }) {
   }
 
   return (
-    <section
-      aria-labelledby="data-heading"
-      className="border-forest/10 mt-12 border-t pt-8"
-    >
-      <h2 id="data-heading" className="display text-forest text-2xl">
+    <section aria-labelledby="data-heading">
+      <h3 id="data-heading" className="text-forest text-base font-semibold">
         Your data
-      </h2>
+      </h3>
       <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
         Your hikes are kept on this device. Back them up or move them to another
         device. Importing adds to what you already have.

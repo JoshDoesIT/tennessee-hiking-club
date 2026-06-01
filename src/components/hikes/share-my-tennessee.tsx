@@ -41,16 +41,13 @@ export function ShareMyTennessee({ origin }: { origin: string }) {
   }
 
   return (
-    <section
-      aria-labelledby="share-my-tennessee-heading"
-      className="border-forest/10 bg-cream-50 mt-8 rounded-2xl border p-5"
-    >
-      <h2
+    <section aria-labelledby="share-my-tennessee-heading">
+      <h3
         id="share-my-tennessee-heading"
-        className="text-forest font-semibold"
+        className="text-forest text-base font-semibold"
       >
         Share your Tennessee
-      </h2>
+      </h3>
       <p className="text-ink/70 mt-1 text-sm leading-relaxed">
         Generate a public link to your map with this trail list. Anyone with
         the link can see it; nothing is shared until you copy and send it.
