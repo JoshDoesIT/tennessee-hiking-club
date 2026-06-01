@@ -61,13 +61,17 @@ Done (this is the foundation):
 
 - Capacitor installed and configured to load the hosted app.
 - npm scripts and this guide.
+- **Offline service worker** (`public/sw.js`, registered by `PwaRegister`): pages,
+  build assets, and map tiles are cached as they are first fetched, so the app
+  works on the trail after the first online open. API requests are never cached.
+  A precached `/offline` page is shown for routes you have not opened yet. The
+  same service worker makes the website itself offline-capable.
 
 Next, within the mobile build:
 
-- **Offline service worker** so the shell, assets, and map tiles are cached and
-  the app works on the trail with no signal.
-- **Background GPS recording** (#216), **offline maps** (#217), **push** (#218),
-  and **store submission** (#219).
+- **Background GPS recording** (#216), **offline maps** (#217, the
+  "download this area" UX on top of the tile cache), **push** (#218), and
+  **store submission** (#219).
 
 The native projects will be committed once we add native customizations (location
 permission strings for background recording, icons, and splash screens).
