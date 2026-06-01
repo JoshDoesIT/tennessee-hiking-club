@@ -63,32 +63,36 @@ background GPS, offline storage, and push through plugins.
 
 ## Architecture
 
-### Bundled build, not a remote URL
+### Service-worker cached shell (not a static export)
 
-A backcountry app must work with no signal, so the Capacitor app **cannot** simply
-load the hosted site in a WebView (no signal would mean a blank app). The app
-shell is **bundled into the app** (a static/client build embedded as the Capacitor
-`webDir`) and talks to the hosted backend over the network only when online.
+The Capacitor app loads the hosted site (`server.url` in `capacitor.config.ts`)
+and a service worker caches the shell, assets, and map tiles, so the app keeps
+working offline **after the first online open**. Because the WebView is served
+from the hosted origin, relative API calls (`/api/...`) resolve against the
+backend automatically. This reuses the entire web app and backend with no static
+export and no per-target build.
 
 This fits the existing architecture well:
 
-- **Works offline (no server needed):** browsing trails (content is Markdown built
-  to static pages), the maps (client-rendered) once tiles are cached, and logging
-  and recording hikes (the hike log is local-first, stored on the device).
+- **Works offline once cached:** browsing trails (content is Markdown built to
+  static pages), the maps (client-rendered) once tiles are cached, and logging and
+  recording hikes (the hike log is local-first, stored on the device).
 - **Needs the network (hosted backend):** sign-in, hike sync, the leaderboard,
   friends, contributions, and admin. These already gate on a client-side
   `/api/auth/session` check or other fetches, so they degrade gracefully when
   offline and reconcile when back online.
 
-### The refactor this requires
+### Why not a fully bundled static export
 
-The app is Next.js App Router, so a few server-rendered pages use `auth()` at
-request time (for example `/hikes`). For the bundled mobile target these render
-statically and resolve session on the client, which the codebase already does in
-many components (`SyncOnSignIn`, `FriendsManager`, the contribution forms). A
-mobile build target produces the static/client bundle and points API calls at the
-hosted backend via a configured base URL. This refactor is the main cost of the
-foundation phase and is bounded.
+A static export (`output: export`) bundled into the binary would also work offline
+on a truly cold, never-been-online launch. We chose not to do that now: the app
+has 21 API route handlers, two dynamic OpenGraph image routes, and a few
+server-rendered pages that use `auth()`, none of which a static export supports.
+Bundling would mean excluding those from a separate mobile build (or a second
+export-only app shell) and a custom build pipeline. The service-worker approach
+avoids that refactor entirely; a member opens the app once on a connection before
+heading to the trailhead, which the cache then covers. If a never-online cold
+launch becomes a real requirement, the static export can be revisited.
 
 ### Native plugins
 
@@ -113,8 +117,8 @@ foundation phase and is bounded.
 Each phase is a tracked issue. The foundation comes first; background GPS, offline
 maps, and push build on it; store release is last.
 
-- **Foundation (#215).** Capacitor iOS/Android project; bundled offline app shell;
-  the static-export refactor; API base URL to the hosted backend.
+- **Foundation (#215).** Capacitor iOS/Android project that loads the hosted app,
+  plus an offline service worker that caches the shell, assets, and tiles.
 - **Background GPS recording (#216).** Native background-geolocation plugin feeding
   the existing recorded-track storage; records with the screen off; permission
   handling.
@@ -136,10 +140,15 @@ required to ship publicly.
 
 ## Risks and mitigations
 
-- **Static-export refactor scope.** Server-rendered pages must become client/
-  static for the bundle. Mitigation: the app is already largely local-first and
-  client-session-driven; scope and land this in the foundation phase before
-  building features on top.
+- **Service-worker correctness.** A misconfigured cache serves stale assets or
+  breaks updates. Mitigation: precache the build output keyed by build hash,
+  runtime-cache tiles and pages with sensible strategies, and verify update and
+  offline behavior before relying on it. Affects the web app too, since the same
+  service worker makes the site offline-capable.
+- **Offline guarantee is "after first open."** A never-been-online cold launch
+  shows the fallback page, not the app. Mitigation: acceptable for the use case
+  (open once before the trailhead); revisit a bundled static export only if this
+  proves to be a real need.
 - **Background-geolocation reliability.** The free community plugin can be flaky.
   Mitigation: budget for a paid plugin (e.g. TransistorSoft) if field testing
   shows drops; this is the one feature worth paying for.
@@ -158,7 +167,8 @@ required to ship publicly.
 The spec is satisfied when the phased issues ship. Per-phase criteria live on each
 issue; the headline checks are:
 
-- [ ] The app runs on iOS and Android from a bundle and loads offline (#215).
+- [ ] The app runs on iOS and Android and works offline after the first open via
+      a cached shell (#215).
 - [ ] A hike records with the screen off and saves to My Hikes like an uploaded
       GPX (#216).
 - [ ] Maps and trails are usable offline after downloading a region (#217).
