@@ -46,7 +46,7 @@ summary: A scenic climb past Arch Rock to Alum Cave Bluffs.`;
 describe("loadTrailsFrom", () => {
   let dir: string;
   beforeAll(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "thc-trails-"));
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "tnhc-trails-"));
     writeTrail(dir, "virgin-falls.md", VIRGIN);
     writeTrail(dir, "alum-cave.md", ALUM);
   });
@@ -65,7 +65,7 @@ describe("loadTrailsFrom", () => {
   });
 
   it("throws a descriptive error naming the file and field for invalid data", () => {
-    const bad = fs.mkdtempSync(path.join(os.tmpdir(), "thc-bad-"));
+    const bad = fs.mkdtempSync(path.join(os.tmpdir(), "tnhc-bad-"));
     writeTrail(
       bad,
       "broken.md",
@@ -76,7 +76,7 @@ describe("loadTrailsFrom", () => {
   });
 
   it("throws on duplicate slugs", () => {
-    const dup = fs.mkdtempSync(path.join(os.tmpdir(), "thc-dup-"));
+    const dup = fs.mkdtempSync(path.join(os.tmpdir(), "tnhc-dup-"));
     writeTrail(dup, "a.md", VIRGIN);
     writeTrail(dup, "b.md", VIRGIN);
     expect(() => loadTrailsFrom(dup)).toThrow(/[Dd]uplicate.*virgin-falls/);
@@ -87,7 +87,7 @@ describe("loadTrailsFrom", () => {
 describe("getTrailBySlug", () => {
   let dir: string;
   beforeAll(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "thc-slug-"));
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "tnhc-slug-"));
     writeTrail(dir, "virgin-falls.md", VIRGIN);
   });
   afterAll(() => fs.rmSync(dir, { recursive: true, force: true }));

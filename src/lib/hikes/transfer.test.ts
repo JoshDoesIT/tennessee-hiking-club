@@ -14,7 +14,7 @@ import type { Trail } from "@/lib/trails/schema";
 
 function resetPhotos(): Promise<void> {
   return new Promise((resolve) => {
-    const req = indexedDB.deleteDatabase("thc");
+    const req = indexedDB.deleteDatabase("tnhc");
     req.onsuccess = req.onerror = req.onblocked = () => resolve();
   });
 }

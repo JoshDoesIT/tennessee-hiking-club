@@ -9,9 +9,9 @@
  */
 
 const VERSION = "v1";
-const PAGES = `thc-pages-${VERSION}`;
-const ASSETS = `thc-assets-${VERSION}`;
-const TILES = `thc-tiles-${VERSION}`;
+const PAGES = `tnhc-pages-${VERSION}`;
+const ASSETS = `tnhc-assets-${VERSION}`;
+const TILES = `tnhc-tiles-${VERSION}`;
 const KEEP = new Set([PAGES, ASSETS, TILES]);
 const OFFLINE_URL = "/offline";
 

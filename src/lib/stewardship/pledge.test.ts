@@ -30,7 +30,7 @@ describe("steward pledge", () => {
 
   it("returns null for corrupt storage", () => {
     const s = memStorage();
-    s.setItem("thc:steward-pledge", "{bad");
+    s.setItem("tnhc:steward-pledge", "{bad");
     expect(getPledge(s)).toBeNull();
   });
 });

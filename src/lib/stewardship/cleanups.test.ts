@@ -32,7 +32,7 @@ describe("cleanup log", () => {
 
   it("returns an empty list for corrupt storage", () => {
     const s = memStorage();
-    s.setItem("thc:cleanups", "{bad");
+    s.setItem("tnhc:cleanups", "{bad");
     expect(getCleanups(s)).toEqual([]);
   });
 
