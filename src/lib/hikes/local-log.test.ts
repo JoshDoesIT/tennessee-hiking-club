@@ -71,7 +71,7 @@ describe("local hike log", () => {
 
   it("returns an empty log for corrupt storage", () => {
     const s = memStorage();
-    s.setItem("thc:hike-log", "{not json");
+    s.setItem("tnhc:hike-log", "{not json");
     expect(readLog(s)).toEqual([]);
   });
 

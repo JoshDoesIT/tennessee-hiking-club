@@ -8,7 +8,7 @@ import { blobToDataUrl } from "./image";
  * anywhere.
  */
 
-const DB_NAME = "thc";
+const DB_NAME = "tnhc";
 const STORE = "hike-photos";
 
 function available(): boolean {

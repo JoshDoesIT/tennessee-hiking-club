@@ -2,7 +2,7 @@
  * A local log of trail cleanups (pack-it-out / litter pickups), stored on the
  * device like the hike log. Feeds the stewardship count surfaced on My hikes.
  */
-const KEY = "thc:cleanups";
+const KEY = "tnhc:cleanups";
 
 export type Cleanup = { loggedOn: string };
 const EMPTY: Cleanup[] = [];
