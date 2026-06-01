@@ -36,13 +36,10 @@ export function PasskeyManager() {
   const has = (count ?? 0) > 0;
 
   return (
-    <section
-      aria-labelledby="passkeys-heading"
-      className="border-forest/10 mt-12 border-t pt-8"
-    >
-      <h2 id="passkeys-heading" className="display text-forest text-2xl">
+    <section aria-labelledby="passkeys-heading">
+      <h3 id="passkeys-heading" className="text-forest text-base font-semibold">
         Passkeys
-      </h2>
+      </h3>
       <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
         {has
           ? `You have ${count} passkey${count === 1 ? "" : "s"} set up. Sign in with your fingerprint, face, or device PIN, no password or email needed.`

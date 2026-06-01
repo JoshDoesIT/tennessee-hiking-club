@@ -130,13 +130,10 @@ export function FriendsManager() {
   const name = (p: Person, fallback: string) => p.displayName || fallback;
 
   return (
-    <section
-      aria-labelledby="friends-heading"
-      className="border-forest/10 mt-12 border-t pt-8"
-    >
-      <h2 id="friends-heading" className="display text-forest text-2xl">
+    <section aria-labelledby="friends-heading">
+      <h3 id="friends-heading" className="text-forest text-base font-semibold">
         Friends
-      </h2>
+      </h3>
       <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
         Compare boards with people you hike with. Share your code, add a friend
         by theirs, and once you both accept you appear on each other&rsquo;s{" "}
@@ -210,9 +207,9 @@ export function FriendsManager() {
 
       {data.incoming.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-olive text-xs font-semibold tracking-wider uppercase">
+          <h4 className="text-olive text-xs font-semibold tracking-wider uppercase">
             Requests
-          </h3>
+          </h4>
           <ul className="mt-2 space-y-2">
             {data.incoming.map((r) => (
               <li key={r.id} className="flex items-center gap-3 text-sm">
@@ -242,9 +239,9 @@ export function FriendsManager() {
       )}
 
       <div className="mt-6">
-        <h3 className="text-olive text-xs font-semibold tracking-wider uppercase">
+        <h4 className="text-olive text-xs font-semibold tracking-wider uppercase">
           Your friends
-        </h3>
+        </h4>
         {data.friends.length === 0 ? (
           <p className="text-ink/70 mt-2 text-sm">No friends yet.</p>
         ) : (
