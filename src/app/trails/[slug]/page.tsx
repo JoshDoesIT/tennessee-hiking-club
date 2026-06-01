@@ -23,6 +23,7 @@ import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { MarkHiked } from "@/components/hikes/mark-hiked";
+import { RecordHike } from "@/components/hikes/record-hike";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -73,6 +74,7 @@ export default async function TrailPage({ params }: Params) {
 
       <div className="mt-6">
         <MarkHiked slug={trail.slug} />
+        <RecordHike slug={trail.slug} trailName={trail.name} />
       </div>
 
       <TrailGallery photos={trail.photos} />

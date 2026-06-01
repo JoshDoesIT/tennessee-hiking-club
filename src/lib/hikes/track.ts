@@ -1,4 +1,8 @@
-import { parseGpxTrack, downsampleRoute } from "@/lib/trails/route-import";
+import {
+  parseGpxTrack,
+  downsampleRoute,
+  metersToFeet,
+} from "@/lib/trails/route-import";
 import { buildElevationProfile, type RoutePoint } from "@/lib/trails/elevation";
 
 /**
@@ -34,6 +38,21 @@ function trackDurationMin(xml: string): number | undefined {
   if (times.length < 2) return undefined;
   const minutes = Math.round((times[times.length - 1] - times[0]) / 60000);
   return minutes > 0 ? minutes : undefined;
+}
+
+/** Map a Geolocation reading to a route point for live recording (#201).
+ *  Altitude is often missing in the browser, so it falls back to zero feet. */
+export function positionToPoint(coords: {
+  latitude: number;
+  longitude: number;
+  altitude?: number | null;
+}): RoutePoint {
+  return {
+    lat: coords.latitude,
+    lng: coords.longitude,
+    elevationFt:
+      coords.altitude != null ? Math.round(metersToFeet(coords.altitude)) : 0,
+  };
 }
 
 export function gpxTrackSummary(
