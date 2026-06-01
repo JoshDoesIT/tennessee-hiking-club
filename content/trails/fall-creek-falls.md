@@ -229,6 +229,11 @@ route:
   - lat: 35.6657987
     lng: -85.3560247
     elevationFt: 1467
+conditionReports:
+  - date: "2026-05-31"
+    status: "Muddy"
+    note: "Very muddy and slippery from all the rain. Waterfall is flowing more than normal."
+    by: "cvsper404"
 ---
 
 The signature hike of Tennessee's flagship state park. From the overlook, a steep, rocky trail drops to the base of Fall Creek Falls, where the water free-falls 256 feet into a cool, misty plunge pool. It's short but the climb back out is a workout, and the rocks stay slick; take your time. Pair it with the nearby Cane Creek and Piney Falls overlooks for a full day.
