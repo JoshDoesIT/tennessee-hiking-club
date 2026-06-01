@@ -22,6 +22,13 @@
     "discover:waypoints": "tsx scripts/discover-waypoints.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "cap:add:ios": "cap add ios",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync",
+    "cap:ios": "cap run ios",
+    "cap:android": "cap run android",
+    "cap:open:ios": "cap open ios",
+    "cap:open:android": "cap open android",
     "prebuild": "tsx scripts/validate-content.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -32,6 +39,9 @@
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
+    "@capacitor/android": "^8.3.4",
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/ios": "^8.3.4",
     "@neondatabase/serverless": "^1.1.0",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
@@ -54,6 +64,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@capacitor/cli": "^8.3.4",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
