@@ -1,18 +1,19 @@
-# 0006: Native mobile apps (research spike)
+# 0006: Native mobile app (Capacitor)
 
-- **Status:** Draft
-- **Milestone:** Research spike (no build milestone yet)
-- **Issue:** #202
+- **Status:** Approved
+- **Milestone:** Mobile app
+- **Issues:** #202 (spike), #215, #216, #217, #218, #219
 
 ## Problem
 
 Tennessee Hiking Club is a Next.js web app. Three things the browser does poorly
-on the trail keep coming up, and all three matter most exactly where members
-actually hike:
+on the trail are the reason to go mobile, and all three matter most exactly where
+members actually hike:
 
 - **Reliable background GPS recording.** The in-browser recorder (#211) uses
   `watchPosition`, which iOS and Android throttle or stop when the screen sleeps
   or the tab backgrounds. A long hike recorded in a mobile browser drops out.
+  This is the main driver.
 - **Offline maps.** Cell coverage is poor or absent in the gorges and backcountry
   (the same signal loss that keeps Cummins Falls off public GPS traces). Without
   cached tiles there is no map where it is needed most.
@@ -20,175 +21,154 @@ actually hike:
   reach members proactively instead of only when they open the site.
 
 Plus a generally smoother on-trail experience: a home-screen icon, full screen,
-and a faster map. This is a **go / no-go research spike**: decide whether and how
-to go mobile, not to build it.
+and a faster map.
 
-## Decision summary
+## Decision
 
-**GO on a PWA now. Conditional GO on a Capacitor shell later**, gated on evidence
-that background GPS recording is a real member need. **Defer React Native and
-fully-native.** Rationale below.
+**Build a Capacitor app now.** Wrap the existing React UI in a native iOS/Android
+shell and add native plugins for background geolocation, offline maps, and push.
+This reuses the entire web UI and the pure TypeScript core, so it ships in weeks
+rather than the months a React Native rewrite would take, and it directly solves
+the background-GPS problem that motivates the project.
 
-## What a mobile app has to improve
+(An earlier draft of this spec recommended a PWA-first phase. That was wrong for
+this product: a PWA cannot do background GPS on iOS, which is the whole point, so
+a PWA phase would be a detour. The assessment below still stands; the conclusion
+is to go straight to Capacitor.)
 
-In priority order, since the options trade off against exactly these:
+## Why Capacitor (not PWA, React Native, or fully native)
 
-1. Background GPS recording that survives a screen-off hike (the #201 gap).
-2. Offline map tiles with no signal.
-3. Push for alerts, closures, and conditions.
-4. Smoother on-trail UX (install, full screen, fast map).
+Legend: good / possible with effort / poor.
 
-## Options
+| Criterion                    | PWA                         | Capacitor                       | Expo / RN                   | Fully native         |
+| ---------------------------- | --------------------------- | ------------------------------- | --------------------------- | -------------------- |
+| Background GPS recording     | no (iOS web has none)       | yes (native plugin, screen-off) | yes (best)                  | yes (best)           |
+| Offline map tiles            | yes (service-worker cache)  | yes (cache + native store)      | yes (MapLibre offline)      | yes                  |
+| Push notifications           | partial (iOS needs install) | yes (APNs / FCM)                | yes                         | yes                  |
+| Code reuse with the web app  | full (same app)             | full (whole web UI reused)      | partial (pure TS core only) | none (algorithms)    |
+| Store / maintenance overhead | none (no store)             | two listings, one UI codebase   | two listings + a second UI  | two native codebases |
+| Cost                         | ~$0                         | store fees + build pipeline     | high (parallel UI)          | highest              |
 
-Cheapest to most involved, matching the issue:
+- **PWA** cannot record background GPS on iOS. It is out as a primary plan; any
+  cheap PWA niceties (installable manifest, a service-worker tile cache) can be
+  folded into the Capacitor build rather than shipped as a separate phase.
+- **React Native** has the best native feel and background-location story, but it
+  reuses only the pure TypeScript core; the entire React DOM + Tailwind UI would
+  be rebuilt and then kept at parity forever. Not justified for a maps-and-
+  recording utility built by a small team.
+- **Fully native** is maximum work, minimum reuse. Overkill.
 
-1. **PWA**: installable web app, service worker, offline tile cache, Web Push.
-2. **Capacitor**: wrap the existing hosted Next.js/React UI in a native shell and
-   add native plugins for background geolocation and push.
-3. **Expo / React Native**: shared TypeScript core, native UI rebuilt in RN.
-4. **Fully native** (Swift / Kotlin): most work, least reuse.
+Capacitor wins because it reuses everything we have built and still gets us native
+background GPS, offline storage, and push through plugins.
 
-## Assessment
+## Architecture
 
-Legend: ✅ good · ⚠️ possible with effort / caveats · ❌ poor.
+### Bundled build, not a remote URL
 
-| Criterion                    | PWA                                                         | Capacitor                                    | Expo / RN                            | Fully native            |
-| ---------------------------- | ----------------------------------------------------------- | -------------------------------------------- | ------------------------------------ | ----------------------- |
-| Background GPS recording     | ❌ iOS web has no background geolocation; Android throttles | ✅ native plugin keeps recording screen-off  | ✅✅ best (background tasks)         | ✅✅ best               |
-| Offline map tiles            | ✅ service-worker tile cache                                | ⚠️ WebView map needs native/SW caching       | ✅ MapLibre offline regions          | ✅                      |
-| Push notifications           | ⚠️ Android yes; iOS only for an installed PWA (16.4+)       | ✅ APNs / FCM                                | ✅ APNs / FCM                        | ✅                      |
-| Code reuse with the web app  | ✅✅ 100% (same app + manifest + SW)                        | ✅ whole web UI reused in a WebView          | ⚠️ pure TS core only; UI rebuilt     | ❌ algorithms only      |
-| Store / maintenance overhead | ✅ none (no store)                                          | ⚠️ two store listings, review, native builds | ⚠️ two store listings + a second app | ❌ two native codebases |
-| Cost                         | ✅ ~$0                                                      | ⚠️ $99/yr Apple + $25 Google + pipeline      | ❌ high (parallel UI)                | ❌ highest              |
+A backcountry app must work with no signal, so the Capacitor app **cannot** simply
+load the hosted site in a WebView (no signal would mean a blank app). The app
+shell is **bundled into the app** (a static/client build embedded as the Capacitor
+`webDir`) and talks to the hosted backend over the network only when online.
 
-### PWA
+This fits the existing architecture well:
 
-The same web app plus a `manifest.webmanifest`, a service worker, and icons.
-Offline tiles are practical: a service worker can runtime-cache MapLibre tiles
-(stale-while-revalidate) and a "download this area" action can pre-fetch a
-bounding box into the Cache Storage. Web Push works on Android and, since iOS
-16.4, on **home-screen-installed** PWAs. The hard limit is background GPS: iOS
-gives web apps no background location at all, and Android browsers suspend
-backgrounded tabs, so a screen-off hike still drops. PWA fixes 2, 3, and 4 of the
-four drivers at essentially zero cost and full reuse, and leaves driver 1 open.
+- **Works offline (no server needed):** browsing trails (content is Markdown built
+  to static pages), the maps (client-rendered) once tiles are cached, and logging
+  and recording hikes (the hike log is local-first, stored on the device).
+- **Needs the network (hosted backend):** sign-in, hike sync, the leaderboard,
+  friends, contributions, and admin. These already gate on a client-side
+  `/api/auth/session` check or other fetches, so they degrade gracefully when
+  offline and reconcile when back online.
 
-### Capacitor
+### The refactor this requires
 
-Capacitor wraps a web app in a native WebView and exposes native plugins. Because
-this app is Next.js App Router with server components and API routes (auth, hike
-sync, OG images), a static `output: export` bundle is **not** viable; the
-Capacitor app would load the **hosted** site (`server.url`) and layer native
-plugins on top. That keeps 100% of the existing UI and server while adding a
-native **background-geolocation** plugin (e.g. `@capacitor-community/
-background-geolocation`, or a commercial option such as TransistorSoft if the
-free plugin proves unreliable) and native **push**. It is the surgical fix for
-the one thing a PWA cannot do, without rebuilding any UI. The cost is two store
-listings, app review, and a native build/release pipeline.
+The app is Next.js App Router, so a few server-rendered pages use `auth()` at
+request time (for example `/hikes`). For the bundled mobile target these render
+statically and resolve session on the client, which the codebase already does in
+many components (`SyncOnSignIn`, `FriendsManager`, the contribution forms). A
+mobile build target produces the static/client bundle and points API calls at the
+hosted backend via a configured base URL. This refactor is the main cost of the
+foundation phase and is bounded.
 
-### Expo / React Native
+### Native plugins
 
-Best native feel and the strongest background-location story (`expo-location` +
-`TaskManager`). But it reuses only the **pure TypeScript core** (see "Code reuse"
-below); the entire React DOM + Tailwind UI must be rebuilt in RN primitives,
-creating a second front end to keep at parity. Not justified by the marginal
-gain over a Capacitor shell for a volunteer hiking-club app.
+- **Background geolocation** for screen-off recording. Start with the
+  `@capacitor-community/background-geolocation` plugin; budget for a paid plugin
+  such as TransistorSoft if the free one is unreliable.
+- **Push notifications** (Capacitor Push Notifications over APNs / FCM).
+- **Offline tiles** via a service-worker / Cache Storage tile cache inside the
+  WebView plus a native store for downloaded regions.
+- Capacitor core plus App, Splash Screen, and Status Bar for shell polish.
 
-### Fully native
+### Reuse map
 
-Maximum platform integration, minimum reuse (only the algorithms port), and two
-native codebases. Overkill here.
+- **Reused as-is** (the whole UI): all of `src/components` and `src/app`.
+- **Reused as-is** (the logic): the pure core in `src/lib/trails/*` and
+  `src/lib/hikes/*` (elevation, GPX, downsampling, graph routing, stats,
+  challenges) and the local-first hike log. The native recorder feeds the same
+  `RecordedTrack` storage the web recorder uses (#210/#211).
 
-## Recommendation: a phased path
+## Build plan
 
-- **Phase 0: PWA (GO now).** Manifest + icons + service worker, offline tile
-  caching for a chosen region, installability, and an offline fallback. This
-  delivers offline maps, install, and full screen immediately at ~$0, reusing
-  everything. Web Push follows as Phase 0b (it needs VAPID keys and a
-  subscription store, so it is a small backend addition rather than pure
-  front-end).
-- **Phase 1: Capacitor shell (CONDITIONAL).** Only if background GPS recording
-  proves to be a real member need (see the trigger under Go / no-go). Wrap the
-  hosted app, add a native background-geolocation plugin that records with the
-  screen off and hands the track to the same recorded-track storage the web app
-  already uses (#210/#211), plus native push. Reuses the whole web UI.
-- **Deferred: React Native / fully native.** Revisit only if the club decides a
-  flagship native app is worth maintaining a parallel UI for. Not now.
+Each phase is a tracked issue. The foundation comes first; background GPS, offline
+maps, and push build on it; store release is last.
 
-## MVP scope (Phase 0 PWA)
+- **Foundation (#215).** Capacitor iOS/Android project; bundled offline app shell;
+  the static-export refactor; API base URL to the hosted backend.
+- **Background GPS recording (#216).** Native background-geolocation plugin feeding
+  the existing recorded-track storage; records with the screen off; permission
+  handling.
+- **Offline maps (#217).** Tile cache plus "download this area"; offline trail and
+  map browsing.
+- **Push notifications (#218).** APNs / FCM registration, a subscription store, an
+  opt-in, and a send path for trail alerts.
+- **App store submission and release (#219).** Icons/splash, store listings,
+  developer accounts, location and privacy disclosures, review submission, and a
+  release pipeline.
 
-In:
+## MVP
 
-- `manifest.webmanifest`: name, icons (maskable), `theme_color`, `background_color`,
-  `display: standalone`, `start_url: /`.
-- Service worker: precache the app shell; runtime-cache map tiles
-  (stale-while-revalidate); an "download this area for offline" control that
-  pre-fetches a bounding box of tiles into Cache Storage.
-- Install affordance and an offline fallback page.
+The minimum lovable mobile app is **Foundation (#215) + Background GPS (#216)**:
+an installed app that records a hike reliably with the screen off and saves it to
+My Hikes. **Offline maps (#217)** is strongly recommended before a public launch
+for a backcountry app. **Push (#218)** can follow. **Store release (#219)** is
+required to ship publicly.
 
-Out (Phase 0):
+## Risks and mitigations
 
-- Background GPS recording (still the in-browser recorder from #211, with its
-  screen-on caveat surfaced in the UI). Closing this gap is the trigger for
-  Phase 1.
-- Native push on iOS without install (a platform limit, not a scope choice).
-
-## Code reuse map
-
-This is the core argument for PWA then Capacitor over React Native:
-
-- **Portable to every path** (pure TypeScript, no framework or DOM):
-  `src/lib/trails/{elevation,route-import,route-network,route-geometry,dem,schema}.ts`,
-  `src/lib/hikes/{track,stats,sync,challenges}.ts` and the storage-abstracted
-  `local-log.ts`, `src/lib/maps.ts`. These are the algorithms (distance,
-  elevation, downsampling, graph routing, GPX, challenges) and they carry to a
-  PWA, a Capacitor app, **or** a future RN app unchanged.
-- **Reused as-is by PWA and Capacitor** (React DOM + Tailwind): all of
-  `src/components` and `src/app`.
-- **Not reusable by React Native:** the DOM/Tailwind UI; it would be rebuilt.
-
-## Cost & overhead
-
-- **PWA:** ~$0, no store, shipped and maintained as part of the web app.
-- **Capacitor:** Apple Developer $99/yr + Google Play $25 once; app review; a
-  native build/release pipeline (Xcode / Android Studio or a managed build); two
-  store listings to maintain. The web app stays the single source of UI.
-- **Expo / RN:** the same store fees plus a second front-end codebase to build
-  and keep at parity. High ongoing cost.
-- **Fully native:** the same fees plus two native codebases. Highest.
-
-## Go / no-go
-
-- **PWA: GO.** Low cost, high value, full reuse, no store gate. Proceed to
-  Phase 0 implementation issues on approval of this spec.
-- **Capacitor: CONDITIONAL GO.** Trigger: ship the PWA, then measure whether
-  members attempt long recordings and lose them (or ask for screen-off
-  recording). If the evidence is there, do Phase 1. If not, the PWA is enough.
-- **React Native / fully native: NO (for now).** Reconsider only if a flagship
-  native app becomes a club priority.
+- **Static-export refactor scope.** Server-rendered pages must become client/
+  static for the bundle. Mitigation: the app is already largely local-first and
+  client-session-driven; scope and land this in the foundation phase before
+  building features on top.
+- **Background-geolocation reliability.** The free community plugin can be flaky.
+  Mitigation: budget for a paid plugin (e.g. TransistorSoft) if field testing
+  shows drops; this is the one feature worth paying for.
+- **iOS background location and App Store review.** iOS requires clear usage
+  strings and justification for "Always" location, and Apple scrutinizes thin
+  WebView wrappers (guideline 4.2). Mitigation: the app provides real native
+  function (background recording, offline maps, push), and the location prompt is
+  tied to an explicit user action (start recording) with a plain explanation.
+- **Privacy disclosures.** Location and account data require App Privacy / Data
+  safety labels. Handle in the release phase (#219).
+- **Cost.** Apple Developer $99/yr, Google Play $25 once, plus a possible paid
+  geolocation plugin. Modest and expected for a real app.
 
 ## Acceptance criteria
 
-This is a research spike, so its artifact is this document and the decision in
-it; there is no code and therefore no test plan.
+The spec is satisfied when the phased issues ship. Per-phase criteria live on each
+issue; the headline checks are:
 
-- [x] All four approaches (PWA, Capacitor, Expo/RN, fully native) assessed
-      against background GPS, offline tiles, push, code reuse, store/maintenance
-      overhead, and cost (see the matrix and per-option notes).
-- [x] A recommendation with a phased path is documented.
-- [x] An MVP scope for the recommended first step (Phase 0 PWA) is defined.
-- [x] A go / no-go decision is recorded.
+- [ ] The app runs on iOS and Android from a bundle and loads offline (#215).
+- [ ] A hike records with the screen off and saves to My Hikes like an uploaded
+      GPX (#216).
+- [ ] Maps and trails are usable offline after downloading a region (#217).
+- [ ] Trail alerts deliver as push notifications, with opt-in/out (#218).
+- [ ] Both apps are submitted to their stores with complete privacy disclosures
+      (#219).
 
 ## Non-goals
 
-- Building any of the apps. Selecting and integrating a specific
-  background-geolocation plugin or vendor. Setting up Apple / Google developer
-  accounts. These belong to Phase 0/1 implementation issues opened only if this
-  spec is approved.
-
-## On approval
-
-Accepting this spec means opening implementation issues for **Phase 0 (PWA)**:
-manifest + service worker + offline tile cache, then Web Push (0b). Phase 1
-(Capacitor) issues are opened only if its trigger condition is met. No
-implementation issues are created by this spike itself, since its job is the
-go / no-go decision.
+- A React Native or fully-native rewrite. The web app stays the single source of
+  the UI; the mobile app wraps it.
+- Replacing or forking the web experience. The site and the app share one
+  codebase and one backend.
