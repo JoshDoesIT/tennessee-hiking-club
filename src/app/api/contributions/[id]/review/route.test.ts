@@ -28,6 +28,7 @@ import {
   conditionSubmissions,
   photoSubmissions,
   waypointSubmissions,
+  routeSubmissions,
 } from "@/lib/db/schema";
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
@@ -113,6 +114,15 @@ describe("POST /api/contributions/[id]/review", () => {
     expect(mocks.update).toHaveBeenCalledWith(waypointSubmissions);
     expect((mocks.set as Mock).mock.calls[0][0].reviewStatus).toBe("approved");
     // Waypoints are curated by hand; no content PR is opened on approval.
+    expect(mocks.publishOnApproval).not.toHaveBeenCalled();
+  });
+
+  it("reviews a route contribution against its table without auto-publishing", async () => {
+    const res = await POST(reviewReq("approve", "route"), ctx("r1"));
+    expect(res.status).toBe(200);
+    expect(mocks.update).toHaveBeenCalledWith(routeSubmissions);
+    expect((mocks.set as Mock).mock.calls[0][0].reviewStatus).toBe("approved");
+    // Routes are curated by hand; no content PR is opened on approval.
     expect(mocks.publishOnApproval).not.toHaveBeenCalled();
   });
 

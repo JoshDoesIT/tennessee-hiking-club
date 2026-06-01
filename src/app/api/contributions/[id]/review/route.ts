@@ -8,6 +8,7 @@ import {
   photoSubmissions,
   trailSubmissions,
   waypointSubmissions,
+  routeSubmissions,
 } from "@/lib/db/schema";
 import { publishOnApproval } from "@/lib/contributions/publish";
 
@@ -44,7 +45,8 @@ export async function POST(req: Request, { params }: Context) {
     type !== "trail" &&
     type !== "condition" &&
     type !== "photo" &&
-    type !== "waypoint"
+    type !== "waypoint" &&
+    type !== "route"
   ) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
@@ -69,6 +71,11 @@ export async function POST(req: Request, { params }: Context) {
       .update(waypointSubmissions)
       .set({ reviewStatus: status, reviewedAt })
       .where(eq(waypointSubmissions.id, id));
+  } else if (type === "route") {
+    await db
+      .update(routeSubmissions)
+      .set({ reviewStatus: status, reviewedAt })
+      .where(eq(routeSubmissions.id, id));
   } else {
     await db
       .update(trailSubmissions)
@@ -80,10 +87,11 @@ export async function POST(req: Request, { params }: Context) {
   // condition entry, or a photo plus its photos[] entry. The decision and
   // recognition are already recorded above, so a GitHub failure (or no token)
   // just falls back to the manual content in the admin UI.
-  // Waypoint suggestions are never auto-published (#191): a maintainer curates
-  // the reviewed point into the trail's `waypoints[]` by hand.
+  // Waypoint suggestions (#191) and route contributions (#201) are never
+  // auto-published: a maintainer curates the reviewed point or track into the
+  // trail's `waypoints[]` / `route` by hand.
   let prUrl: string | null = null;
-  if (action === "approve" && type !== "waypoint") {
+  if (action === "approve" && type !== "waypoint" && type !== "route") {
     try {
       const published = await publishOnApproval({ type, id });
       prUrl = published?.url ?? null;
