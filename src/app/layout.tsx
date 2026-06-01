@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { PwaRegister } from "@/components/pwa-register";
 import { SiteFooter } from "@/components/site-footer";
 import { SkipLink } from "@/components/skip-link";
 import { SITE_URL } from "@/lib/site";
@@ -95,6 +96,7 @@ export default function RootLayout({
       </head>
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
+        <PwaRegister />
         <SiteHeader />
         <main
           id="main-content"
