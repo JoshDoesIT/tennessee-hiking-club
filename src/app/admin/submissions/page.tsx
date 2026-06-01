@@ -11,11 +11,14 @@ import {
   conditionSubmissions,
   photoSubmissions,
   waypointSubmissions,
+  routeSubmissions,
 } from "@/lib/db/schema";
 import { getAllTrails } from "@/lib/trails";
 import { generateTrailContent } from "@/lib/contributions/trail-content";
 import { generateConditionEntry } from "@/lib/contributions/condition";
 import { generateWaypointEntry } from "@/lib/contributions/waypoint";
+import { routeFrontmatterYaml } from "@/lib/trails/route-import";
+import type { RoutePoint } from "@/lib/trails/elevation";
 import type { WaypointType } from "@/lib/trails/schema";
 import {
   SubmissionReviewList,
@@ -33,6 +36,10 @@ import {
   WaypointReviewList,
   type PendingWaypoint,
 } from "@/components/admin/waypoint-review-list";
+import {
+  RouteReviewList,
+  type PendingRoute,
+} from "@/components/admin/route-review-list";
 
 // Gated, request-time only, never indexed.
 export const dynamic = "force-dynamic";
@@ -228,6 +235,46 @@ async function loadPendingWaypoints(): Promise<PendingWaypoint[]> {
   });
 }
 
+async function loadPendingRoutes(): Promise<PendingRoute[]> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(routeSubmissions)
+    .where(eq(routeSubmissions.reviewStatus, "pending"))
+    .orderBy(desc(routeSubmissions.createdAt));
+  if (rows.length === 0) return [];
+
+  const userIds = [...new Set(rows.map((r) => r.userId))];
+  const profileRows = await db
+    .select()
+    .from(profiles)
+    .where(inArray(profiles.userId, userIds));
+  const profileById = new Map(profileRows.map((p) => [p.userId, p]));
+  const nameBySlug = new Map(getAllTrails().map((t) => [t.slug, t.name]));
+
+  return rows.map((r) => {
+    const profile = profileById.get(r.userId);
+    let yaml = "";
+    try {
+      yaml = routeFrontmatterYaml(JSON.parse(r.route) as RoutePoint[]);
+    } catch {
+      yaml = "";
+    }
+    return {
+      id: r.id,
+      trailSlug: r.trailSlug,
+      trailName: nameBySlug.get(r.trailSlug) || r.trailSlug,
+      name: r.name,
+      pointCount: r.pointCount,
+      lengthMiles: r.lengthMiles,
+      gainFt: r.gainFt,
+      submittedBy: profile?.displayName || profile?.githubLogin || "A member",
+      submittedOn: r.createdAt.toISOString().slice(0, 10),
+      entry: { yaml },
+    };
+  });
+}
+
 export default async function AdminSubmissionsPage() {
   // No role system: the page only exists for configured maintainers, and is a
   // 404 for everyone else (it does not reveal that it exists).
@@ -236,13 +283,19 @@ export default async function AdminSubmissionsPage() {
   const userId = session?.user?.id;
   if (!userId || !(await isAdminUser(userId))) notFound();
 
-  const [pending, pendingConditions, pendingPhotos, pendingWaypoints] =
-    await Promise.all([
-      loadPending(),
-      loadPendingConditions(),
-      loadPendingPhotos(),
-      loadPendingWaypoints(),
-    ]);
+  const [
+    pending,
+    pendingConditions,
+    pendingPhotos,
+    pendingWaypoints,
+    pendingRoutes,
+  ] = await Promise.all([
+    loadPending(),
+    loadPendingConditions(),
+    loadPendingPhotos(),
+    loadPendingWaypoints(),
+    loadPendingRoutes(),
+  ]);
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
@@ -293,6 +346,16 @@ export default async function AdminSubmissionsPage() {
           Landmark suggestions
         </h2>
         <WaypointReviewList suggestions={pendingWaypoints} />
+      </section>
+
+      <section aria-labelledby="route-submissions-heading" className="mt-12">
+        <h2
+          id="route-submissions-heading"
+          className="display text-forest text-2xl"
+        >
+          Recorded routes
+        </h2>
+        <RouteReviewList contributions={pendingRoutes} />
       </section>
     </Container>
   );

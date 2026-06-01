@@ -202,6 +202,40 @@ export const waypointSubmissions = pgTable(
 );
 
 /**
+ * A recorded-hike track a member contributes as a trail's `route` (#201). The
+ * GPX they uploaded is parsed, downsampled, and stored here as JSON along with
+ * its length and gain so a maintainer can review it and, on approval, curate
+ * the points into the trail's `route` front-matter (never auto-published, like
+ * waypoint suggestions). The submitter earns recognition for an accepted track.
+ */
+export const routeSubmissions = pgTable(
+  "route_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id").notNull(),
+    trailSlug: text("trail_slug").notNull(),
+    /** Track name from the GPX, if the file carried one. */
+    name: text("name"),
+    /** Downsampled route as JSON: [{ lat, lng, elevationFt }]. */
+    route: text("route").notNull(),
+    /** Trackpoint count in the original upload, before downsampling. */
+    pointCount: integer("point_count").notNull(),
+    lengthMiles: doublePrecision("length_miles").notNull(),
+    gainFt: integer("gain_ft").notNull(),
+    /** pending | approved | rejected */
+    reviewStatus: text("review_status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("route_submissions_user_id_idx").on(table.userId),
+    index("route_submissions_review_status_idx").on(table.reviewStatus),
+  ],
+);
+
+/**
  * A friendship between two members (#147). Mutual by design: one row per
  * relationship, created by `requesterId` toward `addresseeId` as `pending`;
  * the addressee accepts (`accepted`) or declines (the row is deleted). An
