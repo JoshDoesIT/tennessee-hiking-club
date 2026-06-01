@@ -80,6 +80,10 @@ export const viewport: Viewport = {
   // The app defaults to light regardless of the OS setting, so the browser
   // chrome takes the brand forest rather than tracking `prefers-color-scheme`.
   themeColor: "#2a3623",
+  // Render edge-to-edge so the native shell (Capacitor) can use the full screen;
+  // `env(safe-area-inset-*)` then keeps content clear of the status bar, Dynamic
+  // Island, and home indicator (see the header and globals.css).
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
