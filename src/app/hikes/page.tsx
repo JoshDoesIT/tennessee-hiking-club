@@ -60,17 +60,14 @@ export default async function MyHikesPage() {
       {/* Friends & sharing: the social features, grouped under one heading. */}
       <FriendsAndSharing origin={SITE_URL} />
 
-      {/* Account & data: set-and-forget controls, collapsed by default. */}
-      <details className="group border-forest/10 mt-12 border-t pt-8">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-2 [&::-webkit-details-marker]:hidden">
-          <h2 className="display text-forest text-2xl">Account &amp; data</h2>
-          <span
-            aria-hidden="true"
-            className="text-olive text-sm transition-transform group-open:rotate-180"
-          >
-            ▾
-          </span>
-        </summary>
+      {/* Account & data: set-and-forget controls. */}
+      <section
+        aria-labelledby="account-heading"
+        className="border-forest/10 mt-12 border-t pt-8"
+      >
+        <h2 id="account-heading" className="display text-forest text-2xl">
+          Account &amp; data
+        </h2>
         <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
           Manage how you sign in, and back up or move your logged hikes.
         </p>
@@ -78,7 +75,7 @@ export default async function MyHikesPage() {
           {session?.user ? <PasskeyManager /> : null}
           <LogTransfer trails={trails} />
         </div>
-      </details>
+      </section>
     </Container>
   );
 }
