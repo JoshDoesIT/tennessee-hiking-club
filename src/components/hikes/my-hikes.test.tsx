@@ -86,4 +86,22 @@ describe("MyHikes", () => {
     await screen.findByRole("link", { name: /Alpha/i });
     expect(screen.queryByRole("img")).toBeNull();
   });
+
+  it("shows a recorded track's stats and a GPX download", async () => {
+    addHike("a", "2026-01-01", {
+      track: {
+        points: [
+          { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+          { lat: 35.62, lng: -83.44, elevationFt: 1200 },
+        ],
+        durationMin: 90,
+      },
+    });
+    render(<MyHikes trails={trails} />);
+    expect(await screen.findByText(/recorded track/i)).toBeInTheDocument();
+    expect(screen.getByText(/1h 30m/)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /download gpx/i }),
+    ).toBeInTheDocument();
+  });
 });

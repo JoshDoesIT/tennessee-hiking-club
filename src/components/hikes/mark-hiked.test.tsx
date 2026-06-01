@@ -96,6 +96,27 @@ describe("MarkHiked", () => {
     });
   });
 
+  it("parses an uploaded GPX track and stores it on the hike", async () => {
+    const user = userEvent.setup();
+    render(<MarkHiked slug="grotto-falls" />);
+
+    await user.click(screen.getByRole("button", { name: /add a note/i }));
+    const gpx =
+      `<gpx><trk><trkseg>` +
+      `<trkpt lat="35.60" lon="-83.45"><ele>1000</ele><time>2026-05-30T08:00:00Z</time></trkpt>` +
+      `<trkpt lat="35.62" lon="-83.44"><ele>1200</ele><time>2026-05-30T09:30:00Z</time></trkpt>` +
+      `</trkseg></trk></gpx>`;
+    const file = new File([gpx], "hike.gpx", { type: "application/gpx+xml" });
+    await user.upload(screen.getByLabelText(/recorded track/i), file);
+    await user.click(screen.getByRole("button", { name: /mark as hiked/i }));
+
+    await vi.waitFor(() => {
+      const entry = readLog().find((e) => e.trailSlug === "grotto-falls");
+      expect(entry?.track?.points.length).toBeGreaterThanOrEqual(2);
+      expect(entry?.track?.durationMin).toBe(90);
+    });
+  });
+
   it("deletes the remote photo when a hike with one is un-marked", async () => {
     addHike("radnor-lake", "2026-01-01", { photoId: "ph-1" });
     setEntryPhotoUrl("radnor-lake", "2026-01-01", "https://b/p.jpg");

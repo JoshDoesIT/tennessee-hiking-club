@@ -11,6 +11,7 @@ import {
 } from "@/lib/hikes/local-log";
 import { computeStats } from "@/lib/hikes/stats";
 import { HikePhoto } from "./hike-photo";
+import { RecordedTrackSummary } from "./recorded-track-summary";
 import type { Trail } from "@/lib/trails/schema";
 
 export function MyHikes({ trails }: { trails: Trail[] }) {
@@ -65,6 +66,9 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
           const withPhoto = [...entries]
             .reverse()
             .find((e) => e.photoId || e.photoUrl);
+          const withTrack = [...entries]
+            .reverse()
+            .find((e) => e.track && e.track.points.length > 1);
           return (
             <li key={slug} className="border-forest/5 border-b py-1.5">
               <div className="flex items-baseline justify-between gap-3">
@@ -102,6 +106,12 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
                   photoUrl={withPhoto.photoUrl}
                   alt={`Photo from your hike of ${trail.name}`}
                   className="border-forest/10 mt-2 h-28 w-full rounded-lg border object-cover"
+                />
+              ) : null}
+              {withTrack?.track ? (
+                <RecordedTrackSummary
+                  track={withTrack.track}
+                  trailName={trail.name}
                 />
               ) : null}
             </li>

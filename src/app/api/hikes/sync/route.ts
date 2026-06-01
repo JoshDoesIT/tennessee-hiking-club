@@ -6,6 +6,12 @@ import { getDb } from "@/lib/db";
 import { hikes } from "@/lib/db/schema";
 import { planSync, rowToEntry, entryToInsert } from "@/lib/hikes/sync";
 
+const routePointSchema = z.object({
+  lat: z.number(),
+  lng: z.number(),
+  elevationFt: z.number(),
+});
+
 const bodySchema = z.object({
   hikes: z.array(
     z.object({
@@ -14,6 +20,12 @@ const bodySchema = z.object({
       note: z.string().optional(),
       conditions: z.string().optional(),
       photoUrl: z.string().optional(),
+      track: z
+        .object({
+          points: z.array(routePointSchema),
+          durationMin: z.number().optional(),
+        })
+        .optional(),
     }),
   ),
 });
