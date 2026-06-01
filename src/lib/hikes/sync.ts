@@ -1,4 +1,5 @@
 import type { HikeLogEntry } from "./types";
+import type { RoutePoint } from "@/lib/trails/elevation";
 
 /**
  * Merge two hike logs (e.g. the local device log and the account's stored
@@ -30,6 +31,7 @@ export function mergeHikes(
       conditions: existing.conditions ?? entry.conditions,
       photoId: existing.photoId ?? entry.photoId,
       photoUrl: existing.photoUrl ?? entry.photoUrl,
+      track: existing.track ?? entry.track,
     });
   }
 
@@ -83,9 +85,13 @@ type HikeRowLike = {
   note: string | null;
   conditions: string | null;
   photoUrl: string | null;
+  /** JSON-encoded recorded track points; optional so a pre-migration row maps. */
+  route?: string | null;
+  trackDurationMin?: number | null;
 };
 
-/** A database row to a log entry (dropping null note/conditions/photoUrl). */
+/** A database row to a log entry (dropping null note/conditions/photoUrl, and
+ *  rebuilding a recorded track from the stored route JSON when present). */
 export function rowToEntry(row: HikeRowLike): HikeLogEntry {
   const entry: HikeLogEntry = {
     trailSlug: row.trailSlug,
@@ -94,6 +100,19 @@ export function rowToEntry(row: HikeRowLike): HikeLogEntry {
   if (row.note) entry.note = row.note;
   if (row.conditions) entry.conditions = row.conditions;
   if (row.photoUrl) entry.photoUrl = row.photoUrl;
+  if (row.route) {
+    try {
+      const points = JSON.parse(row.route) as RoutePoint[];
+      if (Array.isArray(points) && points.length > 0) {
+        entry.track = { points };
+        if (row.trackDurationMin != null) {
+          entry.track.durationMin = row.trackDurationMin;
+        }
+      }
+    } catch {
+      // Ignore a malformed stored track; the rest of the hike still syncs.
+    }
+  }
   return entry;
 }
 
@@ -106,5 +125,7 @@ export function entryToInsert(userId: string, entry: HikeLogEntry) {
     note: entry.note ?? null,
     conditions: entry.conditions ?? null,
     photoUrl: entry.photoUrl ?? null,
+    route: entry.track ? JSON.stringify(entry.track.points) : null,
+    trackDurationMin: entry.track?.durationMin ?? null,
   };
 }

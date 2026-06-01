@@ -152,6 +152,8 @@ describe("row mappers", () => {
         note: null,
         conditions: null,
         photoUrl: null,
+        route: null,
+        trackDurationMin: null,
       },
     );
   });
@@ -164,5 +166,72 @@ describe("row mappers", () => {
         photoUrl: "https://b/p.jpg",
       }).photoUrl,
     ).toBe("https://b/p.jpg");
+  });
+
+  it("entryToInsert serialises a recorded track and its duration", () => {
+    const points = [
+      { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+      { lat: 35.62, lng: -83.44, elevationFt: 1200 },
+    ];
+    const row = entryToInsert("u1", {
+      trailSlug: "a",
+      hikedOn: "2026-01-01",
+      track: { points, durationMin: 90 },
+    });
+    expect(JSON.parse(row.route as string)).toEqual(points);
+    expect(row.trackDurationMin).toBe(90);
+  });
+
+  it("rowToEntry rebuilds a track from the stored route and duration", () => {
+    const points = [
+      { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+      { lat: 35.62, lng: -83.44, elevationFt: 1200 },
+    ];
+    const entry = rowToEntry({
+      trailSlug: "a",
+      hikedOn: "2026-01-01",
+      note: null,
+      conditions: null,
+      photoUrl: null,
+      route: JSON.stringify(points),
+      trackDurationMin: 90,
+    });
+    expect(entry.track).toEqual({ points, durationMin: 90 });
+  });
+
+  it("rowToEntry leaves track unset when the row has no route", () => {
+    const entry = rowToEntry({
+      trailSlug: "a",
+      hikedOn: "2026-01-01",
+      note: null,
+      conditions: null,
+      photoUrl: null,
+      route: null,
+      trackDurationMin: null,
+    });
+    expect(entry.track).toBeUndefined();
+  });
+});
+
+describe("mergeHikes track field", () => {
+  const points = [
+    { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+    { lat: 35.62, lng: -83.44, elevationFt: 1200 },
+  ];
+
+  it("fills a missing track from the other side of the merge", () => {
+    const merged = mergeHikes(
+      [{ trailSlug: "a", hikedOn: "2026-01-01" }],
+      [{ trailSlug: "a", hikedOn: "2026-01-01", track: { points } }],
+    );
+    expect(merged[0].track).toEqual({ points });
+  });
+
+  it("keeps an existing track over the other side's", () => {
+    const merged = mergeHikes(
+      [{ trailSlug: "a", hikedOn: "2026-01-01", track: { points, durationMin: 90 } }],
+      [{ trailSlug: "a", hikedOn: "2026-01-01", track: { points: [] } }],
+    );
+    expect(merged[0].track?.durationMin).toBe(90);
   });
 });

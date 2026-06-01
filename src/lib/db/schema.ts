@@ -49,6 +49,10 @@ export const hikes = pgTable(
     note: text("note"),
     conditions: text("conditions"),
     photoUrl: text("photo_url"),
+    /** A recorded GPS track for this hike (#201), as JSON route points. */
+    route: text("route"),
+    /** Elapsed minutes for the recorded track, when the GPX had timestamps. */
+    trackDurationMin: integer("track_duration_min"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

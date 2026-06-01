@@ -37,6 +37,21 @@ describe("local hike log", () => {
     ]);
   });
 
+  it("stores a recorded track on the entry when provided", () => {
+    const s = memStorage();
+    const track = {
+      points: [
+        { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+        { lat: 35.62, lng: -83.44, elevationFt: 1200 },
+      ],
+      durationMin: 90,
+    };
+    addHike("grotto-falls", "2026-05-30", { track }, s);
+    expect(readLog(s)).toEqual([
+      { trailSlug: "grotto-falls", hikedOn: "2026-05-30", track },
+    ]);
+  });
+
   it("allows logging the same trail more than once", () => {
     const s = memStorage();
     addHike("a", "2026-01-01", undefined, s);

@@ -13,7 +13,8 @@ import {
 import { compressImage } from "@/lib/hikes/image";
 import { putPhoto } from "@/lib/hikes/photo-store";
 import { uploadPhoto, deleteRemotePhoto } from "@/lib/hikes/photo-upload";
-import { HIKE_CONDITIONS } from "@/lib/hikes/types";
+import { gpxTrackSummary } from "@/lib/hikes/track";
+import { HIKE_CONDITIONS, type RecordedTrack } from "@/lib/hikes/types";
 
 /** Local-first "mark as hiked" toggle for a trail, with an optional note and
  *  conditions captured at log time. Reads the browser-stored log via
@@ -30,6 +31,7 @@ export function MarkHiked({ slug }: { slug: string }) {
   const [note, setNote] = useState("");
   const [conditions, setConditions] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [trackFile, setTrackFile] = useState<File | null>(null);
   const detailsId = useId();
 
   function unlogHike() {
@@ -59,10 +61,31 @@ export function MarkHiked({ slug }: { slug: string }) {
       photoId = crypto.randomUUID();
       await putPhoto(photoId, blob);
     }
-    addHike(slug, date, { note, conditions, photoId });
+
+    // Parse an optional recorded GPX track on the device; a malformed file is
+    // ignored so the hike still logs.
+    let track: RecordedTrack | undefined;
+    if (trackFile) {
+      try {
+        const summary = gpxTrackSummary(await trackFile.text());
+        if (summary) {
+          track = {
+            points: summary.points,
+            ...(summary.durationMin !== undefined
+              ? { durationMin: summary.durationMin }
+              : {}),
+          };
+        }
+      } catch {
+        track = undefined;
+      }
+    }
+
+    addHike(slug, date, { note, conditions, photoId, track });
     setNote("");
     setConditions("");
     setPhoto(null);
+    setTrackFile(null);
     setShowDetails(false);
 
     // Best-effort: when signed in, upload to the account and record the URL so
@@ -148,6 +171,25 @@ export function MarkHiked({ slug }: { slug: string }) {
             />
             <p className="text-ink/50 text-xs">
               Stays on this device until you sign in.
+            </p>
+          </div>
+          <div className="flex flex-col gap-1 sm:col-span-2">
+            <label
+              htmlFor={`${detailsId}-track`}
+              className="text-olive text-xs font-semibold tracking-wider uppercase"
+            >
+              Recorded track (GPX)
+            </label>
+            <input
+              id={`${detailsId}-track`}
+              type="file"
+              accept=".gpx,application/gpx+xml,application/xml,text/xml"
+              onChange={(e) => setTrackFile(e.target.files?.[0] ?? null)}
+              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
+            />
+            <p className="text-ink/50 text-xs">
+              Exported from a watch or app, to map this hike and chart its
+              elevation.
             </p>
           </div>
         </div>
