@@ -57,4 +57,4 @@ Unit / component / e2e coverage for the criteria above.
 | [0003](./0003-trail-directory-and-detail.md) | M4        | Trail directory & detail pages         |
 | [0004](./0004-merch-store.md)                | M7–M8     | Merch store (Stripe + print-on-demand) |
 | [0005](./0005-accounts-and-gamification.md)  | M11       | Accounts, hike logging & gamification  |
-| [0006](./0006-native-mobile-apps.md)         | Spike     | Native mobile apps (research spike)    |
+| [0006](./0006-native-mobile-apps.md)         | Mobile    | Native mobile app (Capacitor)          |
