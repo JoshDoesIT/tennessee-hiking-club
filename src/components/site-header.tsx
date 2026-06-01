@@ -38,7 +38,7 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="border-forest/10 bg-cream/85 sticky top-0 z-50 border-b backdrop-blur-md">
+    <header className="border-forest/10 bg-cream/85 sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <Link href="/" aria-label="Tennessee Hiking Club home">
           <Logo size={42} priority />

@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated native projects (Capacitor) and the bundled mobile shell.
+    "ios/**",
+    "android/**",
+    "mobile/**",
   ]),
 ]);
 
