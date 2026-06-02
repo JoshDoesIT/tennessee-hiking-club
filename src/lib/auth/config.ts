@@ -1,5 +1,6 @@
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import Facebook from "next-auth/providers/facebook";
 import Passkey from "next-auth/providers/passkey";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { NextAuthConfig } from "next-auth";
@@ -33,6 +34,11 @@ export function buildAuthConfig(): NextAuthConfig {
     providers.push(GitHub({ allowDangerousEmailAccountLinking: true }));
   if (process.env.AUTH_GOOGLE_ID)
     providers.push(Google({ allowDangerousEmailAccountLinking: true }));
+  // Facebook lowers sign-in friction for the club's Facebook-group members, but
+  // it does not guarantee a verified email, so it is left without
+  // `allowDangerousEmailAccountLinking` to avoid linking into an account made
+  // with a verified-email provider.
+  if (process.env.AUTH_FACEBOOK_ID) providers.push(Facebook);
 
   const config: NextAuthConfig = {
     providers,

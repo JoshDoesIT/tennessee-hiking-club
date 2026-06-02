@@ -33,6 +33,15 @@ describe("SignInOptions", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders the Facebook button with its brand icon when configured", async () => {
+    mockProviders({ facebook: { id: "facebook", name: "Facebook" } });
+    const { container } = render(<SignInOptions />);
+    expect(
+      await screen.findByRole("button", { name: /continue with facebook/i }),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-icon="facebook"]')).not.toBeNull();
+  });
+
   it("calls signIn with the provider id and callback URL", async () => {
     const user = userEvent.setup();
     mockProviders({ github: { id: "github", name: "GitHub" } });
