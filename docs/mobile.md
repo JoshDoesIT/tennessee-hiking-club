@@ -19,7 +19,8 @@ This is the foundation (#215). Background GPS recording (#216), offline map tile
 ## Prerequisites
 
 - Node + pnpm (as for the web app).
-- iOS: macOS with Xcode and CocoaPods.
+- iOS: macOS with Xcode. Capacitor 8 uses Swift Package Manager, so CocoaPods is
+  not required.
 - Android: Android Studio with the Android SDK.
 
 ## Setup
@@ -55,6 +56,60 @@ CAP_SERVER_URL="https://<preview>.vercel.app" pnpm cap:sync
 For a local `http://` backend during development, also set `cleartext: true` in
 `capacitor.config.ts` (do not commit that).
 
+## Testing on a real device
+
+Because the app loads the deployed site (`server.url`), a device runs whatever is
+live in production. Offline maps and background GPS are deployed, so they can be
+exercised on a phone; push (#218) cannot until its native plugin and APNs/FCM
+credentials are configured.
+
+The setup is non-interactive and can be staged ahead of time. Everything from
+"open the IDE" onward needs the device connected and on-device taps (trust,
+permissions), so do it at test time.
+
+### iPhone
+
+Needs a Mac with Xcode and an Apple ID (a free one works for your own device).
+
+1. `pnpm install && pnpm cap:sync` (the `ios/` project already exists).
+2. `pnpm cap:open:ios` to open Xcode.
+3. Plug in the iPhone, unlock it, and tap **Trust This Computer**.
+4. Xcode -> the **App** target -> **Signing & Capabilities** -> tick
+   **Automatically manage signing** and pick your **Team** (add your Apple ID
+   under Xcode -> Settings -> Accounts first if needed).
+5. Choose the iPhone in the device dropdown and click **Run** (the play button).
+6. First launch: on the phone, **Settings -> General -> VPN & Device Management
+   -> [your developer profile] -> Trust**, then reopen the app.
+7. Allow Location **Always** when prompted.
+
+A free Apple ID re-signs every 7 days (just re-run from Xcode); a paid Apple
+Developer account is required for TestFlight and the App Store (#219).
+
+### Android
+
+Needs Android Studio with the SDK.
+
+1. Generate the project if it does not exist yet:
+   `pnpm cap:add:android && pnpm cap:sync`.
+2. On the phone, enable **Developer options** (Settings -> About phone -> tap
+   **Build number** seven times) and turn on **USB debugging**.
+3. Connect via USB and accept the debugging prompt; confirm with `adb devices`.
+4. `pnpm cap:open:android`, pick the device, and **Run** (or
+   `pnpm exec cap run android --target <device-id>`).
+5. Allow Location when prompted.
+
+Debug installs need no signing; a signed release build is only for the Play
+Store (#219).
+
+### What to verify on device
+
+- **Offline maps (#217):** on `/explore`, choose "Download this area" while
+  online, then switch to Airplane mode and confirm the map still renders and
+  pans there, and trail pages load.
+- **Background GPS (#216):** record a hike with location set to **Always**, lock
+  the screen and move (or use a simulated route), then confirm the track on My
+  Hikes. This cannot be exercised on a simulator.
+
 ## Status and next steps
 
 Done (this is the foundation):
@@ -76,7 +131,6 @@ Done (this is the foundation):
   Native config this needs (already applied to the generated `ios/` project; add
   to `android/` when it is generated, and re-apply if the native projects are
   regenerated):
-
   - **iOS** `ios/App/App/Info.plist`: `NSLocationWhenInUseUsageDescription`,
     `NSLocationAlwaysAndWhenInUseUsageDescription`, and `UIBackgroundModes` with
     `location`.
@@ -89,10 +143,19 @@ Done (this is the foundation):
   grant location "Always", lock the screen and walk, then finish and confirm the
   track on My Hikes. Background GPS cannot be exercised on a simulator.
 
+- **Offline maps** (#217): a "download this area" control and an offline-maps
+  manager on `/explore`, on top of the service-worker tile cache. Downloaded
+  regions are tracked locally and evicted precisely when removed.
+
+- **Push notifications** (#218, scaffolded): the `push_subscriptions` store, the
+  registration API, the opt-in toggle, and the send path. The native
+  `@capacitor/push-notifications` plugin, APNs/FCM credentials, and the delivery
+  transport are still to do (tracked on #218).
+
 Next, within the mobile build:
 
-- **Offline maps** (#217, the "download this area" UX on top of the tile cache),
-  **push** (#218), and **store submission** (#219).
+- Finish **push** (#218) transport + credentials, then **store submission**
+  (#219).
 
 The native projects will be committed once we add the rest of the native
 customizations (icons and splash screens); until then, re-apply the location
