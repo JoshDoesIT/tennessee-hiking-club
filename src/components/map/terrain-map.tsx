@@ -1,12 +1,13 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { StyleSpecification } from "maplibre-gl";
 import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import { TENNESSEE_BOUNDS } from "@/lib/maps";
 import { ALERT_LABEL } from "@/lib/trails/conditions";
 import type { TrailAlert } from "@/lib/trails/schema";
+import { DownloadAreaControl, type Viewport } from "./download-area-control";
 
 export type TrailPin = {
   slug: string;
@@ -41,8 +42,29 @@ const TN_BOUNDS: [[number, number], [number, number]] = [
  */
 export function TerrainMap({ trails }: { trails: TrailPin[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<import("maplibre-gl").Map | null>(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+
+  // Current map bounds + zoom, read on demand by the offline-download control.
+  const getViewport = useCallback((): Viewport | null => {
+    const map = mapRef.current;
+    if (!map) return null;
+    try {
+      const b = map.getBounds();
+      return {
+        bounds: {
+          west: b.getWest(),
+          south: b.getSouth(),
+          east: b.getEast(),
+          north: b.getNorth(),
+        },
+        zoom: map.getZoom(),
+      };
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     let map: import("maplibre-gl").Map | undefined;
@@ -76,6 +98,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           cooperativeGestures: true,
           canvasContextAttributes: { preserveDrawingBuffer: true },
         });
+        mapRef.current = map;
 
         map.addControl(
           new maplibregl.NavigationControl({ visualizePitch: true }),
@@ -182,6 +205,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
 
     return () => {
       cancelled = true;
+      mapRef.current = null;
       map?.remove();
     };
   }, [trails]);
@@ -194,6 +218,11 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         aria-label="Interactive 3D terrain map of Tennessee"
         className="bg-parchment border-forest/15 h-[70vh] min-h-[420px] w-full overflow-hidden rounded-2xl border"
       />
+      {ready ? (
+        <div className="absolute bottom-3 left-3 z-10">
+          <DownloadAreaControl getViewport={getViewport} />
+        </div>
+      ) : null}
       {!ready ? (
         <div className="text-pine pointer-events-none absolute inset-0 grid place-items-center text-sm">
           {failed

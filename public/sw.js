@@ -125,3 +125,42 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(navigateNetworkFirst(request));
   }
 });
+
+/**
+ * Let the page manage downloaded map tiles (#217). The "download this area"
+ * flow caches tiles by simply fetching them (the fetch handler above stores
+ * them); these messages are how the offline-maps manager reclaims that space.
+ * When the sender passes a MessagePort we post the result back so it can await
+ * completion.
+ */
+async function handleMessage(data) {
+  const cache = await caches.open(TILES);
+  if (data.type === "TNHC_CLEAR_TILES") {
+    await caches.delete(TILES);
+    return { cleared: true };
+  }
+  if (data.type === "TNHC_DELETE_TILES" && Array.isArray(data.urls)) {
+    let deleted = 0;
+    await Promise.all(
+      data.urls.map(async (url) => {
+        if (await cache.delete(url)) deleted++;
+      }),
+    );
+    return { deleted };
+  }
+  if (data.type === "TNHC_TILES_USAGE") {
+    return { count: (await cache.keys()).length };
+  }
+  return { ok: false };
+}
+
+self.addEventListener("message", (event) => {
+  const data = event.data;
+  if (!data || typeof data.type !== "string") return;
+  const port = event.ports && event.ports[0];
+  event.waitUntil(
+    handleMessage(data).then((result) => {
+      if (port) port.postMessage(result);
+    }),
+  );
+});

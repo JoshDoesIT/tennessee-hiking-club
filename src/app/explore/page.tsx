@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { TerrainMap } from "@/components/map/terrain-map";
+import { OfflineMapsManager } from "@/components/map/offline-maps-manager";
 import { Container } from "@/components/ui/container";
 import { getAllTrails } from "@/lib/trails";
 import { highestAlertLevel, ALERT_LABEL } from "@/lib/trails/conditions";
@@ -36,6 +37,8 @@ export default function ExplorePage() {
       <div className="mt-8">
         <TerrainMap trails={pins} />
       </div>
+
+      <OfflineMapsManager />
 
       {/* Accessible / no-WebGL fallback: every trail as a plain link. */}
       <section aria-labelledby="all-trails-heading" className="mt-10">
