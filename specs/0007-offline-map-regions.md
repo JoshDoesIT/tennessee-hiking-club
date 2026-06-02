@@ -80,11 +80,17 @@ AC 1 and 2 are verified on device (offline after first open) and tracked the way
 the other mobile phases are; AC 3 and all pure logic are covered by automated
 tests.
 
+## Precise per-region eviction (#236, done)
+
+Each region now records the exact tile URLs it downloaded (under
+`tnhc:offline-region-tiles`), so removing a region deletes precisely those
+tiles, reference-counted against the other saved regions: a tile shared with
+another region survives, and because the stored URL is the one that was cached,
+eviction is correct even after the vector tile version rolls over. Regions saved
+before this fall back to the earlier best-effort recompute. See
+`offline-regions.ts` (`evictableTiles`) and its tests.
+
 ## Out of scope (v1)
 
-- Precise per-region eviction (tracked in #236): deleting a region removes its
-  tiles best-effort. Vector tiles carry a dated version, so a region saved
-  before a version roll-over only fully clears via "Clear all"; overlapping
-  regions share tiles. Acceptable for v1; re-downloading re-caches.
 - A native (filesystem) tile store separate from Cache Storage; the WebView
   cache is sufficient for the first release.
