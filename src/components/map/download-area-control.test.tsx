@@ -20,7 +20,11 @@ vi.mock("@/lib/maps/download-region", async (orig) => {
 });
 
 import { DownloadAreaControl } from "./download-area-control";
-import { readRegions, clearRegions } from "@/lib/maps/offline-regions";
+import {
+  readRegions,
+  clearRegions,
+  readRegionTiles,
+} from "@/lib/maps/offline-regions";
 
 const BOX = { west: -84.02, south: 35.92, east: -83.96, north: 35.98 };
 
@@ -53,6 +57,9 @@ describe("DownloadAreaControl", () => {
     ).toBeInTheDocument();
     expect(readRegions()).toHaveLength(1);
     expect(readRegions()[0].tileCount).toBeGreaterThan(0);
+    // The exact downloaded tile URLs are recorded so eviction is precise (#236).
+    const id = readRegions()[0].id;
+    expect(readRegionTiles()[id]?.length).toBeGreaterThan(0);
   });
 
   it("asks the member to move the map when there is no viewport", async () => {

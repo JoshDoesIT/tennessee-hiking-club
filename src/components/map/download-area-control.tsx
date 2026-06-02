@@ -9,7 +9,7 @@ import {
   type TileSource,
 } from "@/lib/maps/download-region";
 import { resolveTileSources } from "@/lib/maps/tile-sources";
-import { saveRegion } from "@/lib/maps/offline-regions";
+import { saveRegion, saveRegionTiles } from "@/lib/maps/offline-regions";
 
 export type Viewport = { bounds: LngLatBounds; zoom: number };
 
@@ -104,8 +104,9 @@ export function DownloadAreaControl({
     const result = await downloadTiles(urls, {
       onProgress: (p) => setProgress({ done: p.done, total: p.total }),
     });
+    const id = newId();
     saveRegion({
-      id: newId(),
+      id,
       name: name.trim() || defaultName(plan.bounds),
       bounds: plan.bounds,
       minZoom: plan.minZoom,
@@ -113,6 +114,9 @@ export function DownloadAreaControl({
       tileCount: result.ok,
       savedAt: new Date().toISOString(),
     });
+    // Record the exact URLs fetched so removing this region later evicts
+    // precisely these tiles, even after the vector version rolls over (#236).
+    saveRegionTiles(id, urls);
     setSaved(result.ok);
     setPhase("done");
   }

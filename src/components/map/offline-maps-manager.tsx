@@ -7,6 +7,9 @@ import {
   getServerRegionsSnapshot,
   removeRegion,
   clearRegions,
+  readRegionTiles,
+  removeRegionTiles,
+  evictableTiles,
   type OfflineRegion,
 } from "@/lib/maps/offline-regions";
 import { regionTileUrls } from "@/lib/maps/download-region";
@@ -24,12 +27,22 @@ function savedOn(iso: string): string {
       });
 }
 
-/** Best-effort: recompute the region's tile URLs and ask the worker to drop
- *  them. Vector tiles carry a dated version, so this reliably reclaims the
- *  elevation tiles and any vector tiles whose version has not rolled over since
- *  download; "Clear all" is the guaranteed full reclaim. */
+/**
+ * Evict a removed region's tiles (#236). Preferred path: the region recorded the
+ * exact URLs it downloaded, so delete precisely those that no other saved region
+ * still needs (reference-counted, and version-correct even after the vector
+ * version rolls over). Fallback for a region saved before this existed: best-
+ * effort recompute, where "Clear all" remains the guaranteed full reclaim.
+ */
 async function evictRegionTiles(region: OfflineRegion): Promise<void> {
   try {
+    const index = readRegionTiles();
+    if (region.id in index) {
+      const urls = evictableTiles(index, region.id);
+      if (urls.length) await deleteOfflineTiles(urls);
+      removeRegionTiles(region.id);
+      return;
+    }
     const sources = await resolveTileSources();
     const urls = regionTileUrls(
       sources,

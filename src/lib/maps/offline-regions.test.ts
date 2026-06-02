@@ -5,6 +5,10 @@ import {
   removeRegion,
   clearRegions,
   subscribe,
+  readRegionTiles,
+  saveRegionTiles,
+  removeRegionTiles,
+  evictableTiles,
   type OfflineRegion,
 } from "./offline-regions";
 
@@ -91,5 +95,46 @@ describe("offline-regions store", () => {
     unsub();
     saveRegion(region({ id: "z" }), storage);
     expect(calls).toBe(2);
+  });
+});
+
+describe("region tile-url index", () => {
+  it("stores and reads back the exact tile urls a region downloaded", () => {
+    saveRegionTiles("a", ["t1", "t2"], storage);
+    expect(readRegionTiles(storage)).toEqual({ a: ["t1", "t2"] });
+  });
+
+  it("removes one region's tile list without touching the others", () => {
+    saveRegionTiles("a", ["t1"], storage);
+    saveRegionTiles("b", ["t2"], storage);
+    removeRegionTiles("a", storage);
+    expect(readRegionTiles(storage)).toEqual({ b: ["t2"] });
+  });
+
+  it("ignores corrupt storage", () => {
+    storage.setItem("tnhc:offline-region-tiles", "{bad");
+    expect(readRegionTiles(storage)).toEqual({});
+  });
+
+  it("is wiped when all regions are cleared", () => {
+    saveRegionTiles("a", ["t1"], storage);
+    clearRegions(storage);
+    expect(readRegionTiles(storage)).toEqual({});
+  });
+});
+
+describe("evictableTiles", () => {
+  it("evicts only the tiles a region does not share with another", () => {
+    const map = { a: ["t1", "t2", "t3"], b: ["t2", "t3", "t4"] };
+    expect(evictableTiles(map, "a")).toEqual(["t1"]);
+    expect(evictableTiles(map, "b")).toEqual(["t4"]);
+  });
+
+  it("evicts everything for the only saved region", () => {
+    expect(evictableTiles({ a: ["t1", "t2"] }, "a")).toEqual(["t1", "t2"]);
+  });
+
+  it("returns nothing for an unknown region id", () => {
+    expect(evictableTiles({ a: ["t1"] }, "missing")).toEqual([]);
   });
 });

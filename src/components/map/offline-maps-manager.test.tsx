@@ -15,6 +15,7 @@ vi.mock("@/lib/maps/tile-sources", () => ({
 import { OfflineMapsManager } from "./offline-maps-manager";
 import {
   saveRegion,
+  saveRegionTiles,
   clearRegions,
   type OfflineRegion,
 } from "@/lib/maps/offline-regions";
@@ -63,6 +64,21 @@ describe("OfflineMapsManager", () => {
     expect(screen.queryByText("Obed")).not.toBeInTheDocument();
     expect(screen.getByText("Frozen Head")).toBeInTheDocument();
     expect(tileCache.deleteOfflineTiles).toHaveBeenCalled();
+  });
+
+  it("keeps tiles shared with another saved region when removing one (#236)", async () => {
+    const user = userEvent.setup();
+    saveRegion(region({ id: "a", name: "Obed" }));
+    saveRegion(region({ id: "b", name: "Frozen Head" }));
+    // Obed owns t1 alone and shares t2/t3 with Frozen Head.
+    saveRegionTiles("a", ["t1", "t2", "t3"]);
+    saveRegionTiles("b", ["t2", "t3", "t4"]);
+    render(<OfflineMapsManager />);
+
+    await user.click(screen.getByRole("button", { name: /remove obed/i }));
+
+    // Only Obed's unshared tile is evicted; the shared ones survive for b.
+    expect(tileCache.deleteOfflineTiles).toHaveBeenCalledWith(["t1"]);
   });
 
   it("clears all downloaded tiles after confirming", async () => {

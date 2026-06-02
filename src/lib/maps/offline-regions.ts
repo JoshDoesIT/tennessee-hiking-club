@@ -93,8 +93,74 @@ export function removeRegion(id: string, storage?: Storage): OfflineRegion[] {
 }
 
 export function clearRegions(storage?: Storage): OfflineRegion[] {
+  // No region remains, so its tile-url index is meaningless too (#236).
+  store(storage)?.removeItem(TILES_KEY);
   write(EMPTY, storage);
   return EMPTY;
+}
+
+// --- Per-region tile index (for exact eviction, #236) --------------------
+
+/**
+ * The exact tile URLs each region downloaded, kept under a separate key (not in
+ * the region records, so the snapshot stays light). Storing the real fetched
+ * URLs means eviction is version-correct: vector tiles carry a dated version in
+ * their URL, and recomputing later could miss them, but the stored URL always
+ * matches what was cached. Reference-counting across regions (`evictableTiles`)
+ * keeps tiles that another saved region still needs.
+ */
+const TILES_KEY = "tnhc:offline-region-tiles";
+export type RegionTileIndex = Record<string, string[]>;
+
+function parseTileIndex(raw: string | null): RegionTileIndex {
+  try {
+    const parsed = JSON.parse(raw ?? "{}");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const out: RegionTileIndex = {};
+    for (const [id, urls] of Object.entries(parsed)) {
+      if (Array.isArray(urls) && urls.every((u) => typeof u === "string")) {
+        out[id] = urls as string[];
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+export function readRegionTiles(storage?: Storage): RegionTileIndex {
+  const s = store(storage);
+  return s ? parseTileIndex(s.getItem(TILES_KEY)) : {};
+}
+
+export function saveRegionTiles(
+  id: string,
+  urls: string[],
+  storage?: Storage,
+): void {
+  const index = readRegionTiles(storage);
+  index[id] = urls;
+  store(storage)?.setItem(TILES_KEY, JSON.stringify(index));
+}
+
+export function removeRegionTiles(id: string, storage?: Storage): void {
+  const index = readRegionTiles(storage);
+  if (!(id in index)) return;
+  delete index[id];
+  store(storage)?.setItem(TILES_KEY, JSON.stringify(index));
+}
+
+/** Tiles owned by `id` that no other region in `index` also holds, i.e. the set
+ *  safe to delete when removing that region. */
+export function evictableTiles(index: RegionTileIndex, id: string): string[] {
+  const mine = index[id];
+  if (!mine) return [];
+  const kept = new Set<string>();
+  for (const [otherId, urls] of Object.entries(index)) {
+    if (otherId === id) continue;
+    for (const url of urls) kept.add(url);
+  }
+  return mine.filter((url) => !kept.has(url));
 }
 
 // --- External-store interface for useSyncExternalStore -------------------
