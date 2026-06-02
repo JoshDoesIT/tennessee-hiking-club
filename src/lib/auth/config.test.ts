@@ -8,7 +8,12 @@ vi.mock("@auth/drizzle-adapter", () => ({ DrizzleAdapter: () => ({}) }));
 import { buildAuthConfig } from "./config";
 import type { NextAuthConfig } from "next-auth";
 
-const ENV_KEYS = ["DATABASE_URL", "AUTH_GITHUB_ID", "AUTH_GOOGLE_ID"] as const;
+const ENV_KEYS = [
+  "DATABASE_URL",
+  "AUTH_GITHUB_ID",
+  "AUTH_GOOGLE_ID",
+  "AUTH_FACEBOOK_ID",
+] as const;
 const ORIGINAL = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
 afterEach(() => {
   for (const k of ENV_KEYS) {
@@ -48,6 +53,23 @@ describe("buildAuthConfig", () => {
           ?.allowDangerousEmailAccountLinking,
       ).toBe(true);
     }
+  });
+
+  it("adds Facebook only when its credentials exist, without email linking", () => {
+    delete process.env.AUTH_FACEBOOK_ID;
+    expect(providerIds(buildAuthConfig())).not.toContain("facebook");
+
+    process.env.AUTH_FACEBOOK_ID = "fb";
+    const cfg = buildAuthConfig();
+    expect(providerIds(cfg)).toContain("facebook");
+    // Facebook does not guarantee a verified email, so it must not
+    // auto-link to an account created with another provider.
+    const fb = (cfg.providers ?? [])
+      .map((p) => (typeof p === "function" ? p({}) : p))
+      .find((p) => (p as { id: string }).id === "facebook") as
+      | { options?: { allowDangerousEmailAccountLinking?: boolean } }
+      | undefined;
+    expect(fb?.options?.allowDangerousEmailAccountLinking).not.toBe(true);
   });
 
   it("omits WebAuthn when no database is configured (e.g. the CI build)", () => {
