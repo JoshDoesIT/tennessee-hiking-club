@@ -97,6 +97,9 @@
   "pnpm": {
     "overrides": {
       "postcss@<8.5.10": ">=8.5.10"
+    },
+    "patchedDependencies": {
+      "@capacitor-community/background-geolocation@1.2.26": "patches/@capacitor-community__background-geolocation@1.2.26.patch"
     }
   }
 }
