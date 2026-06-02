@@ -7,6 +7,11 @@ settings:
 overrides:
   postcss@<8.5.10: '>=8.5.10'
 
+patchedDependencies:
+  '@capacitor-community/background-geolocation@1.2.26':
+    hash: 66512890bc7486820f2479bd36c5dc1e1cb649d70dc2f483376c79e7b10f391b
+    path: patches/@capacitor-community__background-geolocation@1.2.26.patch
+
 importers:
 
   .:
@@ -16,7 +21,7 @@ importers:
         version: 1.11.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3)
       '@capacitor-community/background-geolocation':
         specifier: ^1.2.26
-        version: 1.2.26(@capacitor/core@8.3.4)
+        version: 1.2.26(patch_hash=66512890bc7486820f2479bd36c5dc1e1cb649d70dc2f483376c79e7b10f391b)(@capacitor/core@8.3.4)
       '@capacitor/android':
         specifier: ^8.3.4
         version: 8.3.4(@capacitor/core@8.3.4)
@@ -4147,7 +4152,7 @@ snapshots:
     dependencies:
       css-tree: 3.2.1
 
-  '@capacitor-community/background-geolocation@1.2.26(@capacitor/core@8.3.4)':
+  '@capacitor-community/background-geolocation@1.2.26(patch_hash=66512890bc7486820f2479bd36c5dc1e1cb649d70dc2f483376c79e7b10f391b)(@capacitor/core@8.3.4)':
     dependencies:
       '@capacitor/core': 8.3.4
 
