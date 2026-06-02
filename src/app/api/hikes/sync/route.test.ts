@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   values: vi.fn(async () => undefined),
   where: vi.fn(async () => [] as unknown[]),
+  deleteTable: vi.fn(),
+  del: vi.fn(async () => undefined),
 }));
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/db", () => ({
@@ -12,10 +14,14 @@ vi.mock("@/lib/db", () => ({
     select: () => ({ from: () => ({ where: mocks.where }) }),
     insert: () => ({ values: mocks.values }),
     update: () => ({ set: () => ({ where: async () => undefined }) }),
+    delete: (t: unknown) => {
+      mocks.deleteTable(t);
+      return { where: mocks.del };
+    },
   }),
 }));
 
-import { POST } from "./route";
+import { POST, DELETE } from "./route";
 
 const points = [
   { lat: 35.6, lng: -83.45, elevationFt: 1000 },
@@ -76,5 +82,35 @@ describe("POST /api/hikes/sync", () => {
     );
     const data = await res.json();
     expect(data.hikes[0].track).toEqual({ points, durationMin: 90 });
+  });
+});
+
+function delReq(body: unknown) {
+  return new Request("http://localhost/api/hikes/sync", {
+    method: "DELETE",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+describe("DELETE /api/hikes/sync", () => {
+  it("returns 401 when not signed in and never deletes", async () => {
+    mocks.auth.mockResolvedValue(null);
+    const res = await DELETE(delReq({ trailSlug: "a", hikedOn: "2026-01-01" }));
+    expect(res.status).toBe(401);
+    expect(mocks.del).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 without both a trail and a date", async () => {
+    const res = await DELETE(delReq({ trailSlug: "a" }));
+    expect(res.status).toBe(400);
+    expect(mocks.del).not.toHaveBeenCalled();
+  });
+
+  it("deletes the matching hike for the signed-in user", async () => {
+    const res = await DELETE(delReq({ trailSlug: "a", hikedOn: "2026-01-01" }));
+    expect(res.status).toBe(200);
+    expect(mocks.deleteTable).toHaveBeenCalled();
+    expect(mocks.del).toHaveBeenCalled();
   });
 });

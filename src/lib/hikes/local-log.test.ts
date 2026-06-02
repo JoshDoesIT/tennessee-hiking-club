@@ -3,6 +3,7 @@ import {
   readLog,
   addHike,
   removeTrail,
+  removeHike,
   isHiked,
   setEntryPhotoUrl,
 } from "./local-log";
@@ -57,6 +58,18 @@ describe("local hike log", () => {
     addHike("a", "2026-01-01", undefined, s);
     addHike("a", "2026-02-01", undefined, s);
     expect(readLog(s)).toHaveLength(2);
+  });
+
+  it("removes a single hike by trail and date, keeping the trail's others", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", undefined, s);
+    addHike("a", "2026-02-01", undefined, s);
+    addHike("b", "2026-03-01", undefined, s);
+    removeHike("a", "2026-01-01", s);
+    expect(readLog(s).map((e) => `${e.trailSlug}|${e.hikedOn}`)).toEqual([
+      "a|2026-02-01",
+      "b|2026-03-01",
+    ]);
   });
 
   it("removes every entry for a trail", () => {

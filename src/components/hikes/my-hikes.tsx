@@ -8,11 +8,51 @@ import {
   subscribe,
   getLogSnapshot,
   getServerLogSnapshot,
+  removeHike,
 } from "@/lib/hikes/local-log";
+import { deleteRemotePhoto } from "@/lib/hikes/photo-upload";
 import { computeStats } from "@/lib/hikes/stats";
 import { HikePhoto } from "./hike-photo";
 import { RecordedTrackSummary } from "./recorded-track-summary";
+import type { HikeLogEntry } from "@/lib/hikes/types";
 import type { Trail } from "@/lib/trails/schema";
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/** Format an ISO `yyyy-mm-dd` as e.g. "Jan 1, 2026", with no timezone surprises. */
+function formatHikeDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  if (!y || !m || !d) return iso;
+  return `${MONTHS[m - 1]} ${d}, ${y}`;
+}
+
+/** Remove a single hike everywhere: the local log (which also GCs its local
+ *  photo), the account when signed in, and any remote photo. */
+function deleteHike(entry: HikeLogEntry) {
+  removeHike(entry.trailSlug, entry.hikedOn);
+  if (entry.photoUrl) void deleteRemotePhoto(entry.photoUrl);
+  void fetch("/api/hikes/sync", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      trailSlug: entry.trailSlug,
+      hikedOn: entry.hikedOn,
+    }),
+  }).catch(() => {});
+}
 
 export function MyHikes({ trails }: { trails: Trail[] }) {
   const log = useSyncExternalStore(
@@ -43,9 +83,17 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
 
   const stats = computeStats(log, trails);
   const bySlug = new Map(trails.map((t) => [t.slug, t]));
-  const distinct = [...new Set(log.map((e) => e.trailSlug))].filter((s) =>
-    bySlug.has(s),
-  );
+
+  // Each logged hike, newest first; same-day hikes keep their logged order.
+  const rows = log
+    .map((entry, index) => ({ entry, index, trail: bySlug.get(entry.trailSlug) }))
+    .filter((r): r is { entry: HikeLogEntry; index: number; trail: Trail } =>
+      Boolean(r.trail),
+    )
+    .sort(
+      (a, b) =>
+        b.entry.hikedOn.localeCompare(a.entry.hikedOn) || b.index - a.index,
+    );
 
   return (
     <div>
@@ -56,67 +104,71 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
         <Stat label="Divisions" value={`${stats.regions.length} of 3`} />
       </dl>
 
-      <ul className="mt-6 grid gap-x-8 gap-y-2 sm:grid-cols-2">
-        {distinct.map((slug) => {
-          const trail = bySlug.get(slug)!;
-          const entries = log.filter((e) => e.trailSlug === slug);
-          const detail = [...entries]
-            .reverse()
-            .find((e) => e.note || e.conditions);
-          const withPhoto = [...entries]
-            .reverse()
-            .find((e) => e.photoId || e.photoUrl);
-          const withTrack = [...entries]
-            .reverse()
-            .find((e) => e.track && e.track.points.length > 1);
-          return (
-            <li key={slug} className="border-forest/5 border-b py-1.5">
-              <div className="flex items-baseline justify-between gap-3">
-                <Link
-                  href={`/trails/${slug}`}
-                  className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
-                >
-                  {trail.name}
-                </Link>
-                <span className="text-ink/70 shrink-0 text-sm">
-                  {trail.region} TN
-                  {entries.length > 1 ? ` · ${entries.length}x` : ""}
-                </span>
-              </div>
-              {detail ? (
-                <p className="mt-0.5 text-xs">
-                  {detail.conditions ? (
-                    <span className="text-olive font-medium">
-                      {detail.conditions}
-                    </span>
-                  ) : null}
-                  {detail.conditions && detail.note ? (
-                    <span className="text-ink/40"> &middot; </span>
-                  ) : null}
-                  {detail.note ? (
-                    <span className="text-ink/70 italic">
-                      &ldquo;{detail.note}&rdquo;
-                    </span>
-                  ) : null}
-                </p>
-              ) : null}
-              {withPhoto ? (
-                <HikePhoto
-                  photoId={withPhoto.photoId}
-                  photoUrl={withPhoto.photoUrl}
-                  alt={`Photo from your hike of ${trail.name}`}
-                  className="border-forest/10 mt-2 h-28 w-full rounded-lg border object-cover"
-                />
-              ) : null}
-              {withTrack?.track ? (
-                <RecordedTrackSummary
-                  track={withTrack.track}
-                  trailName={trail.name}
-                />
-              ) : null}
-            </li>
-          );
-        })}
+      <h2 className="text-olive mt-8 text-xs font-semibold tracking-wider uppercase">
+        Hike log
+      </h2>
+      <ul className="mt-3 space-y-3">
+        {rows.map(({ entry, index, trail }) => (
+          <li
+            key={`${entry.trailSlug}-${entry.hikedOn}-${index}`}
+            className="border-forest/10 bg-cream-50 rounded-2xl border p-4"
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <Link
+                href={`/trails/${trail.slug}`}
+                className="text-pine hover:text-forest font-medium underline-offset-4 hover:underline"
+              >
+                {trail.name}
+              </Link>
+              <span className="text-ink/70 shrink-0 text-sm">
+                {formatHikeDate(entry.hikedOn)}
+              </span>
+            </div>
+            <p className="text-ink/50 text-xs">{trail.region} TN</p>
+
+            {entry.note || entry.conditions ? (
+              <p className="mt-1 text-xs">
+                {entry.conditions ? (
+                  <span className="text-olive font-medium">
+                    {entry.conditions}
+                  </span>
+                ) : null}
+                {entry.conditions && entry.note ? (
+                  <span className="text-ink/40"> &middot; </span>
+                ) : null}
+                {entry.note ? (
+                  <span className="text-ink/70 italic">
+                    &ldquo;{entry.note}&rdquo;
+                  </span>
+                ) : null}
+              </p>
+            ) : null}
+
+            {entry.photoId || entry.photoUrl ? (
+              <HikePhoto
+                photoId={entry.photoId}
+                photoUrl={entry.photoUrl}
+                alt={`Photo from your hike of ${trail.name}`}
+                className="border-forest/10 mt-2 h-28 w-full rounded-lg border object-cover"
+              />
+            ) : null}
+
+            {entry.track && entry.track.points.length > 1 ? (
+              <RecordedTrackSummary track={entry.track} trailName={trail.name} />
+            ) : null}
+
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={() => deleteHike(entry)}
+                aria-label={`Delete your ${trail.name} hike on ${formatHikeDate(entry.hikedOn)}`}
+                className="text-ink/50 hover:text-forest text-xs font-medium underline-offset-4 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   );

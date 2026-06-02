@@ -100,6 +100,26 @@ export function removeTrail(slug: string, storage?: Storage): HikeLogEntry[] {
   return next;
 }
 
+/** Remove a single logged hike (a trail on a specific date). Returns the new
+ *  log; the entry's local photo is garbage-collected (best-effort). */
+export function removeHike(
+  slug: string,
+  hikedOn: string,
+  storage?: Storage,
+): HikeLogEntry[] {
+  const current = readLog(storage);
+  const next = current.filter(
+    (e) => !(e.trailSlug === slug && e.hikedOn === hikedOn),
+  );
+  writeLog(next, storage);
+  for (const e of current) {
+    if (e.trailSlug === slug && e.hikedOn === hikedOn && e.photoId) {
+      void deletePhoto(e.photoId);
+    }
+  }
+  return next;
+}
+
 /** Replace the entire log (used by import). Returns the new log. */
 export function replaceLog(
   log: HikeLogEntry[],

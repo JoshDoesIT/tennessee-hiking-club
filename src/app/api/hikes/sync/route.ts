@@ -81,3 +81,41 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ hikes: merged });
 }
+
+/**
+ * Delete a single logged hike from the account (#229), identified by trail and
+ * date, so a hike the member removes on My Hikes does not reappear on the next
+ * sync. Sync is otherwise additive; this is the one path that deletes.
+ */
+export async function DELETE(req: Request) {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    return NextResponse.json({ error: "Not signed in" }, { status: 401 });
+  }
+
+  let body: { trailSlug?: unknown; hikedOn?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+  const trailSlug = typeof body.trailSlug === "string" ? body.trailSlug : "";
+  const hikedOn = typeof body.hikedOn === "string" ? body.hikedOn : "";
+  if (!trailSlug || !hikedOn) {
+    return NextResponse.json({ error: "Missing trail or date" }, { status: 400 });
+  }
+
+  const db = getDb();
+  await db
+    .delete(hikes)
+    .where(
+      and(
+        eq(hikes.userId, userId),
+        eq(hikes.trailSlug, trailSlug),
+        eq(hikes.hikedOn, hikedOn),
+      ),
+    );
+
+  return NextResponse.json({ ok: true });
+}

@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MyHikes } from "./my-hikes";
 import { addHike } from "@/lib/hikes/local-log";
 import { putPhoto } from "@/lib/hikes/photo-store";
@@ -104,4 +105,36 @@ describe("MyHikes", () => {
       screen.getByRole("button", { name: /download gpx/i }),
     ).toBeInTheDocument();
   });
+
+  it("lists hikes by date and deletes a single one", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn(
+      async (_input?: unknown, _init?: RequestInit) => ({ ok: true }) as Response,
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    addHike("a", "2026-02-10");
+    addHike("a", "2026-05-20");
+    render(<MyHikes trails={trails} />);
+
+    // Both dated entries for the same trail are listed.
+    expect(screen.getByText("Feb 10, 2026")).toBeInTheDocument();
+    expect(screen.getByText("May 20, 2026")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", { name: /delete your Alpha hike on Feb 10, 2026/i }),
+    );
+
+    // The other hike remains; the deleted date is gone; a remote delete fired.
+    expect(screen.queryByText("Feb 10, 2026")).toBeNull();
+    expect(screen.getByText("May 20, 2026")).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.some(
+        (c) =>
+          String(c[0]).includes("/api/hikes/sync") && c[1]?.method === "DELETE",
+      ),
+    ).toBe(true);
+  });
 });
+
+afterEach(() => vi.unstubAllGlobals());
