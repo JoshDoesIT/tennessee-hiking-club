@@ -8,7 +8,7 @@
  * API requests are never cached, so auth and sync always hit the network.
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const PAGES = `tnhc-pages-${VERSION}`;
 const ASSETS = `tnhc-assets-${VERSION}`;
 const TILES = `tnhc-tiles-${VERSION}`;
