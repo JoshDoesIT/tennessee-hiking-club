@@ -8,8 +8,9 @@ import { AuthControl } from "./auth/auth-control";
 import { AdminNavLink } from "./auth/admin-nav-link";
 import { ThemeToggle } from "./theme-toggle";
 
+// "Explore" is intentionally not here: the prominent "Open the map" button is
+// the single entry point to the map (#223), on both desktop and the mobile menu.
 const NAV = [
-  { href: "/explore", label: "Explore" },
   { href: "/trails", label: "Trails" },
   { href: "/hikes", label: "My hikes" },
   { href: "/about", label: "About" },
@@ -103,6 +104,13 @@ export function SiteHeader() {
           className="border-forest/10 bg-cream border-t md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-3">
+            <Link
+              href="/explore"
+              onClick={() => setOpen(false)}
+              className={`${buttonVariants({ size: "sm" })} mb-3 w-full justify-center`}
+            >
+              Open the map
+            </Link>
             {NAV.map((item) => (
               <Link
                 key={item.href}

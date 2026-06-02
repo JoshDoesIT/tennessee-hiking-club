@@ -35,7 +35,19 @@ describe("SiteHeader mobile menu", () => {
     render(<SiteHeader />);
     await user.click(toggle());
     const menu = screen.getByRole("navigation", { name: /mobile/i });
-    await user.click(within(menu).getByRole("link", { name: "Explore" }));
+    await user.click(within(menu).getByRole("link", { name: "Trails" }));
     expect(toggle()).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("reaches the map via one Open the map link, with no separate Explore item", async () => {
+    const user = userEvent.setup();
+    render(<SiteHeader />);
+    expect(screen.queryByRole("link", { name: "Explore" })).toBeNull();
+
+    await user.click(toggle());
+    const menu = screen.getByRole("navigation", { name: /mobile/i });
+    expect(
+      within(menu).getByRole("link", { name: /open the map/i }),
+    ).toHaveAttribute("href", "/explore");
   });
 });
