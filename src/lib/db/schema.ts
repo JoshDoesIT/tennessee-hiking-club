@@ -266,7 +266,33 @@ export const friendships = pgTable(
   ],
 );
 
+/**
+ * A device registered to receive push notifications for trail alerts (#218,
+ * spec 0008). Keyed by the APNs/FCM `token` (unique, so re-registering a device
+ * upserts). `userId` ties it to an account when the member is signed in, but a
+ * device can subscribe anonymously, so it is nullable. Opting out deletes the
+ * row, which is what stops delivery.
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    token: text("token").notNull().unique(),
+    /** ios | android | web */
+    platform: text("platform").notNull(),
+    userId: text("user_id"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("push_subscriptions_user_id_idx").on(table.userId)],
+);
+
 export type ProfileRow = typeof profiles.$inferSelect;
+export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect;
 export type HikeRow = typeof hikes.$inferSelect;
 export type CleanupRow = typeof cleanups.$inferSelect;
 export type FriendshipRow = typeof friendships.$inferSelect;
