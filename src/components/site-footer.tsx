@@ -51,7 +51,6 @@ export function SiteFooter() {
           links={[
             { label: "Interactive map", href: "/explore" },
             { label: "All trails", href: "/trails" },
-            { label: "Regions", href: "/explore" },
           ]}
         />
         <FooterCol
