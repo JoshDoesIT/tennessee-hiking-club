@@ -155,6 +155,11 @@ async function handleMessage(data) {
 }
 
 self.addEventListener("message", (event) => {
+  // Only act on messages from our own pages. Service-worker messages are
+  // same-origin by nature (no other origin can reach this registration), but
+  // verify the origin explicitly so a stray cross-origin message can never
+  // trigger cache management.
+  if (event.origin && event.origin !== self.location.origin) return;
   const data = event.data;
   if (!data || typeof data.type !== "string") return;
   const port = event.ports && event.ports[0];
