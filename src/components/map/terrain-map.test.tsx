@@ -158,6 +158,13 @@ describe("TerrainMap", () => {
     }
   });
 
+  it("offers the offline 'download this area' control once the map is ready", async () => {
+    render(<TerrainMap trails={trails} />);
+    expect(
+      await screen.findByRole("button", { name: /download this area/i }),
+    ).toBeInTheDocument();
+  });
+
   it("notes an alert in a pin's accessible label", async () => {
     render(
       <TerrainMap
