@@ -14,6 +14,9 @@ importers:
       '@auth/drizzle-adapter':
         specifier: ^1.11.2
         version: 1.11.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3)
+      '@capacitor-community/background-geolocation':
+        specifier: ^1.2.26
+        version: 1.2.26(@capacitor/core@8.3.4)
       '@capacitor/android':
         specifier: ^8.3.4
         version: 8.3.4(@capacitor/core@8.3.4)
@@ -293,6 +296,11 @@ packages:
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
     hasBin: true
+
+  '@capacitor-community/background-geolocation@1.2.26':
+    resolution: {integrity: sha512-kuva8VQ6zM+uIKgHUJTP87IYbmGKhX7DZw62JYfGZ888h4Xr5zeN+UTR6KBRHQVrGBpzSfbv+6/HQVuHYa7W5A==}
+    peerDependencies:
+      '@capacitor/core': '>=3.0.0'
 
   '@capacitor/android@8.3.4':
     resolution: {integrity: sha512-7gJjrG3X32Am1QMLqgMztWTYMLMVNE+VZwhekNxhvYizH4mOV05vH+rC9B+f17bCkYZfyu/qXQX6hoY7kLeVZw==}
@@ -4138,6 +4146,10 @@ snapshots:
   '@bramus/specificity@2.4.2':
     dependencies:
       css-tree: 3.2.1
+
+  '@capacitor-community/background-geolocation@1.2.26(@capacitor/core@8.3.4)':
+    dependencies:
+      '@capacitor/core': 8.3.4
 
   '@capacitor/android@8.3.4(@capacitor/core@8.3.4)':
     dependencies:

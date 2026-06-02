@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { addHike } from "@/lib/hikes/local-log";
 import { downsampleRoute } from "@/lib/trails/route-import";
 import { buildElevationProfile, type RoutePoint } from "@/lib/trails/elevation";
-import { positionToPoint } from "@/lib/hikes/track";
+import { startLocationWatch, type StopWatch } from "@/lib/hikes/geo-watcher";
 
 type Status = "idle" | "recording" | "paused" | "saved";
 
@@ -14,11 +14,12 @@ type Status = "idle" | "recording" | "paused" | "saved";
 const MAX_POINTS = 200;
 
 /**
- * Record a hike live in the browser (#201): start, pause/resume, and finish a
- * `watchPosition` session, showing live distance and elevation. On finish the
- * track is downsampled and logged against this trail (local-first, synced when
- * signed in), so it appears on My Hikes like an uploaded GPX. Browser GPS pauses
- * when the screen sleeps, which is why a native app (#202) is the durable fix.
+ * Record a hike live (#201, #216): start, pause/resume, and finish a location
+ * session, showing live distance and elevation. On a native build this records
+ * in the background with the screen off (the background-geolocation plugin behind
+ * `startLocationWatch`); in the browser it uses foreground `watchPosition`. On
+ * finish the track is downsampled and logged against this trail (local-first,
+ * synced when signed in), so it appears on My Hikes like an uploaded GPX.
  */
 export function RecordHike({
   slug,
@@ -30,26 +31,29 @@ export function RecordHike({
   const [status, setStatus] = useState<Status>("idle");
   const [points, setPoints] = useState<RoutePoint[]>([]);
   const [message, setMessage] = useState("");
-  const watchId = useRef<number | null>(null);
+  const stopWatch = useRef<StopWatch | null>(null);
+  const watching = useRef(false);
   const elapsedMs = useRef(0);
   const segmentStart = useRef<number | null>(null);
 
   function beginWatch() {
     segmentStart.current = Date.now();
-    watchId.current = navigator.geolocation.watchPosition(
-      (pos) => setPoints((prev) => [...prev, positionToPoint(pos.coords)]),
-      () =>
-        setMessage(
-          "Couldn’t read your location. Check location permission and try again.",
-        ),
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
-    );
+    watching.current = true;
+    void startLocationWatch(
+      (point) => setPoints((prev) => [...prev, point]),
+      (msg) => setMessage(msg),
+    ).then((stop) => {
+      // If recording was stopped before the watcher finished starting, stop it.
+      if (watching.current) stopWatch.current = stop;
+      else stop();
+    });
   }
 
   function endWatch() {
-    if (watchId.current != null) {
-      navigator.geolocation.clearWatch(watchId.current);
-      watchId.current = null;
+    watching.current = false;
+    if (stopWatch.current) {
+      stopWatch.current();
+      stopWatch.current = null;
     }
     if (segmentStart.current != null) {
       elapsedMs.current += Date.now() - segmentStart.current;

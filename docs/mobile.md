@@ -67,11 +67,33 @@ Done (this is the foundation):
   A precached `/offline` page is shown for routes you have not opened yet. The
   same service worker makes the website itself offline-capable.
 
+- **Background GPS recording** (#216): on a native build, "Record this hike" uses
+  the `@capacitor-community/background-geolocation` plugin so a hike keeps
+  recording with the screen off; on the web it falls back to foreground
+  `watchPosition`. The platform choice lives in `src/lib/hikes/geo-watcher.ts`,
+  and both paths feed the same recorded-track storage.
+
+  Native config this needs (already applied to the generated `ios/` project; add
+  to `android/` when it is generated, and re-apply if the native projects are
+  regenerated):
+
+  - **iOS** `ios/App/App/Info.plist`: `NSLocationWhenInUseUsageDescription`,
+    `NSLocationAlwaysAndWhenInUseUsageDescription`, and `UIBackgroundModes` with
+    `location`.
+  - **Android** `AndroidManifest.xml`: `ACCESS_FINE_LOCATION`,
+    `ACCESS_BACKGROUND_LOCATION`, and `FOREGROUND_SERVICE` /
+    `FOREGROUND_SERVICE_LOCATION`, plus the plugin's foreground service (see the
+    plugin README).
+
+  To test: rebuild the app (`pnpm cap:sync && pnpm cap:ios`), start a recording,
+  grant location "Always", lock the screen and walk, then finish and confirm the
+  track on My Hikes. Background GPS cannot be exercised on a simulator.
+
 Next, within the mobile build:
 
-- **Background GPS recording** (#216), **offline maps** (#217, the
-  "download this area" UX on top of the tile cache), **push** (#218), and
-  **store submission** (#219).
+- **Offline maps** (#217, the "download this area" UX on top of the tile cache),
+  **push** (#218), and **store submission** (#219).
 
-The native projects will be committed once we add native customizations (location
-permission strings for background recording, icons, and splash screens).
+The native projects will be committed once we add the rest of the native
+customizations (icons and splash screens); until then, re-apply the location
+config above after a regeneration.
