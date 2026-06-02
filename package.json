@@ -39,6 +39,7 @@
   "packageManager": "pnpm@10.24.0",
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
+    "@capacitor-community/background-geolocation": "^1.2.26",
     "@capacitor/android": "^8.3.4",
     "@capacitor/core": "^8.3.4",
     "@capacitor/ios": "^8.3.4",
