@@ -1,59 +1,56 @@
 "use client";
 
 import { useId, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   subscribe,
   getLogSnapshot,
   getServerLogSnapshot,
   addHike,
-  removeTrail,
   setEntryPhotoUrl,
 } from "@/lib/hikes/local-log";
 import { compressImage } from "@/lib/hikes/image";
 import { putPhoto } from "@/lib/hikes/photo-store";
-import { uploadPhoto, deleteRemotePhoto } from "@/lib/hikes/photo-upload";
+import { uploadPhoto } from "@/lib/hikes/photo-upload";
 import { gpxTrackSummary } from "@/lib/hikes/track";
 import { HIKE_CONDITIONS, type RecordedTrack } from "@/lib/hikes/types";
 
-/** Local-first "mark as hiked" toggle for a trail, with an optional note and
- *  conditions captured at log time. Reads the browser-stored log via
- *  useSyncExternalStore (SSR-safe) and persists with no account required. */
+function today(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Log a hike of a trail (#201, #229): tap "Mark as hiked" to record it on the
+ * chosen date (today by default), optionally with conditions, a note, a photo,
+ * or a recorded GPX track. A trail can be logged more than once (on different
+ * dates); each logged hike is managed and deleted on My Hikes. Local-first via
+ * `useSyncExternalStore`; no account required.
+ */
 export function MarkHiked({ slug }: { slug: string }) {
   const log = useSyncExternalStore(
     subscribe,
     getLogSnapshot,
     getServerLogSnapshot,
   );
-  const hiked = log.some((e) => e.trailSlug === slug);
+  const count = log.filter((e) => e.trailSlug === slug).length;
 
   const [showDetails, setShowDetails] = useState(false);
+  const [date, setDate] = useState<string>(today);
   const [note, setNote] = useState("");
   const [conditions, setConditions] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [trackFile, setTrackFile] = useState<File | null>(null);
+  const [status, setStatus] = useState("");
   const detailsId = useId();
 
-  function unlogHike() {
-    // Delete any account-backed photos for this trail before dropping the
-    // entries (removeTrail also GCs the local IndexedDB copies). Best-effort.
-    const remoteUrls = log
-      .filter((e) => e.trailSlug === slug && e.photoUrl)
-      .map((e) => e.photoUrl!);
-    removeTrail(slug);
-    for (const url of remoteUrls) void deleteRemotePhoto(url);
-  }
-
-  if (hiked) {
-    return (
-      <Button variant="primary" aria-pressed onClick={unlogHike}>
-        Hiked
-      </Button>
-    );
-  }
-
   async function logHike() {
-    const date = new Date().toISOString().slice(0, 10);
+    const when = date || today();
+    if (log.some((e) => e.trailSlug === slug && e.hikedOn === when)) {
+      setStatus("Already logged for that date.");
+      return;
+    }
+
     let photoId: string | undefined;
     let blob: Blob | undefined;
     if (photo) {
@@ -81,26 +78,28 @@ export function MarkHiked({ slug }: { slug: string }) {
       }
     }
 
-    addHike(slug, date, { note, conditions, photoId, track });
+    addHike(slug, when, { note, conditions, photoId, track });
+    setStatus("Logged.");
     setNote("");
     setConditions("");
     setPhoto(null);
     setTrackFile(null);
+    setDate(today());
     setShowDetails(false);
 
     // Best-effort: when signed in, upload to the account and record the URL so
     // the photo syncs across devices. Stays local-only if signed out/offline.
     if (blob) {
       const url = await uploadPhoto(blob);
-      if (url) setEntryPhotoUrl(slug, date, url);
+      if (url) setEntryPhotoUrl(slug, when, url);
     }
   }
 
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <Button variant="outline" aria-pressed={false} onClick={logHike}>
-          Mark as hiked
+        <Button variant="outline" onClick={logHike}>
+          {count > 0 ? "Log another hike" : "Mark as hiked"}
         </Button>
         <button
           type="button"
@@ -109,15 +108,47 @@ export function MarkHiked({ slug }: { slug: string }) {
           aria-controls={showDetails ? detailsId : undefined}
           className="text-olive hover:text-forest text-sm font-medium underline-offset-4 hover:underline"
         >
-          {showDetails ? "Hide details" : "Add a note, conditions, or photo"}
+          {showDetails ? "Hide details" : "Add a date, note, conditions, or photo"}
         </button>
+        <span role="status" aria-live="polite" className="text-pine text-sm">
+          {status}
+        </span>
       </div>
+
+      {count > 0 ? (
+        <p className="text-ink/60 mt-1 text-sm">
+          Hiked {count} time{count === 1 ? "" : "s"}.{" "}
+          <Link
+            href="/hikes"
+            className="text-pine hover:text-forest underline underline-offset-4"
+          >
+            Manage on My hikes
+          </Link>
+          .
+        </p>
+      ) : null}
 
       {showDetails ? (
         <div
           id={detailsId}
           className="border-forest/10 bg-cream-50 mt-3 grid gap-3 rounded-xl border p-4 sm:grid-cols-2"
         >
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor={`${detailsId}-date`}
+              className="text-olive text-xs font-semibold tracking-wider uppercase"
+            >
+              Date hiked
+            </label>
+            <input
+              id={`${detailsId}-date`}
+              type="date"
+              value={date}
+              max={today()}
+              onChange={(e) => setDate(e.target.value)}
+              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
+            />
+          </div>
           <div className="flex flex-col gap-1">
             <label
               htmlFor={`${detailsId}-cond`}
@@ -139,7 +170,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               ))}
             </select>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1 sm:col-span-2">
             <label
               htmlFor={`${detailsId}-note`}
               className="text-olive text-xs font-semibold tracking-wider uppercase"

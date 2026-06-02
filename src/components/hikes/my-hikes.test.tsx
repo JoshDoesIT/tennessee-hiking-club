@@ -108,9 +108,9 @@ describe("MyHikes", () => {
 
   it("lists hikes by date and deletes a single one", async () => {
     const user = userEvent.setup();
-    const fetchMock = vi.fn(
-      async (_input?: unknown, _init?: RequestInit) => ({ ok: true }) as Response,
-    );
+    const fetchMock = vi.fn<
+      (input: unknown, init?: RequestInit) => Promise<Response>
+    >(async () => ({ ok: true }) as Response);
     vi.stubGlobal("fetch", fetchMock);
 
     addHike("a", "2026-02-10");
