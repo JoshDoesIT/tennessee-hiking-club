@@ -6,7 +6,9 @@ test("logging a hike persists locally and shows on My hikes", async ({
   await page.goto("/trails/fall-creek-falls");
 
   await page.getByRole("button", { name: /mark as hiked/i }).click();
-  await expect(page.getByRole("button", { name: /^hiked$/i })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /log another hike/i }),
+  ).toBeVisible();
 
   await page.goto("/hikes");
   await expect(page.getByRole("heading", { name: /my hikes/i })).toBeVisible();
@@ -28,16 +30,16 @@ test("logging a hike with a photo shows a thumbnail on My hikes (signed out)", a
 }) => {
   await page.goto("/trails/fall-creek-falls");
 
-  await page
-    .getByRole("button", { name: /add a note, conditions, or photo/i })
-    .click();
+  await page.getByRole("button", { name: /add a date/i }).click();
   await page.getByLabel(/photo/i).setInputFiles({
     name: "trail.png",
     mimeType: "image/png",
     buffer: Buffer.from(PNG_1x1, "base64"),
   });
   await page.getByRole("button", { name: /mark as hiked/i }).click();
-  await expect(page.getByRole("button", { name: /^hiked$/i })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /log another hike/i }),
+  ).toBeVisible();
 
   await page.goto("/hikes");
   await expect(
