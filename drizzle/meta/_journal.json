@@ -99,6 +99,13 @@
       "when": 1780311657489,
       "tag": "0013_short_ted_forrester",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1780396546827,
+      "tag": "0014_supreme_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

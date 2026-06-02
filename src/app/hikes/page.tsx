@@ -6,6 +6,7 @@ import { LogTransfer } from "@/components/hikes/log-transfer";
 import { SyncOnSignIn } from "@/components/hikes/sync-on-signin";
 import { FriendsAndSharing } from "@/components/hikes/friends-and-sharing";
 import { PasskeyManager } from "@/components/auth/passkey-manager";
+import { PushOptIn } from "@/components/push/push-opt-in";
 import { StewardBadge } from "@/components/stewardship/steward-badge";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { SITE_URL } from "@/lib/site";
@@ -72,6 +73,7 @@ export default async function MyHikesPage() {
           Manage how you sign in, and back up or move your logged hikes.
         </p>
         <div className="mt-6 space-y-8">
+          <PushOptIn />
           {session?.user ? <PasskeyManager /> : null}
           <LogTransfer trails={trails} />
         </div>
