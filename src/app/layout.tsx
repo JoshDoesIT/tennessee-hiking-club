@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { PwaRegister } from "@/components/pwa-register";
 import { OfflinePrecache } from "@/components/offline-precache";
+import { OfflineTilePrefetch } from "@/components/offline-tile-prefetch";
 import { SiteFooter } from "@/components/site-footer";
 import { getAllTrails } from "@/lib/trails";
 import { appRoutes } from "@/lib/offline/routes";
@@ -93,7 +94,9 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const precacheRoutes = appRoutes(getAllTrails().map((trail) => trail.slug));
+  const trails = getAllTrails();
+  const precacheRoutes = appRoutes(trails.map((trail) => trail.slug));
+  const trailheads = trails.map((trail) => trail.coordinates);
   return (
     <html
       lang="en"
@@ -107,6 +110,7 @@ export default function RootLayout({
         <SkipLink />
         <PwaRegister />
         <OfflinePrecache routes={precacheRoutes} />
+        <OfflineTilePrefetch trailheads={trailheads} />
         <SiteHeader />
         <main
           id="main-content"
