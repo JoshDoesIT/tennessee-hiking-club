@@ -15,16 +15,11 @@ import {
   withPhotoData,
 } from "@/lib/hikes/transfer";
 import type { Trail } from "@/lib/trails/schema";
+import { saveOrShareTextFile } from "@/lib/share/save-file";
 
 function download(filename: string, content: string, type: string) {
-  const url = URL.createObjectURL(new Blob([content], { type }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  // Web downloads a blob; the native app opens the share sheet (#245).
+  void saveOrShareTextFile(filename, content, type);
 }
 
 /**
