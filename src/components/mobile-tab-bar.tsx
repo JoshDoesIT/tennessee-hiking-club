@@ -82,6 +82,22 @@ function RecordIcon() {
   );
 }
 
+function MoreIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      stroke="none"
+      className={ICON}
+    >
+      <circle cx="5" cy="12" r="1.7" />
+      <circle cx="12" cy="12" r="1.7" />
+      <circle cx="19" cy="12" r="1.7" />
+    </svg>
+  );
+}
+
 type Tab = {
   href: string;
   label: string;
@@ -114,6 +130,12 @@ const TABS: Tab[] = [
     icon: <RecordIcon />,
     match: (p) => p === "/record",
   },
+  {
+    href: "/more",
+    label: "More",
+    icon: <MoreIcon />,
+    match: (p) => p === "/more",
+  },
 ];
 
 /**
@@ -131,8 +153,7 @@ export function MobileTabBar() {
     if (!native) return;
     // Leave room under page content for the fixed bar (see globals.css).
     document.documentElement.classList.add("has-mobile-tabbar");
-    return () =>
-      document.documentElement.classList.remove("has-mobile-tabbar");
+    return () => document.documentElement.classList.remove("has-mobile-tabbar");
   }, [native]);
 
   if (!native) return null;

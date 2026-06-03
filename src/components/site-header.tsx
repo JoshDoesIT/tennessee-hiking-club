@@ -18,24 +18,12 @@ const NAV = [
   { href: "/contribute", label: "Contribute" },
 ];
 
-// On the native app the bottom tab bar carries the primary destinations (My
-// Hikes, Trails, Map, Record) and the marketing footer is hidden, so the header
-// menu becomes the "more" menu: the remaining secondary pages, so nothing is
-// unreachable (#250).
-const MORE_LINKS = [
-  { href: "/about", label: "About" },
-  { href: "/contribute", label: "Contribute" },
-  { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/leave-no-trace", label: "Leave No Trace" },
-  { href: "/credits", label: "Credits" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/accessibility", label: "Accessibility" },
-];
-
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  // On the native app the bottom tab bar is the primary navigation and a "More"
+  // tab holds the secondary pages, so the header drops its menu entirely and is
+  // just the logo + theme toggle (#250). The website keeps the full menu.
   const native = useIsNative();
-  const menuLinks = native ? MORE_LINKS : NAV;
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLElement>(null);
 
@@ -72,7 +60,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <AdminNavLink className="text-amber-700 hover:text-amber-600 text-sm font-medium transition-colors" />
+          <AdminNavLink className="text-sm font-medium text-amber-700 transition-colors hover:text-amber-600" />
           <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
@@ -82,38 +70,45 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
-          <button
-            ref={toggleRef}
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          aria-label="Toggle navigation menu"
-          className="border-forest/15 text-forest flex h-10 w-10 items-center justify-center rounded-full border md:hidden"
-        >
-          <span className="sr-only">Menu</span>
-          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-            {open ? (
-              <path
-                d="M3 3l12 12M15 3L3 15"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            ) : (
-              <path
-                d="M2 5h14M2 9h14M2 13h14"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            )}
-          </svg>
-          </button>
+          {native ? null : (
+            <button
+              ref={toggleRef}
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-controls="mobile-nav"
+              aria-label="Toggle navigation menu"
+              className="border-forest/15 text-forest flex h-10 w-10 items-center justify-center rounded-full border md:hidden"
+            >
+              <span className="sr-only">Menu</span>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                aria-hidden="true"
+              >
+                {open ? (
+                  <path
+                    d="M3 3l12 12M15 3L3 15"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                ) : (
+                  <path
+                    d="M2 5h14M2 9h14M2 13h14"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                )}
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
-      {open ? (
+      {open && !native ? (
         <nav
           ref={menuRef}
           id="mobile-nav"
@@ -121,16 +116,14 @@ export function SiteHeader() {
           className="border-forest/10 bg-cream border-t md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-3">
-            {native ? null : (
-              <Link
-                href="/explore"
-                onClick={() => setOpen(false)}
-                className={`${buttonVariants({ size: "sm" })} mb-3 w-full justify-center`}
-              >
-                Open the map
-              </Link>
-            )}
-            {menuLinks.map((item) => (
+            <Link
+              href="/explore"
+              onClick={() => setOpen(false)}
+              className={`${buttonVariants({ size: "sm" })} mb-3 w-full justify-center`}
+            >
+              Open the map
+            </Link>
+            {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -141,7 +134,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <AdminNavLink
-              className="text-amber-700 border-forest/5 border-b py-3 text-base font-medium"
+              className="border-forest/5 border-b py-3 text-base font-medium text-amber-700"
               onNavigate={() => setOpen(false)}
             />
             <div className="pt-3">

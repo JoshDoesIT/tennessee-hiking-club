@@ -17,7 +17,7 @@ describe("MobileTabBar", () => {
     render(<MobileTabBar />);
 
     const nav = await screen.findByRole("navigation", { name: /primary/i });
-    for (const label of ["My Hikes", "Trails", "Map", "Record"]) {
+    for (const label of ["My Hikes", "Trails", "Map", "Record", "More"]) {
       expect(
         screen.getByRole("link", { name: new RegExp(label, "i") }),
       ).toBeInTheDocument();

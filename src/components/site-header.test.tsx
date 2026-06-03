@@ -59,21 +59,14 @@ describe("SiteHeader mobile menu", () => {
     ).toHaveAttribute("href", "/explore");
   });
 
-  it("on native, the menu carries the secondary pages and drops the redundant tab/map links", async () => {
+  it("drops the header menu entirely on native (the tab bar + More tab navigate)", () => {
     isNativePlatform.mockReturnValue(true);
-    const user = userEvent.setup();
     render(<SiteHeader />);
-
-    await user.click(toggle());
-    const menu = screen.getByRole("navigation", { name: /mobile/i });
-    // Relocated footer/secondary pages stay reachable.
-    for (const label of ["Leaderboard", "Privacy", "Accessibility"]) {
-      expect(
-        within(menu).getByRole("link", { name: label }),
-      ).toBeInTheDocument();
-    }
-    // The tab bar already covers these, so the menu does not repeat them.
-    expect(within(menu).queryByRole("link", { name: /open the map/i })).toBeNull();
-    expect(within(menu).queryByRole("link", { name: "Trails" })).toBeNull();
+    // No hamburger toggle and no mobile menu: navigation lives in the bottom
+    // tab bar and the More tab instead.
+    expect(screen.queryByRole("button", { name: /menu/i })).toBeNull();
+    expect(
+      screen.queryByRole("navigation", { name: /mobile/i }),
+    ).toBeNull();
   });
 });
