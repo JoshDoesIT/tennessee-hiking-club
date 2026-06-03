@@ -187,3 +187,10 @@ body::after {
 .dark .maplibregl-canvas {
   filter: invert(0.9) hue-rotate(180deg) brightness(1.05);
 }
+
+/* Native app only (#250): leave room under page content for the fixed bottom
+ * tab bar (plus the home-indicator safe area), so nothing hides behind it. The
+ * class is added to <html> by MobileTabBar on a Capacitor build. */
+.has-mobile-tabbar main {
+  padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+}
