@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { saveOrShareTextFile } from "@/lib/share/save-file";
 
 export type PendingSubmission = {
   id: string;
@@ -31,19 +32,10 @@ export type PendingSubmission = {
 
 type Decision = "approved" | "rejected";
 
-/** Download generated markdown as a file the maintainer can commit. */
+/** Download generated markdown as a file the maintainer can commit. Web
+ *  downloads a blob; the native app opens the share sheet (#245). */
 function downloadFile(fileName: string, markdown: string) {
-  if (typeof URL.createObjectURL !== "function") return;
-  const url = URL.createObjectURL(
-    new Blob([markdown], { type: "text/markdown" }),
-  );
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  void saveOrShareTextFile(fileName, markdown, "text/markdown");
 }
 
 /**
