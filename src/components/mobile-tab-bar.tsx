@@ -2,19 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useSyncExternalStore, type ReactNode } from "react";
-import { Capacitor } from "@capacitor/core";
-
-// Native status never changes within a session; read it SSR-safely (server and
-// first client render see `false`, so there is no hydration mismatch).
-const noopSubscribe = () => () => {};
-function useIsNative(): boolean {
-  return useSyncExternalStore(
-    noopSubscribe,
-    () => Capacitor.isNativePlatform(),
-    () => false,
-  );
-}
+import { useEffect, type ReactNode } from "react";
+import { useIsNative } from "@/lib/use-is-native";
 
 const ICON = "h-6 w-6";
 

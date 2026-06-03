@@ -194,3 +194,9 @@ body::after {
 .has-mobile-tabbar main {
   padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
 }
+
+/* The marketing footer is web chrome; in the native app the tab bar + header
+ * "more" menu carry navigation instead (#250). */
+.has-mobile-tabbar footer {
+  display: none;
+}

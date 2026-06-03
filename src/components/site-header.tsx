@@ -7,6 +7,7 @@ import { buttonVariants } from "./ui/button";
 import { AuthControl } from "./auth/auth-control";
 import { AdminNavLink } from "./auth/admin-nav-link";
 import { ThemeToggle } from "./theme-toggle";
+import { useIsNative } from "@/lib/use-is-native";
 
 // "Explore" is intentionally not here: the prominent "Open the map" button is
 // the single entry point to the map (#223), on both desktop and the mobile menu.
@@ -17,8 +18,24 @@ const NAV = [
   { href: "/contribute", label: "Contribute" },
 ];
 
+// On the native app the bottom tab bar carries the primary destinations (My
+// Hikes, Trails, Map, Record) and the marketing footer is hidden, so the header
+// menu becomes the "more" menu: the remaining secondary pages, so nothing is
+// unreachable (#250).
+const MORE_LINKS = [
+  { href: "/about", label: "About" },
+  { href: "/contribute", label: "Contribute" },
+  { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/leave-no-trace", label: "Leave No Trace" },
+  { href: "/credits", label: "Credits" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/accessibility", label: "Accessibility" },
+];
+
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const native = useIsNative();
+  const menuLinks = native ? MORE_LINKS : NAV;
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLElement>(null);
 
@@ -104,14 +121,16 @@ export function SiteHeader() {
           className="border-forest/10 bg-cream border-t md:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-3">
-            <Link
-              href="/explore"
-              onClick={() => setOpen(false)}
-              className={`${buttonVariants({ size: "sm" })} mb-3 w-full justify-center`}
-            >
-              Open the map
-            </Link>
-            {NAV.map((item) => (
+            {native ? null : (
+              <Link
+                href="/explore"
+                onClick={() => setOpen(false)}
+                className={`${buttonVariants({ size: "sm" })} mb-3 w-full justify-center`}
+              >
+                Open the map
+              </Link>
+            )}
+            {menuLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
