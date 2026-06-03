@@ -120,8 +120,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Page navigations: network-first, fall back to cache, then the offline page.
-  if (request.mode === "navigate") {
+  // Page documents: real navigations and the client's offline warm-up fetches
+  // (#244) both ask for `text/html`. Network-first, fall back to cache, then the
+  // offline page. Caching the warm-up fetches is what makes pages the member
+  // never opened still load offline. (App Router RSC requests ask for
+  // `text/x-component`, so they are not cached here and never collide with the
+  // HTML cached under the same URL.)
+  const accept = request.headers.get("accept") || "";
+  if (request.mode === "navigate" || accept.includes("text/html")) {
     event.respondWith(navigateNetworkFirst(request));
   }
 });
