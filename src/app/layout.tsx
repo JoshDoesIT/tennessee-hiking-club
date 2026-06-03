@@ -3,7 +3,10 @@ import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { PwaRegister } from "@/components/pwa-register";
+import { OfflinePrecache } from "@/components/offline-precache";
 import { SiteFooter } from "@/components/site-footer";
+import { getAllTrails } from "@/lib/trails";
+import { appRoutes } from "@/lib/offline/routes";
 import { SkipLink } from "@/components/skip-link";
 import { SITE_URL } from "@/lib/site";
 import { shouldUseDarkTheme } from "@/lib/theme";
@@ -89,6 +92,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const precacheRoutes = appRoutes(getAllTrails().map((trail) => trail.slug));
   return (
     <html
       lang="en"
@@ -101,6 +105,7 @@ export default function RootLayout({
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
         <PwaRegister />
+        <OfflinePrecache routes={precacheRoutes} />
         <SiteHeader />
         <main
           id="main-content"

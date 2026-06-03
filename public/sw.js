@@ -151,6 +151,30 @@ async function handleMessage(data) {
   if (data.type === "TNHC_TILES_USAGE") {
     return { count: (await cache.keys()).length };
   }
+  // Proactively cache every app page on the first online visit (#244), so the
+  // whole app is navigable offline, not just the pages that happened to be
+  // browsed. Fetched in small batches so the first visit does not hammer the
+  // connection; best-effort per page.
+  if (data.type === "TNHC_PRECACHE" && Array.isArray(data.routes)) {
+    const pages = await caches.open(PAGES);
+    let cached = 0;
+    for (let i = 0; i < data.routes.length; i += 6) {
+      await Promise.all(
+        data.routes.slice(i, i + 6).map(async (route) => {
+          try {
+            const res = await fetch(route, { credentials: "same-origin" });
+            if (res && res.ok) {
+              await pages.put(route, res.clone());
+              cached++;
+            }
+          } catch {
+            // ignore; this page just stays uncached
+          }
+        }),
+      );
+    }
+    return { cached };
+  }
   return { ok: false };
 }
 
