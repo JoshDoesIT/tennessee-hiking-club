@@ -3,6 +3,7 @@ import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
+import { ApiOriginSetup } from "@/components/api-origin-setup";
 import { PwaRegister } from "@/components/pwa-register";
 import { SplashHider } from "@/components/splash-hider";
 import { OfflinePrecache } from "@/components/offline-precache";
@@ -109,6 +110,7 @@ export default function RootLayout({
       </head>
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
+        <ApiOriginSetup />
         <SplashHider />
         <PwaRegister />
         <OfflinePrecache routes={precacheRoutes} />
