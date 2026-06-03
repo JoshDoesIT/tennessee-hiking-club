@@ -1,9 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import {
-  downloadTiles,
-  regionTileUrls,
-  countRegionTiles,
-} from "./download-region";
+import { downloadTiles, regionTileUrls } from "./download-region";
 import { countTiles, type LngLatBounds } from "./tiles";
 
 const okFetch = () =>
@@ -87,21 +83,5 @@ describe("regionTileUrls", () => {
     // The DEM caps at z11, so no DEM url should reach z12.
     expect(urls.some((u) => u.includes("/terrarium/12/"))).toBe(false);
     expect(urls.some((u) => u.includes("/planet/v/12/"))).toBe(true);
-  });
-});
-
-describe("countRegionTiles", () => {
-  it("sums each source's tiles without ever throwing on a huge area", () => {
-    const vector = { template: "https://t/planet/v/{z}/{x}/{y}.pbf", maxzoom: 14 };
-    const dem = { template: "https://t/terrarium/{z}/{x}/{y}.png", maxzoom: 11 };
-    expect(countRegionTiles([vector, dem], BOX, 10, 12)).toBe(
-      countTiles(BOX, 10, 12) + countTiles(BOX, 10, 11),
-    );
-
-    // The whole state at z14 would overflow enumerateTiles' ceiling; the count
-    // helper still returns a (large) number instead of throwing.
-    const tn: LngLatBounds = { west: -90.3, south: 35, east: -81.6, north: 36.7 };
-    expect(() => countRegionTiles([vector], tn, 14, 14)).not.toThrow();
-    expect(countRegionTiles([vector], tn, 14, 14)).toBeGreaterThan(0);
   });
 });

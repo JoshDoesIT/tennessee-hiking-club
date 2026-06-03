@@ -1,96 +1,73 @@
-# 0007: Offline map regions ("download this area")
+# 0007: Offline maps (silent all-trail prefetch)
 
-- **Status:** in progress
-- **Issue:** #217 (part of the native mobile build, #202 / spec 0006)
+- **Status:** implemented (pending on-device verification)
+- **Issue:** #217 / #244 (part of the native mobile build, #202 / spec 0006)
 - **Depends on:** the Capacitor shell (#215) and the offline service worker (#224)
 
 ## Problem
 
 Cell coverage is poor or absent in the gorges and backcountry, which is exactly
-where a hiker needs the map most. The service worker already caches map tiles
-*cache-first as they are fetched* (`public/sw.js`), so panning ground you have
-already viewed online works offline. But a hiker cannot pre-load a trailhead
-they have not visited yet. #217 adds an explicit "download this area for
-offline" action plus a way to see, re-open, and clear what has been downloaded.
+where a hiker needs the map most. The service worker caches tiles cache-first as
+they are fetched, so panning ground you have already viewed online works
+offline. The gap is the trailheads you have not opened, at the zoom levels you
+never reached.
+
+An earlier version added an explicit "Download this area" control plus a manager
+to list and clear regions. On device that proved redundant and awkward
+(browsing already caches silently, the WebView keeps its own HTTP cache so
+"Clear all" could not fully reclaim, and it put work on the user). **The
+implemented design is silent and complete:** the native app caches the map area
+around *every* trailhead on the first online launch, so all the maps work
+offline with no action from the member.
 
 ## Tiles we depend on
 
-The detail map is MapLibre with key-free, open data (see `build-style.ts`):
+MapLibre with key-free, open data (see `build-style.ts`):
 
-- **Vector base** (OpenFreeMap `openmaptiles`): the style's `openmaptiles`
-  source resolves a TileJSON at `https://tiles.openfreemap.org/planet` whose
-  tile template carries a **dated version segment**
-  (`…/planet/<version>/{z}/{x}/{y}.pbf`, maxzoom 14). The version changes over
-  time, so the download resolves the current template from the TileJSON at run
-  time rather than hard-coding it.
+- **Vector base** (OpenFreeMap): a TileJSON at
+  `https://tiles.openfreemap.org/planet` whose tile template carries a dated
+  version segment, resolved at run time. Maxzoom 14.
 - **Terrain / hillshade DEM** (AWS Terrarium): `…/terrarium/{z}/{x}/{y}.png`,
   maxzoom 13.
 
-Both hosts are already in the service worker's `TILE_HOSTS`, so any `fetch()` of
-a tile URL from a controlled page is intercepted and stored in the
-`tnhc-tiles-<version>` cache. That is the whole prefetch mechanism: enumerate
-the tile URLs for a bounding box and `fetch()` them; the service worker caches
-them. No second copy of the caching logic, and it works identically in the
-browser PWA and the Capacitor WebView.
+Both hosts are in the service worker's `TILE_HOSTS`, so any `fetch()` of a tile
+URL is intercepted and cached. The prefetch is just: enumerate the tile URLs for
+a bounding box and `fetch()` them; the worker caches them. Re-running later is
+cheap because already-cached tiles return without a network hit.
 
 ## Design
 
-### Pure core (unit-tested)
+- `src/lib/maps/tiles.ts`: Web Mercator slippy-map math (`enumerateTiles`,
+  `expandTemplate`, a `MAX_TILES` ceiling).
+- `src/lib/maps/tile-sources.ts`: resolve the versioned vector template + the
+  DEM template.
+- `src/lib/maps/download-region.ts`: `regionTileUrls(...)` expands the URLs for a
+  box; `downloadTiles(...)` fetches them with bounded concurrency.
+- `src/lib/maps/prefetch.ts`: `trailBounds(center)` makes a ~9 km box around a
+  trailhead; `prefetchAllTrailAreas(centers)` resolves the sources once and
+  fetches every trailhead's box across hiking zoom levels (12-14). A no-op
+  offline; gentle (low concurrency, one trail at a time).
+- `src/components/offline-tile-prefetch.tsx` (mounted in the root layout, native
+  only): on first launch, after the worker is active, prefetches all trailheads
+  from `getAllTrails()`. Renders nothing.
 
-- `src/lib/maps/tiles.ts`: Web Mercator slippy-map math.
-  - `lngLatToTile(lng, lat, z)` and the inverse range for a bounding box.
-  - `enumerateTiles(bounds, minZoom, maxZoom)` and `countTiles(...)` (the count
-    without allocating, for the "~N tiles / ~M MB" estimate), clamped to a hard
-    `MAX_TILES` ceiling so a careless zoom range cannot try to fetch the planet.
-  - `expandTemplate(template, tile)` to fill `{z}/{x}/{y}`.
-- `src/lib/maps/offline-regions.ts`: a `localStorage`-backed store of saved
-  regions (`tnhc:offline-regions`), mirroring `hikes/local-log.ts`
-  (injectable storage, `useSyncExternalStore` snapshot, storage-event
-  subscribe). A region is `{ id, name, bounds, minZoom, maxZoom, tileCount,
-  savedAt }`.
-- `src/lib/maps/download-region.ts`: `downloadRegion(...)` fetches the tile URLs
-  with bounded concurrency, reports progress, and returns an ok/failed summary.
-  `fetch` is injected for tests. Caching is a side effect of the service worker.
+No UI, no region index, no management surface, no service-worker message
+handler. The website keeps lazy cache-as-you-browse.
 
-### Service worker
+## Acceptance criteria (#217 / #244)
 
-A `message` handler so the management UI can reclaim space:
-
-- `{ type: "TNHC_CLEAR_TILES" }` deletes the whole `tnhc-tiles-*` cache.
-- `{ type: "TNHC_DELETE_TILES", urls }` deletes specific tile URLs.
-
-No cache-version bump (that would needlessly evict everyone's existing tiles);
-the handler is additive and ships via the existing update-on-focus path.
-
-### UI
-
-- A "Download this area" control on the terrain map reads the current map
-  bounds, resolves the current planet template, estimates the tile count, takes
-  a short name, downloads with a progress indicator, and saves the region.
-- An "Offline maps" manager lists saved regions with their size and a Delete,
-  plus "Clear all". Mounted on `/explore` beneath the map.
-
-## Acceptance criteria (from #217)
-
-1. After downloading a region, the map renders and pans with the device offline.
+1. The map renders and pans offline at any trailhead after one online launch.
 2. Trail detail and its map are usable offline.
-3. Downloaded areas can be viewed, managed, and cleared.
+3. ~~Downloaded areas can be viewed, managed, and cleared.~~ Descoped: caching is
+   silent and automatic, so there is no manager.
 
-AC 1 and 2 are verified on device (offline after first open) and tracked the way
-the other mobile phases are; AC 3 and all pure logic are covered by automated
-tests.
+AC 1 and 2 are verified on device (offline after first open); the prefetch logic
+is covered by automated tests.
 
-## Precise per-region eviction (#236, done)
+## Notes
 
-Each region now records the exact tile URLs it downloaded (under
-`tnhc:offline-region-tiles`), so removing a region deletes precisely those
-tiles, reference-counted against the other saved regions: a tile shared with
-another region survives, and because the stored URL is the one that was cached,
-eviction is correct even after the vector tile version rolls over. Regions saved
-before this fall back to the earlier best-effort recompute. See
-`offline-regions.ts` (`evictableTiles`) and its tests.
-
-## Out of scope (v1)
-
-- A native (filesystem) tile store separate from Cache Storage; the WebView
-  cache is sufficient for the first release.
+- First launch downloads the tiles for all trails in the background (tens of MB,
+  one time). A future refinement could gate the heavier fetching to Wi-Fi.
+- The removed explicit-download design (the control, the `offline-regions`
+  store including the #236 eviction work, the `tile-cache` bridge, and the
+  service-worker clear/delete handler) was deleted with this change.

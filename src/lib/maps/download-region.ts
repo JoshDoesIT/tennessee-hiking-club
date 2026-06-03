@@ -1,9 +1,4 @@
-import {
-  countTiles,
-  enumerateTiles,
-  expandTemplate,
-  type LngLatBounds,
-} from "./tiles";
+import { enumerateTiles, expandTemplate, type LngLatBounds } from "./tiles";
 
 /**
  * Tile-download orchestration for "download this area" (#217, spec 0007).
@@ -53,27 +48,6 @@ export function regionTileUrls(
     }
   }
   return urls;
-}
-
-/**
- * Total tiles a region download would fetch across all sources (each clamped to
- * its own zoom range), for the "~N tiles" estimate. Never throws, so it is safe
- * to call on an over-large area to decide whether to offer the download.
- */
-export function countRegionTiles(
-  sources: TileSource[],
-  bounds: LngLatBounds,
-  minZoom: number,
-  maxZoom: number,
-): number {
-  let total = 0;
-  for (const source of sources) {
-    const lo = Math.max(minZoom, source.minzoom ?? 0);
-    const hi = Math.min(maxZoom, source.maxzoom ?? maxZoom);
-    if (lo > hi) continue;
-    total += countTiles(bounds, lo, hi);
-  }
-  return total;
 }
 
 /**
