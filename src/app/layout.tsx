@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { PwaRegister } from "@/components/pwa-register";
+import { SplashHider } from "@/components/splash-hider";
 import { OfflinePrecache } from "@/components/offline-precache";
 import { OfflineTilePrefetch } from "@/components/offline-tile-prefetch";
 import { SiteFooter } from "@/components/site-footer";
@@ -108,6 +109,7 @@ export default function RootLayout({
       </head>
       <body className="bg-cream text-ink flex min-h-full flex-col antialiased">
         <SkipLink />
+        <SplashHider />
         <PwaRegister />
         <OfflinePrecache routes={precacheRoutes} />
         <OfflineTilePrefetch trailheads={trailheads} />

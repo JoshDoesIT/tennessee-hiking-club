@@ -19,6 +19,20 @@ const config: CapacitorConfig = {
     url: process.env.CAP_SERVER_URL ?? "https://www.tnhiking.club",
     cleartext: false,
   },
+  plugins: {
+    // A branded launch splash so the app does not flash a black/white screen
+    // while the hosted app loads (#246). It stays up (no auto-hide) until the
+    // web app is ready and calls `SplashScreen.hide()` (see SplashHider), and
+    // shows the brand forest with a cream spinner meanwhile.
+    SplashScreen: {
+      launchAutoHide: false,
+      backgroundColor: "#2a3623",
+      showSpinner: true,
+      spinnerColor: "#fbf6e9",
+      androidSpinnerStyle: "large",
+      iosSpinnerStyle: "large",
+    },
+  },
 };
 
 export default config;
