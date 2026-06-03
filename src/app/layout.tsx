@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
+import { MobileTabBar } from "@/components/mobile-tab-bar";
 import { PwaRegister } from "@/components/pwa-register";
 import { OfflinePrecache } from "@/components/offline-precache";
 import { SiteFooter } from "@/components/site-footer";
@@ -115,6 +116,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <MobileTabBar />
         <Analytics />
         <SpeedInsights />
       </body>
