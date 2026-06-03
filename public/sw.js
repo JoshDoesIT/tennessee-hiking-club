@@ -157,14 +157,24 @@ async function handleMessage(data) {
   // connection; best-effort per page.
   if (data.type === "TNHC_PRECACHE" && Array.isArray(data.routes)) {
     const pages = await caches.open(PAGES);
+    // Constrain to same-origin app paths so the routes from the message can
+    // never make the worker fetch an off-origin URL (request forgery).
+    const targets = [];
+    for (const route of data.routes) {
+      if (typeof route !== "string" || !route.startsWith("/") || route.startsWith("//")) {
+        continue;
+      }
+      const url = new URL(route, self.location.origin);
+      if (url.origin === self.location.origin) targets.push(url.href);
+    }
     let cached = 0;
-    for (let i = 0; i < data.routes.length; i += 6) {
+    for (let i = 0; i < targets.length; i += 6) {
       await Promise.all(
-        data.routes.slice(i, i + 6).map(async (route) => {
+        targets.slice(i, i + 6).map(async (href) => {
           try {
-            const res = await fetch(route, { credentials: "same-origin" });
+            const res = await fetch(href, { credentials: "same-origin" });
             if (res && res.ok) {
-              await pages.put(route, res.clone());
+              await pages.put(href, res.clone());
               cached++;
             }
           } catch {
