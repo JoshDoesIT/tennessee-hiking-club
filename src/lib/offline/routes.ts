@@ -10,6 +10,7 @@ export const STATIC_ROUTES = [
   "/explore",
   "/hikes",
   "/record",
+  "/more",
   "/leaderboard",
   "/about",
   "/contribute",
