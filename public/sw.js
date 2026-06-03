@@ -120,8 +120,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Page navigations: network-first, fall back to cache, then the offline page.
-  if (request.mode === "navigate") {
+  // Page documents: real navigations and the client's offline warm-up fetches
+  // (#244) both ask for `text/html`. Network-first, fall back to cache, then the
+  // offline page. Caching the warm-up fetches is what makes pages the member
+  // never opened still load offline. (App Router RSC requests ask for
+  // `text/x-component`, so they are not cached here and never collide with the
+  // HTML cached under the same URL.)
+  const accept = request.headers.get("accept") || "";
+  if (request.mode === "navigate" || accept.includes("text/html")) {
     event.respondWith(navigateNetworkFirst(request));
   }
 });
@@ -150,40 +156,6 @@ async function handleMessage(data) {
   }
   if (data.type === "TNHC_TILES_USAGE") {
     return { count: (await cache.keys()).length };
-  }
-  // Proactively cache every app page on the first online visit (#244), so the
-  // whole app is navigable offline, not just the pages that happened to be
-  // browsed. Fetched in small batches so the first visit does not hammer the
-  // connection; best-effort per page.
-  if (data.type === "TNHC_PRECACHE" && Array.isArray(data.routes)) {
-    const pages = await caches.open(PAGES);
-    // Constrain to same-origin app paths so the routes from the message can
-    // never make the worker fetch an off-origin URL (request forgery).
-    const targets = [];
-    for (const route of data.routes) {
-      if (typeof route !== "string" || !route.startsWith("/") || route.startsWith("//")) {
-        continue;
-      }
-      const url = new URL(route, self.location.origin);
-      if (url.origin === self.location.origin) targets.push(url.href);
-    }
-    let cached = 0;
-    for (let i = 0; i < targets.length; i += 6) {
-      await Promise.all(
-        targets.slice(i, i + 6).map(async (href) => {
-          try {
-            const res = await fetch(href, { credentials: "same-origin" });
-            if (res && res.ok) {
-              await pages.put(href, res.clone());
-              cached++;
-            }
-          } catch {
-            // ignore; this page just stays uncached
-          }
-        }),
-      );
-    }
-    return { cached };
   }
   return { ok: false };
 }
