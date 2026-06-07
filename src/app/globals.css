@@ -200,3 +200,9 @@ body::after {
 .has-mobile-tabbar footer {
   display: none;
 }
+
+/* Lift the "recording in progress" pill (#267) above the bottom tab bar on a
+ * native build so the two do not overlap. */
+.has-mobile-tabbar .recording-pill {
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+}

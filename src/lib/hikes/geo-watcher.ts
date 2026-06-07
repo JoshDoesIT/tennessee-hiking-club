@@ -71,5 +71,6 @@ export async function startLocationWatch(
       ),
     { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
   );
-  return () => navigator.geolocation.clearWatch(watchId);
+  // Guard: geolocation may be gone by the time the watch is stopped.
+  return () => navigator.geolocation?.clearWatch(watchId);
 }
