@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TrailCard } from "./trail-card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { trailsByDistance } from "@/lib/trails/distance";
+import {
+  isLocationEnabled,
+  setLocationEnabled,
+} from "@/lib/maps/location-pref";
 import type { Trail } from "@/lib/trails/schema";
 
 type Sorted = (Trail & { distanceMi?: number })[];
@@ -20,30 +24,55 @@ export function TrailResults({ trails }: { trails: Trail[] }) {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const applyPosition = useCallback(
+    (pos: GeolocationPosition) => {
+      // Remember the opt-in so other maps and this list can apply it
+      // automatically next time, without re-prompting (#285).
+      setLocationEnabled(true);
+      setSorted(
+        trailsByDistance(trails, {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        }),
+      );
+      setStatus("Sorted by distance from you. Your location stayed on this device.");
+      setBusy(false);
+    },
+    [trails],
+  );
+
+  const onLocateError = useCallback(() => {
+    setStatus("Couldn’t get your location, so the default order is shown.");
+    setBusy(false);
+  }, []);
+
   function sortByDistance() {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setStatus("Location isn’t available on this device.");
       return;
     }
     setBusy(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setSorted(
-          trailsByDistance(trails, {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          }),
-        );
-        setStatus("Sorted by distance from you. Your location stayed on this device.");
-        setBusy(false);
-      },
-      () => {
-        setStatus("Couldn’t get your location, so the default order is shown.");
-        setBusy(false);
-      },
-      { maximumAge: 60_000, timeout: 10_000 },
-    );
+    navigator.geolocation.getCurrentPosition(applyPosition, onLocateError, {
+      maximumAge: 60_000,
+      timeout: 10_000,
+    });
   }
+
+  // If the member already shared their location elsewhere, sort by distance
+  // automatically on load so they don't have to tap and re-share each visit.
+  // The request is async, so state only changes in the callbacks above.
+  useEffect(() => {
+    if (
+      typeof navigator !== "undefined" &&
+      navigator.geolocation &&
+      isLocationEnabled()
+    ) {
+      navigator.geolocation.getCurrentPosition(applyPosition, onLocateError, {
+        maximumAge: 60_000,
+        timeout: 10_000,
+      });
+    }
+  }, [applyPosition, onLocateError]);
 
   const list: Sorted = sorted ?? trails;
 

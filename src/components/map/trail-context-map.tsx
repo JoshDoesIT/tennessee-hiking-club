@@ -7,6 +7,7 @@ import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import type { WaypointType } from "@/lib/trails/schema";
 import { createWaypointMarkerEl } from "@/components/trails/waypoint-style";
 import { routeLineFeature } from "@/lib/maps/route-line";
+import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
 
 type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
 
@@ -102,14 +103,12 @@ export function TrailContextMap({
         );
         // Opt-in "where am I": the button asks for location on tap, then shows
         // and tracks the member's position on the map (#271).
-        map.addControl(
-          new maplibregl.GeolocateControl({
-            positionOptions: { enableHighAccuracy: true },
-            trackUserLocation: true,
-            showUserLocation: true,
-          }),
-          "top-right",
-        );
+        const geolocate = new maplibregl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          showUserLocation: true,
+        });
+        map.addControl(geolocate, "top-right");
         map.on("error", () => {
           /* ignore transient tile errors */
         });
@@ -117,6 +116,9 @@ export function TrailContextMap({
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
+          // Remember the location choice and auto-activate it if the member has
+          // shared before, so they don't re-tap on every map (#285).
+          rememberAndApplyLocation(geolocate);
 
           // The trail's actual route, drawn as an amber line with a dark casing
           // for contrast over the basemap (#270).

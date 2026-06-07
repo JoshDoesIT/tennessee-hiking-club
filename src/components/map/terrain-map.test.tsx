@@ -50,7 +50,9 @@ vi.mock("maplibre-gl", () => ({
     Popup: mocks.Popup,
     NavigationControl: vi.fn(),
     FullscreenControl: vi.fn(),
-    GeolocateControl: vi.fn(),
+    GeolocateControl: vi.fn(function () {
+      return { on: vi.fn(), trigger: vi.fn() };
+    }),
   },
 }));
 

@@ -1,7 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TrailResults } from "./trail-results";
+import {
+  isLocationEnabled,
+  setLocationEnabled,
+} from "@/lib/maps/location-pref";
 import type { Trail } from "@/lib/trails/schema";
 
 const make = (slug: string, name: string, lat: number, lng: number): Trail => ({
@@ -42,6 +46,10 @@ function mockGeolocation(
     configurable: true,
   });
 }
+
+beforeEach(() => {
+  window.localStorage.clear();
+});
 
 describe("TrailResults", () => {
   it("renders trails in the given order with an opt-in, privacy-stated control", () => {
@@ -85,5 +93,47 @@ describe("TrailResults", () => {
     expect(screen.getByRole("status").textContent).toMatch(
       /location|default order/i,
     );
+  });
+
+  it("remembers the location preference after a successful distance sort", async () => {
+    mockGeolocation((success) =>
+      success({
+        coords: { latitude: 35.96, longitude: -83.92 },
+      } as GeolocationPosition),
+    );
+    expect(isLocationEnabled()).toBe(false);
+    const user = userEvent.setup();
+    render(<TrailResults trails={trails} />);
+
+    await user.click(
+      screen.getByRole("button", { name: /sort by distance from me/i }),
+    );
+
+    expect(isLocationEnabled()).toBe(true);
+  });
+
+  it("auto-sorts by distance on mount once the member has shared before", async () => {
+    setLocationEnabled(true);
+    mockGeolocation((success) =>
+      success({
+        coords: { latitude: 35.96, longitude: -83.92 },
+      } as GeolocationPosition),
+    );
+
+    render(<TrailResults trails={trails} />);
+
+    await waitFor(() => expect(headingOrder()[0]).toBe("Near Trail"));
+  });
+
+  it("does not auto-request location when the member has never shared", () => {
+    let requested = false;
+    mockGeolocation(() => {
+      requested = true;
+    });
+
+    render(<TrailResults trails={trails} />);
+
+    expect(requested).toBe(false);
+    expect(headingOrder()).toEqual(["Far Trail", "Near Trail", "Mid Trail"]);
   });
 });
