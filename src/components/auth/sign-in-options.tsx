@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { ProviderIcon } from "./provider-icons";
 import { useIsNative } from "@/lib/use-is-native";
-import { appSignInPath } from "@/lib/auth/app-signin";
+import { startNativeSignIn } from "@/lib/auth/native-signin";
 
 type ProviderInfo = { id: string; name: string; type?: string };
 
@@ -56,12 +56,12 @@ export function SignInOptions() {
           key={provider.id}
           variant="outline"
           onClick={() => {
-            // The native app starts OAuth via a full-page navigation so the
-            // PKCE / state cookies are set on a navigation the WebView keeps
-            // (a fetch-set cookie is not shared with the next navigation in the
-            // iOS WebView, #264). The website keeps the standard fetch flow.
+            // The native app runs OAuth in the system browser and bridges the
+            // result back with a one-time code, because the iOS WebView drops
+            // the OAuth cookies during the provider round-trip (#264, #276).
+            // The website keeps the standard in-page flow.
             if (native) {
-              window.location.assign(appSignInPath(provider.id));
+              void startNativeSignIn(provider.id);
             } else {
               void signIn(provider.id, { callbackUrl: "/hikes" });
             }
