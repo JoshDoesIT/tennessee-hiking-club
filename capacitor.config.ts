@@ -18,6 +18,10 @@ const config: CapacitorConfig = {
   server: {
     url: process.env.CAP_SERVER_URL ?? "https://www.tnhiking.club",
     cleartext: false,
+    // Shown when the launch navigation to `url` fails (e.g. a cold launch with
+    // no signal). Without it WKWebView shows a black screen; this serves the
+    // branded offline page from `webDir` with a way back instead (#248, opt 1).
+    errorPath: "index.html",
   },
   plugins: {
     // A branded launch splash so the app does not flash a black/white screen
