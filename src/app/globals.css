@@ -207,35 +207,38 @@ body::after {
   bottom: calc(4.75rem + env(safe-area-inset-bottom));
 }
 
-/* The live "you are here" marker on the recording map (#271): a forest dot with
- * a cream ring and a soft amber pulse, so the current position reads clearly
- * over both the planned route and the recorded track. Tokens keep it visible in
- * dark mode (the dot/ring invert) while the marker sits above the tinted canvas. */
-.recording-position {
-  position: relative;
-  width: 1rem;
-  height: 1rem;
-  border-radius: 9999px;
-  background: var(--color-forest);
-  border: 2px solid var(--color-cream-50);
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.4);
+/* The live "you are here" heading puck on the recording map (#271): a forest dot
+ * with a cream ring, a pulsing accuracy halo, and an amber heading cone. The map
+ * is kept course-up, so the screen-fixed cone always points the way you're
+ * travelling, like a GPS app. Tokens keep it visible in dark mode (the dot/ring
+ * invert) while the puck sits above the tinted canvas. */
+.recording-puck svg {
+  display: block;
+  overflow: visible;
 }
-.recording-position::before {
-  content: "";
-  position: absolute;
-  inset: -0.5rem;
-  border-radius: 9999px;
-  background: var(--color-amber);
-  opacity: 0.3;
+.recording-puck-dot {
+  fill: var(--color-forest);
+  stroke: var(--color-cream-50);
+  stroke-width: 3;
+}
+.recording-puck-cone {
+  fill: var(--color-amber);
+  opacity: 0.5;
+}
+.recording-puck-halo {
+  fill: var(--color-forest);
+  opacity: 0.18;
+  transform-box: fill-box;
+  transform-origin: center;
   animation: recording-ping 2s ease-out infinite;
 }
 @keyframes recording-ping {
   0% {
     transform: scale(0.5);
-    opacity: 0.45;
+    opacity: 0.4;
   }
   100% {
-    transform: scale(1.4);
+    transform: scale(1.6);
     opacity: 0;
   }
 }
