@@ -19,6 +19,7 @@ export default function ExplorePage() {
     name: trail.name,
     region: trail.region,
     coordinates: trail.coordinates,
+    route: trail.route,
     alert: highestAlertLevel(trail.alerts) ?? undefined,
   }));
 

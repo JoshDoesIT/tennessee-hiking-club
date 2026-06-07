@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { routeLineFeature } from "./route-line";
+import { routeLineFeature, routeLinesCollection } from "./route-line";
 
 describe("routeLineFeature", () => {
   it("returns null for a missing or too-short route", () => {
@@ -18,5 +18,28 @@ describe("routeLineFeature", () => {
       [-82.1, 36.1],
       [-82.0, 36.2],
     ]);
+  });
+});
+
+describe("routeLinesCollection", () => {
+  it("collects only trails with a drawable route, tagged by slug", () => {
+    const c = routeLinesCollection([
+      {
+        slug: "a",
+        route: [
+          { lat: 36.1, lng: -82.1 },
+          { lat: 36.2, lng: -82.0 },
+        ],
+      },
+      { slug: "b", route: [{ lat: 36, lng: -82 }] }, // too short, skipped
+      { slug: "c" }, // no route, skipped
+    ]);
+    expect(c.type).toBe("FeatureCollection");
+    expect(c.features).toHaveLength(1);
+    expect(c.features[0].properties.slug).toBe("a");
+  });
+
+  it("returns an empty collection for no trails", () => {
+    expect(routeLinesCollection([]).features).toEqual([]);
   });
 });
