@@ -100,6 +100,16 @@ export function TrailContextMap({
           new maplibregl.NavigationControl({ visualizePitch: true }),
           "top-right",
         );
+        // Opt-in "where am I": the button asks for location on tap, then shows
+        // and tracks the member's position on the map (#271).
+        map.addControl(
+          new maplibregl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+            showUserLocation: true,
+          }),
+          "top-right",
+        );
         map.on("error", () => {
           /* ignore transient tile errors */
         });
