@@ -51,21 +51,13 @@ export function buildAuthConfig(): NextAuthConfig {
     },
   };
 
-  // In the native WebView (Capacitor), the OAuth state / PKCE / nonce cookies
-  // must survive the cross-site redirect back from the provider. SameSite=Lax
-  // can be dropped there, which surfaces as an Auth.js "Configuration" error in
-  // the app even though web sign-in works (#264). Loosen just those short-lived
-  // check cookies to SameSite=None in production, where they are also Secure
-  // (which None requires); the deep merge with Auth.js's defaults keeps their
-  // names, the secure flag, and max-age. Skipped outside production because
-  // None without Secure (local http) would be rejected.
-  if (process.env.NODE_ENV === "production") {
-    config.cookies = {
-      pkceCodeVerifier: { options: { sameSite: "none" } },
-      state: { options: { sameSite: "none" } },
-      nonce: { options: { sameSite: "none" } },
-    };
-  }
+  // Keep Auth.js's default SameSite=Lax for the OAuth check cookies. Forcing
+  // SameSite=None (an earlier attempt at #264) made the iOS WebView's tracking
+  // prevention drop the PKCE cookie, so it was missing at the callback; the
+  // default Lax cookie survives and is sent on the top-level callback
+  // navigation. The native app starts the flow via a navigation (see
+  // `/api/app-signin/[provider]`) so the cookie is also set on a response the
+  // WebView keeps.
 
   // Auth.js logs the wrapped error, whose underlying cause (the actual reason a
   // sign-in failed) is easily lost to log truncation. Record the full cause
