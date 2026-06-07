@@ -5,16 +5,61 @@ import { useEffect, useRef, useState } from "react";
 import type { GeoJSONSource, StyleSpecification } from "maplibre-gl";
 import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import { routeLineFeature } from "@/lib/maps/route-line";
-import { currentPosition } from "@/lib/maps/recording-map";
+import {
+  currentPosition,
+  travelHeading,
+  boundsOf,
+} from "@/lib/maps/recording-map";
 import type { RoutePoint } from "@/lib/trails/elevation";
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+
+type LngLat = { lat: number; lng: number };
+type CameraMode = "overview" | "follow";
 
 const EMPTY_TRACK: GeoJSON.Feature = {
   type: "Feature",
   properties: {},
   geometry: { type: "LineString", coordinates: [] },
 };
+
+/**
+ * Point the camera per mode: "follow" zooms in and turns course-up toward the
+ * direction of travel (the immersive GPS view); "overview" frames the whole
+ * planned route plus the position, north-up, so you can see where you are along
+ * the trail. Used on load, on a mode switch, and (for follow) on each fix.
+ */
+function frameMap(
+  map: import("maplibre-gl").Map,
+  mode: CameraMode,
+  points: RoutePoint[],
+  route: LngLat[] | undefined,
+  center: LngLat,
+  animate: boolean,
+): void {
+  const duration = animate ? 600 : 0;
+  if (mode === "follow") {
+    const pos = currentPosition(points, center);
+    const heading = travelHeading(points);
+    map.easeTo({
+      center: pos,
+      zoom: 15,
+      duration,
+      ...(heading != null ? { bearing: heading } : {}),
+    });
+    return;
+  }
+  const bounds = boundsOf([...(route ?? []), ...points, center]);
+  if (bounds) {
+    map.fitBounds(bounds, {
+      padding: 48,
+      maxZoom: 16,
+      bearing: 0,
+      pitch: 0,
+      duration,
+    });
+  }
+}
 
 /**
  * A live, GPS-style map for the recording view (#271): the trail's planned
@@ -40,12 +85,19 @@ export function RecordingMap({
   const loadedRef = useRef(false);
   const pointsRef = useRef(points);
   const [failed, setFailed] = useState(false);
+  // Default to follow: the immersive course-up GPS view. "Overview" switches to
+  // the whole-route-with-your-position framing.
+  const [mode, setMode] = useState<CameraMode>("follow");
+  const modeRef = useRef(mode);
 
-  // Keep the latest fixes reachable from the build-once effect's async `load`
-  // callback without making the map rebuild on every fix.
+  // Keep the latest fixes and mode reachable from the build-once effect's async
+  // `load` callback without making the map rebuild on every fix.
   useEffect(() => {
     pointsRef.current = points;
   });
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   const routeKey = JSON.stringify(route ?? []);
   const last = points[points.length - 1];
@@ -91,7 +143,8 @@ export function RecordingMap({
           if (cancelled) return;
           map.resize();
 
-          // The planned trail route, faint beneath the recorded track.
+          // The planned trail route, drawn clearly beneath the recorded track
+          // so you can see the whole trail and your progress along it.
           const routeFeature = routeLineFeature(startRoute);
           if (routeFeature) {
             map.addSource("trail-route", {
@@ -104,10 +157,10 @@ export function RecordingMap({
               source: "trail-route",
               layout: { "line-cap": "round", "line-join": "round" },
               paint: {
-                "line-color": "#6c724a",
-                "line-width": 3,
-                "line-opacity": 0.6,
-                "line-dasharray": [2, 1.5],
+                "line-color": "#475036",
+                "line-width": 4,
+                "line-opacity": 0.9,
+                "line-dasharray": [1.5, 1.2],
               },
             });
           }
@@ -133,15 +186,26 @@ export function RecordingMap({
             paint: { "line-color": "#e0a24c", "line-width": 3.5 },
           });
 
-          // The "you are here" marker.
+          // The "you are here" heading puck: a forest dot with a cream ring, a
+          // pulsing accuracy halo, and an amber heading cone. The map is kept
+          // course-up (rotated to the heading below), so the cone, fixed to the
+          // screen, always points the direction of travel.
           const el = document.createElement("div");
-          el.className = "recording-position";
+          el.className = "recording-puck";
           el.setAttribute("aria-hidden", "true");
+          el.innerHTML = `
+            <svg viewBox="0 0 64 64" width="64" height="64">
+              <circle class="recording-puck-halo" cx="32" cy="32" r="13" />
+              <path class="recording-puck-cone" d="M32 32 L16 6 A30 30 0 0 1 48 6 Z" />
+              <circle class="recording-puck-dot" cx="32" cy="32" r="8" />
+            </svg>`;
           markerRef.current = new maplibregl.Marker({ element: el })
             .setLngLat(currentPosition(pointsRef.current, center))
             .addTo(map);
 
           loadedRef.current = true;
+          // Initial framing: overview shows the whole route + position.
+          frameMap(map, modeRef.current, pointsRef.current, startRoute, center, false);
         });
       } catch {
         if (!cancelled) setFailed(true);
@@ -159,8 +223,8 @@ export function RecordingMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeKey]);
 
-  // Follow the device: on each new fix, extend the recorded track, move the
-  // marker, and recenter so the current position stays in view.
+  // On each new fix: extend the recorded track and move the marker. In follow
+  // mode also recenter course-up; overview keeps the whole route framed.
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !loadedRef.current) return;
@@ -169,24 +233,51 @@ export function RecordingMap({
     (map.getSource("recorded-track") as GeoJSONSource | undefined)?.setData(
       track,
     );
-    const pos = currentPosition(points, center);
-    markerRef.current?.setLngLat(pos);
-    map.easeTo({ center: pos, duration: 600 });
+    markerRef.current?.setLngLat(currentPosition(points, center));
+    if (modeRef.current === "follow") {
+      frameMap(map, "follow", points, route, center, true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [positionKey]);
 
+  // Re-frame the camera when the member switches between overview and follow.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !loadedRef.current) return;
+    frameMap(map, mode, points, route, center, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
+
   return (
-    <div
-      ref={containerRef}
-      role="img"
-      aria-label={`Your position while recording${trailName ? ` ${trailName}` : ""}`}
-      className="border-forest/10 mt-3 h-64 w-full overflow-hidden rounded-xl border sm:h-80"
-    >
-      {failed ? (
-        <p className="text-ink/70 p-4 text-sm">
-          The live map isn’t available on this device. Your hike is still
-          recording.
-        </p>
+    <div className="relative mt-3">
+      <div
+        ref={containerRef}
+        role="img"
+        aria-label={`Your position while recording${trailName ? ` ${trailName}` : ""}`}
+        className="border-forest/10 h-64 w-full overflow-hidden rounded-xl border sm:h-80"
+      >
+        {failed ? (
+          <p className="text-ink/70 p-4 text-sm">
+            The live map isn’t available on this device. Your hike is still
+            recording.
+          </p>
+        ) : null}
+      </div>
+      {!failed ? (
+        <button
+          type="button"
+          onClick={() =>
+            setMode((m) => (m === "overview" ? "follow" : "overview"))
+          }
+          aria-label={
+            mode === "overview"
+              ? "Follow my position on the map"
+              : "Show the whole route on the map"
+          }
+          className="text-forest border-forest/15 bg-cream-50/90 absolute top-2 left-2 z-10 rounded-full border px-3 py-1 text-xs font-semibold shadow-sm backdrop-blur"
+        >
+          {mode === "overview" ? "Follow" : "Overview"}
+        </button>
       ) : null}
     </div>
   );

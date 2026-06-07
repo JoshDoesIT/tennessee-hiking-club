@@ -7,7 +7,7 @@ import {
   afterEach,
   type Mock,
 } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import type { RoutePoint } from "@/lib/trails/elevation";
 
 // WebGL can't run in jsdom, so mock maplibre-gl and assert our wiring.
@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => {
     sources.has(id) ? { setData } : undefined,
   );
   const easeTo = vi.fn();
+  const fitBounds = vi.fn();
   const markerSetLngLat = vi.fn().mockReturnThis();
   const on = vi.fn((evt: string, cb: () => void) => {
     if (evt === "load") cb();
@@ -30,6 +31,7 @@ const mocks = vi.hoisted(() => {
       addLayer: vi.fn(),
       getSource,
       easeTo,
+      fitBounds,
       on,
       resize: vi.fn(),
       remove: vi.fn(),
@@ -42,7 +44,7 @@ const mocks = vi.hoisted(() => {
       remove: vi.fn(),
     };
   });
-  return { Map, Marker, markerSetLngLat, addSource, easeTo, setData };
+  return { Map, Marker, markerSetLngLat, addSource, easeTo, fitBounds, setData };
 });
 
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
@@ -126,7 +128,33 @@ describe("RecordingMap", () => {
     });
   });
 
-  it("follows the device, recentering when a new fix arrives", async () => {
+  it("frames the whole route when switched to overview", async () => {
+    render(
+      <RecordingMap
+        center={center}
+        route={[
+          { lat: 35.6, lng: -83.4 },
+          { lat: 35.7, lng: -83.5 },
+        ]}
+        points={[pt(35.6, -83.4)]}
+      />,
+    );
+    await waitFor(() => expect(mocks.Map).toHaveBeenCalledTimes(1));
+    fireEvent.click(
+      screen.getByRole("button", { name: /show the whole route/i }),
+    );
+    await waitFor(() => expect(mocks.fitBounds).toHaveBeenCalled());
+  });
+
+  it("offers an overview/follow toggle", () => {
+    render(<RecordingMap center={center} points={[]} />);
+    // Default is follow, so the toggle offers a switch to the whole-route view.
+    expect(
+      screen.getByRole("button", { name: /show the whole route/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("follows the device by default, recentering when a new fix arrives", async () => {
     const { rerender } = render(
       <RecordingMap center={center} points={[pt(35.6, -83.4)]} />,
     );
@@ -145,5 +173,25 @@ describe("RecordingMap", () => {
       ),
     );
     expect(mocks.setData).toHaveBeenCalled();
+  });
+
+  it("turns the map course-up toward the direction of travel by default", async () => {
+    const { rerender } = render(
+      <RecordingMap center={center} points={[pt(35.6, -83.4)]} />,
+    );
+    await waitFor(() => expect(mocks.Map).toHaveBeenCalledTimes(1));
+
+    // Move due east: the map should rotate to a ~90 deg bearing.
+    rerender(
+      <RecordingMap center={center} points={[pt(35.6, -83.4), pt(35.6, -83.3)]} />,
+    );
+
+    await waitFor(() => {
+      const withBearing = mocks.easeTo.mock.calls
+        .map((c) => c[0])
+        .find((o) => typeof o.bearing === "number");
+      expect(withBearing).toBeTruthy();
+      expect(withBearing.bearing).toBeCloseTo(90, 0);
+    });
   });
 });
