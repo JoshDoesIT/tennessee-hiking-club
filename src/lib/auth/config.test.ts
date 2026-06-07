@@ -80,21 +80,10 @@ describe("buildAuthConfig", () => {
     expect(providerIds(cfg)).not.toContain("passkey");
   });
 
-  it("loosens the OAuth check cookies to SameSite=None in production", () => {
-    // In the native WebView the state/PKCE/nonce cookies must survive the
-    // cross-site redirect back from the provider, which SameSite=Lax can drop
-    // (#264). They stay Secure, which None requires, in production.
+  it("keeps Auth.js default cookies (Lax, not a SameSite=None override)", () => {
+    // SameSite=None made the iOS WebView's tracking prevention drop the PKCE
+    // cookie (#264); the default Lax cookie survives, so we must not override it.
     vi.stubEnv("NODE_ENV", "production");
-    const cfg = buildAuthConfig();
-    for (const key of ["state", "pkceCodeVerifier", "nonce"] as const) {
-      expect(cfg.cookies?.[key]?.options?.sameSite).toBe("none");
-    }
-  });
-
-  it("leaves Auth.js cookie defaults untouched outside production", () => {
-    // Setting SameSite=None without Secure (local http) would be rejected, so
-    // the override only applies in production.
-    vi.stubEnv("NODE_ENV", "development");
     expect(buildAuthConfig().cookies).toBeUndefined();
   });
 
