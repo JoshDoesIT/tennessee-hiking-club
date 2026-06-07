@@ -67,6 +67,31 @@ export function buildAuthConfig(): NextAuthConfig {
     };
   }
 
+  // Auth.js logs the wrapped error, whose underlying cause (the actual reason a
+  // sign-in failed) is easily lost to log truncation. Record the full cause
+  // chain with the root cause first, so the real failure is always visible.
+  config.logger = {
+    error(error: unknown) {
+      const chain: string[] = [];
+      let current: unknown = error;
+      for (let depth = 0; depth < 8 && current && typeof current === "object"; depth++) {
+        const e = current as {
+          name?: string;
+          code?: string;
+          message?: string;
+          cause?: unknown;
+        };
+        chain.push([e.name, e.code, e.message].filter(Boolean).join(": "));
+        const cause = e.cause as { err?: unknown } | undefined;
+        current =
+          cause && typeof cause === "object" && "err" in cause
+            ? cause.err
+            : e.cause;
+      }
+      console.error("[auth][cause]", chain.reverse().join("  <=  "));
+    },
+  };
+
   if (process.env.DATABASE_URL) {
     config.adapter = DrizzleAdapter(getDb(), {
       usersTable: users,

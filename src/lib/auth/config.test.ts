@@ -97,4 +97,32 @@ describe("buildAuthConfig", () => {
     vi.stubEnv("NODE_ENV", "development");
     expect(buildAuthConfig().cookies).toBeUndefined();
   });
+
+  it("logs the root cause of an auth error first, ahead of its wrappers", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const root = Object.assign(new Error("decryption operation failed"), {
+        name: "JWEDecryptionFailed",
+      });
+      const mid = Object.assign(new Error("state value could not be parsed"), {
+        name: "InvalidCheck",
+        cause: root,
+      });
+      const top = Object.assign(new Error("Read more at ..."), {
+        name: "CallbackRouteError",
+        cause: { err: mid },
+      });
+      buildAuthConfig().logger?.error?.(top);
+      expect(spy).toHaveBeenCalled();
+      const logged = spy.mock.calls.map((c) => c.join(" ")).join("\n");
+      expect(logged).toContain("JWEDecryptionFailed");
+      // The deepest cause must appear before the top-level wrapper so it
+      // survives log truncation.
+      expect(logged.indexOf("JWEDecryptionFailed")).toBeLessThan(
+        logged.indexOf("CallbackRouteError"),
+      );
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });
