@@ -5,10 +5,11 @@ vi.mock("@/auth", () => ({ signIn: (...args: unknown[]) => signIn(...args) }));
 
 import { GET } from "./route";
 
-function call(provider: string) {
-  return GET(new Request(`https://www.tnhiking.club/api/app-signin/${provider}`), {
-    params: Promise.resolve({ provider }),
-  });
+function call(provider: string, to?: string) {
+  const url = `https://www.tnhiking.club/api/app-signin/${provider}${
+    to ? `?to=${encodeURIComponent(to)}` : ""
+  }`;
+  return GET(new Request(url), { params: Promise.resolve({ provider }) });
 }
 
 describe("GET /api/app-signin/[provider]", () => {
@@ -31,5 +32,23 @@ describe("GET /api/app-signin/[provider]", () => {
     const res = await call("evilcorp");
     expect(signIn).not.toHaveBeenCalled();
     expect(res.headers.get("location")).toContain("/signin");
+  });
+
+  it("honours a relative ?to= for the native completion route", async () => {
+    signIn.mockResolvedValue("https://github.com/login/oauth/authorize");
+    await call("github", "/api/native-auth/complete");
+    expect(signIn).toHaveBeenCalledWith("github", {
+      redirect: false,
+      redirectTo: "/api/native-auth/complete",
+    });
+  });
+
+  it("ignores an off-site ?to= and falls back to /hikes", async () => {
+    signIn.mockResolvedValue("https://github.com/login/oauth/authorize");
+    await call("github", "//evil.example.com");
+    expect(signIn).toHaveBeenCalledWith("github", {
+      redirect: false,
+      redirectTo: "/hikes",
+    });
   });
 });
