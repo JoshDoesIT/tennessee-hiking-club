@@ -98,15 +98,22 @@ async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   if (cached) return cached;
-  const response = await fetch(request);
-  if (response && response.ok) cache.put(request, response.clone());
-  return response;
+  try {
+    const response = await fetchWithTimeout(request);
+    if (response && response.ok) cache.put(request, response.clone());
+    return response;
+  } catch {
+    // Offline and uncached: fail fast rather than hang the request. An uncached
+    // map tile or style otherwise stalls the whole map until the network is
+    // back (#244).
+    return Response.error();
+  }
 }
 
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
-  const network = fetch(request)
+  const network = fetchWithTimeout(request)
     .then((response) => {
       if (response && response.ok) cache.put(request, response.clone());
       return response;
