@@ -187,4 +187,40 @@ describe("service worker offline navigation (#244)", () => {
     const offline = await dispatchFetch(handlers, req());
     expect(offline?._tag).toBe("image");
   });
+
+  // The WKWebView can hold a connection open in airplane mode instead of
+  // failing it, so every fetch path must time out, not just navigation (#244).
+  async function settlesWhenNetworkHangs(request: unknown) {
+    vi.useFakeTimers();
+    try {
+      const { handlers } = loadSw(state);
+      state.behavior = "hang";
+      const responded = dispatchFetch(handlers, request);
+      let settled = false;
+      void responded?.then(() => {
+        settled = true;
+      });
+      await vi.advanceTimersByTimeAsync(6000);
+      await Promise.resolve();
+      return settled;
+    } finally {
+      vi.useRealTimers();
+    }
+  }
+
+  it("fails a map/tile request fast when the network hangs", async () => {
+    const settled = await settlesWhenNetworkHangs(
+      makeRequest("https://tiles.openfreemap.org/styles/liberty", {
+        accept: "application/json",
+      }),
+    );
+    expect(settled).toBe(true);
+  });
+
+  it("fails an uncached asset fast when the network hangs", async () => {
+    const settled = await settlesWhenNetworkHangs(
+      makeRequest(`${ORIGIN}/_next/static/chunks/app.js`, { accept: "*/*" }),
+    );
+    expect(settled).toBe(true);
+  });
 });
