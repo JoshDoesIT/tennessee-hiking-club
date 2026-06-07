@@ -8,6 +8,7 @@ import { TENNESSEE_BOUNDS } from "@/lib/maps";
 import { ALERT_LABEL } from "@/lib/trails/conditions";
 import type { TrailAlert } from "@/lib/trails/schema";
 import { routeLinesCollection } from "@/lib/maps/route-line";
+import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
 
 export type TrailPin = {
   slug: string;
@@ -87,14 +88,12 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         map.addControl(new maplibregl.FullscreenControl(), "top-right");
         // Opt-in "where am I": shows and tracks the member's position once they
         // tap the control and allow location (#271).
-        map.addControl(
-          new maplibregl.GeolocateControl({
-            positionOptions: { enableHighAccuracy: true },
-            trackUserLocation: true,
-            showUserLocation: true,
-          }),
-          "top-right",
-        );
+        const geolocate = new maplibregl.GeolocateControl({
+          positionOptions: { enableHighAccuracy: true },
+          trackUserLocation: true,
+          showUserLocation: true,
+        });
+        map.addControl(geolocate, "top-right");
         map.on("error", () => {
           /* ignore transient tile errors */
         });
@@ -102,6 +101,9 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
+          // Remember the location choice and auto-activate it if the member has
+          // shared before, so they don't re-tap on every map (#285).
+          rememberAndApplyLocation(geolocate);
 
           // Draw every trail's shape as a faint amber line beneath the pins, so
           // the state map conveys the routes, not only their locations (#270).
