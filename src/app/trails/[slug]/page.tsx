@@ -74,7 +74,12 @@ export default async function TrailPage({ params }: Params) {
 
       <div className="mt-6">
         <MarkHiked slug={trail.slug} />
-        <RecordHike slug={trail.slug} trailName={trail.name} />
+        <RecordHike
+          slug={trail.slug}
+          trailName={trail.name}
+          coordinates={trail.coordinates}
+          route={trail.route}
+        />
       </div>
 
       <TrailGallery photos={trail.photos} />

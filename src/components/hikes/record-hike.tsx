@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { buildElevationProfile } from "@/lib/trails/elevation";
+import { RecordingMap } from "@/components/map/recording-map";
 import {
   useRecording,
   startRecording,
@@ -24,9 +25,13 @@ type Confirm = "discard" | "finish" | null;
 export function RecordHike({
   slug,
   trailName,
+  coordinates,
+  route,
 }: {
   slug: string;
   trailName: string;
+  coordinates: { lat: number; lng: number };
+  route?: { lat: number; lng: number }[];
 }) {
   const rec = useRecording();
   const [message, setMessage] = useState("");
@@ -89,6 +94,13 @@ export function RecordHike({
             {currentElevation.toLocaleString()} ft
             {rec.status === "paused" ? " · paused" : ""}
           </p>
+
+          <RecordingMap
+            center={coordinates}
+            route={route}
+            points={rec.points}
+            trailName={trailName}
+          />
 
           {confirm ? (
             <div className="mt-3">
