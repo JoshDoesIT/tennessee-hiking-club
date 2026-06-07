@@ -114,6 +114,7 @@ export default async function TrailPage({ params }: Params) {
           <TrailContextMap
             coordinates={trail.coordinates}
             name={trail.name}
+            route={trail.route}
             parking={resolvedParking?.parking}
             waypoints={trail.waypoints}
           />

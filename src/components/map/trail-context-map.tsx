@@ -6,6 +6,7 @@ import type { StyleSpecification } from "maplibre-gl";
 import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import type { WaypointType } from "@/lib/trails/schema";
 import { createWaypointMarkerEl } from "@/components/trails/waypoint-style";
+import { routeLineFeature } from "@/lib/maps/route-line";
 
 type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
 
@@ -20,11 +21,13 @@ const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 export function TrailContextMap({
   coordinates,
   name,
+  route,
   parking,
   waypoints,
 }: {
   coordinates: { lat: number; lng: number };
   name: string;
+  route?: { lat: number; lng: number }[];
   parking?: { lat: number; lng: number };
   waypoints?: MapWaypoint[];
 }) {
@@ -33,9 +36,10 @@ export function TrailContextMap({
   const [visible, setVisible] = useState(false);
   const parkingLat = parking?.lat;
   const parkingLng = parking?.lng;
-  // Stable primitive dep so the marker effect re-runs only when waypoints
-  // actually change, not on every render (array identity churns each render).
+  // Stable primitive deps so the effect re-runs only when these actually change,
+  // not on every render (array identity churns each render).
   const waypointsKey = JSON.stringify(waypoints ?? []);
+  const routeKey = JSON.stringify(route ?? []);
 
   // The map sits below the fold, so defer loading MapLibre (a heavy WebGL
   // bundle) until it scrolls near the viewport. This keeps it off the critical
@@ -104,6 +108,36 @@ export function TrailContextMap({
           if (!map || cancelled) return;
           map.resize();
 
+          // The trail's actual route, drawn as an amber line with a dark casing
+          // for contrast over the basemap (#270).
+          const routePoints: { lat: number; lng: number }[] =
+            JSON.parse(routeKey);
+          const routeFeature = routeLineFeature(routePoints);
+          if (routeFeature) {
+            map.addSource("trail-route", {
+              type: "geojson",
+              data: routeFeature as unknown as GeoJSON.Feature,
+            });
+            map.addLayer({
+              id: "trail-route-casing",
+              type: "line",
+              source: "trail-route",
+              layout: { "line-join": "round", "line-cap": "round" },
+              paint: {
+                "line-color": "#2a3623",
+                "line-width": 6,
+                "line-opacity": 0.5,
+              },
+            });
+            map.addLayer({
+              id: "trail-route-line",
+              type: "line",
+              source: "trail-route",
+              layout: { "line-join": "round", "line-cap": "round" },
+              paint: { "line-color": "#e0a24c", "line-width": 3.5 },
+            });
+          }
+
           const el = document.createElement("div");
           el.setAttribute("aria-hidden", "true");
           Object.assign(el.style, {
@@ -118,6 +152,9 @@ export function TrailContextMap({
 
           const bounds = new maplibregl.LngLatBounds(center, center);
           let hasExtra = false;
+
+          for (const p of routePoints) bounds.extend([p.lng, p.lat]);
+          if (routePoints.length >= 2) hasExtra = true;
 
           if (parkingLat != null && parkingLng != null) {
             const pEl = document.createElement("div");
@@ -172,6 +209,7 @@ export function TrailContextMap({
     parkingLat,
     parkingLng,
     waypointsKey,
+    routeKey,
   ]);
 
   return (
