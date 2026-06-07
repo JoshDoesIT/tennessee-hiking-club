@@ -4,12 +4,15 @@ import userEvent from "@testing-library/user-event";
 
 vi.mock("next-auth/react", () => ({ signIn: vi.fn() }));
 vi.mock("@/lib/use-is-native", () => ({ useIsNative: vi.fn(() => false) }));
+vi.mock("@/lib/auth/native-signin", () => ({ startNativeSignIn: vi.fn() }));
 import { signIn } from "next-auth/react";
 import { useIsNative } from "@/lib/use-is-native";
+import { startNativeSignIn } from "@/lib/auth/native-signin";
 import { SignInOptions } from "./sign-in-options";
 
 const signInMock = vi.mocked(signIn);
 const useIsNativeMock = vi.mocked(useIsNative);
+const startNativeSignInMock = vi.mocked(startNativeSignIn);
 
 function mockProviders(data: unknown) {
   vi.stubGlobal(
@@ -20,6 +23,7 @@ function mockProviders(data: unknown) {
 
 beforeEach(() => {
   signInMock.mockClear();
+  startNativeSignInMock.mockClear();
   useIsNativeMock.mockReturnValue(false);
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -58,20 +62,15 @@ describe("SignInOptions", () => {
     expect(signInMock).toHaveBeenCalledWith("github", { callbackUrl: "/hikes" });
   });
 
-  it("on a native build navigates to the app sign-in route instead of fetch-based signIn", async () => {
+  it("on a native build starts native sign-in instead of fetch-based signIn", async () => {
     const user = userEvent.setup();
     useIsNativeMock.mockReturnValue(true);
-    const assign = vi.fn();
-    vi.stubGlobal("location", {
-      assign,
-      href: "https://www.tnhiking.club/signin",
-    });
     mockProviders({ github: { id: "github", name: "GitHub" } });
     render(<SignInOptions />);
     await user.click(
       await screen.findByRole("button", { name: /continue with github/i }),
     );
-    expect(assign).toHaveBeenCalledWith("/api/app-signin/github");
+    expect(startNativeSignInMock).toHaveBeenCalledWith("github");
     expect(signInMock).not.toHaveBeenCalled();
   });
 
