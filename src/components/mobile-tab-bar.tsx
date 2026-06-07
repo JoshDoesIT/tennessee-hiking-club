@@ -161,7 +161,11 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="border-forest/12 bg-cream/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      // Sit the icons close to the home indicator: reserve most of the
+      // safe-area inset minus a little, with a small floor for phones that have
+      // no inset, rather than the full inset (which left a wide empty strip on
+      // devices with a large bottom inset).
+      className="border-forest/12 bg-cream/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[max(0.375rem,calc(env(safe-area-inset-bottom)-0.75rem))] backdrop-blur"
     >
       <ul className="flex">
         {TABS.map((tab) => {
@@ -171,7 +175,7 @@ export function MobileTabBar() {
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative flex flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors ${
+                className={`relative flex flex-col items-center gap-1 pt-2 pb-1 text-[11px] font-medium transition-colors ${
                   active ? "text-forest" : "text-pine/55"
                 }`}
               >
