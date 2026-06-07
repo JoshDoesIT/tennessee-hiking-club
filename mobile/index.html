@@ -9,7 +9,7 @@
     <title>Tennessee Hiking Club</title>
     <style>
       :root {
-        color-scheme: light;
+        color-scheme: dark;
       }
       html,
       body {
@@ -19,7 +19,10 @@
       body {
         display: grid;
         place-items: center;
-        padding: 2rem;
+        /* Match the launch splash so the offline screen feels continuous. */
+        background: #2a3623;
+        color: #fbf6e9;
+        text-align: center;
         font-family:
           ui-sans-serif,
           system-ui,
@@ -27,31 +30,64 @@
           "Segoe UI",
           Roboto,
           sans-serif;
-        background: #fefcf5;
-        color: #2f3b2c;
-        text-align: center;
+        padding: calc(2rem + env(safe-area-inset-top)) 2rem
+          calc(2rem + env(safe-area-inset-bottom));
       }
       main {
         max-width: 28rem;
+      }
+      .mark {
+        font-size: 2.5rem;
+        line-height: 1;
+        margin-bottom: 1rem;
       }
       h1 {
         font-size: 1.5rem;
         margin: 0 0 0.75rem;
       }
       p {
-        margin: 0;
+        margin: 0 0 1.5rem;
         line-height: 1.6;
-        color: #555b50;
+        color: #d8d3c2;
+      }
+      button {
+        font: inherit;
+        font-weight: 600;
+        color: #2a3623;
+        background: #e0a24c;
+        border: 0;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      button:active {
+        background: #c8852f;
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>Tennessee Hiking Club</h1>
+      <div class="mark" aria-hidden="true">⛰️</div>
+      <h1>You're offline</h1>
       <p>
-        Connect to the internet once to load the app. After that it keeps
-        working on the trail, even with no signal.
+        Tennessee Hiking Club needs a connection to open. Reconnect to the
+        internet, then try again. Already-saved trails and hikes are waiting
+        inside.
       </p>
+      <button type="button" id="retry">Try again</button>
     </main>
+    <script>
+      // Re-attempt the hosted app. Capacitor serves this page from the local
+      // bundle only when the launch navigation fails, so going back means
+      // navigating to the production origin again.
+      var APP_URL = "https://www.tnhiking.club";
+      function reopen() {
+        window.location.href = APP_URL;
+      }
+      document.getElementById("retry").addEventListener("click", reopen);
+      // Auto-retry the moment the device reports it is back online.
+      window.addEventListener("online", reopen);
+    </script>
   </body>
 </html>
