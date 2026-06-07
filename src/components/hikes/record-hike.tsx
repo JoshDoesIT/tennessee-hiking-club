@@ -1,25 +1,25 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { addHike } from "@/lib/hikes/local-log";
-import { downsampleRoute } from "@/lib/trails/route-import";
-import { buildElevationProfile, type RoutePoint } from "@/lib/trails/elevation";
-import { startLocationWatch, type StopWatch } from "@/lib/hikes/geo-watcher";
+import { buildElevationProfile } from "@/lib/trails/elevation";
+import {
+  useRecording,
+  startRecording,
+  pauseRecording,
+  resumeRecording,
+  discardRecording,
+  finishRecording,
+} from "@/lib/hikes/recording-store";
 
-type Status = "idle" | "recording" | "paused" | "saved";
-
-/** Cap a recorded track so the stored log stays small; on-the-ground recordings
- *  can run to thousands of points. */
-const MAX_POINTS = 200;
+type Confirm = "discard" | "finish" | null;
 
 /**
- * Record a hike live (#201, #216): start, pause/resume, and finish a location
- * session, showing live distance and elevation. On a native build this records
- * in the background with the screen off (the background-geolocation plugin behind
- * `startLocationWatch`); in the browser it uses foreground `watchPosition`. On
- * finish the track is downsampled and logged against this trail (local-first,
- * synced when signed in), so it appears on My Hikes like an uploaded GPX.
+ * Record a hike live (#201, #216, #267). The recording itself lives in an
+ * app-wide store (`recording-store`), so it keeps running as the member moves
+ * between screens and survives a relaunch; this component is just the controls
+ * for the trail it is on. Stopping the recording (finish or discard) always
+ * takes an explicit confirmation so a stray tap cannot end or lose it.
  */
 export function RecordHike({
   slug,
@@ -28,95 +28,41 @@ export function RecordHike({
   slug: string;
   trailName: string;
 }) {
-  const [status, setStatus] = useState<Status>("idle");
-  const [points, setPoints] = useState<RoutePoint[]>([]);
+  const rec = useRecording();
   const [message, setMessage] = useState("");
-  const stopWatch = useRef<StopWatch | null>(null);
-  const watching = useRef(false);
-  const elapsedMs = useRef(0);
-  const segmentStart = useRef<number | null>(null);
+  const [confirm, setConfirm] = useState<Confirm>(null);
 
-  function beginWatch() {
-    segmentStart.current = Date.now();
-    watching.current = true;
-    void startLocationWatch(
-      (point) => setPoints((prev) => [...prev, point]),
-      (msg) => setMessage(msg),
-    ).then((stop) => {
-      // If recording was stopped before the watcher finished starting, stop it.
-      if (watching.current) stopWatch.current = stop;
-      else stop();
-    });
-  }
-
-  function endWatch() {
-    watching.current = false;
-    if (stopWatch.current) {
-      stopWatch.current();
-      stopWatch.current = null;
-    }
-    if (segmentStart.current != null) {
-      elapsedMs.current += Date.now() - segmentStart.current;
-      segmentStart.current = null;
-    }
-  }
+  const activeHere = rec.status !== "idle" && rec.slug === slug;
+  const activeElsewhere = rec.status !== "idle" && rec.slug !== slug;
 
   function start() {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setMessage("Location isn’t available on this device.");
       return;
     }
-    setPoints([]);
     setMessage("");
-    elapsedMs.current = 0;
-    setStatus("recording");
-    beginWatch();
+    startRecording(slug, trailName);
   }
 
-  function pause() {
-    endWatch();
-    setStatus("paused");
+  function onFinish() {
+    setConfirm(null);
+    setMessage(
+      finishRecording()
+        ? "Saved to My Hikes."
+        : "Not enough movement was recorded to save a track.",
+    );
   }
 
-  function resume() {
-    setStatus("recording");
-    beginWatch();
-  }
-
-  function discard() {
-    endWatch();
-    setPoints([]);
-    elapsedMs.current = 0;
-    setStatus("idle");
+  function onDiscard() {
+    setConfirm(null);
+    discardRecording();
     setMessage("");
   }
 
-  function finish() {
-    endWatch();
-    if (points.length < 2) {
-      setStatus("idle");
-      setMessage("Not enough movement was recorded to save a track.");
-      return;
-    }
-    const route = downsampleRoute(points, MAX_POINTS);
-    const durationMin = Math.round(elapsedMs.current / 60_000);
-    const date = new Date().toISOString().slice(0, 10);
-    addHike(slug, date, {
-      track: {
-        points: route,
-        ...(durationMin > 0 ? { durationMin } : {}),
-      },
-    });
-    setPoints([]);
-    setStatus("saved");
-    setMessage("Saved to My Hikes.");
-  }
-
-  const live = status === "recording" || status === "paused";
-  const profile = points.length >= 2 ? buildElevationProfile(points) : null;
+  const profile = rec.points.length >= 2 ? buildElevationProfile(rec.points) : null;
   const miles = profile ? profile.totalMiles.toFixed(2) : "0.00";
-  const currentElevation = points.length
-    ? points[points.length - 1].elevationFt
+  const currentElevation = rec.points.length
+    ? rec.points[rec.points.length - 1].elevationFt
     : 0;
 
   return (
@@ -126,49 +72,99 @@ export function RecordHike({
     >
       <p className="text-forest text-sm font-medium">Record this hike live</p>
 
-      {live ? (
+      {activeElsewhere ? (
+        <p className="text-ink/75 mt-2 text-sm">
+          A hike is already recording on{" "}
+          <span className="font-medium">{rec.trailName}</span>. Finish or discard
+          it before starting a new one.
+        </p>
+      ) : activeHere ? (
         <>
           <p
             className="text-ink/75 mt-2 text-sm"
             role="status"
             aria-live="polite"
           >
-            {miles} mi · {points.length} pts ·{" "}
+            {miles} mi · {rec.points.length} pts ·{" "}
             {currentElevation.toLocaleString()} ft
-            {status === "paused" ? " · paused" : ""}
+            {rec.status === "paused" ? " · paused" : ""}
           </p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {status === "recording" ? (
-              <Button type="button" variant="outline" size="sm" onClick={pause}>
-                Pause
-              </Button>
-            ) : (
+
+          {confirm ? (
+            <div className="mt-3">
+              <p className="text-ink/80 text-sm">
+                {confirm === "discard"
+                  ? "Discard this recording? Your tracked route will be lost, and this can’t be undone."
+                  : "Finish and save this hike to My Hikes?"}
+              </p>
+              <div className="mt-2 flex flex-wrap gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConfirm(null)}
+                >
+                  Keep recording
+                </Button>
+                <Button
+                  type="button"
+                  variant={confirm === "discard" ? "ghost" : "accent"}
+                  size="sm"
+                  onClick={confirm === "discard" ? onDiscard : onFinish}
+                >
+                  {confirm === "discard" ? "Discard recording" : "Finish & save"}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-3">
+              {rec.status === "recording" ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => pauseRecording()}
+                >
+                  Pause
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => resumeRecording()}
+                >
+                  Resume
+                </Button>
+              )}
               <Button
                 type="button"
-                variant="outline"
+                variant="accent"
                 size="sm"
-                onClick={resume}
+                onClick={() => setConfirm("finish")}
               >
-                Resume
+                Finish
               </Button>
-            )}
-            <Button type="button" variant="accent" size="sm" onClick={finish}>
-              Finish
-            </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={discard}>
-              Discard
-            </Button>
-          </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirm("discard")}
+              >
+                Discard
+              </Button>
+            </div>
+          )}
         </>
       ) : (
         <>
           <p className="text-ink/75 mt-1 text-xs">
-            Uses your device location while this stays open. Keep the screen on;
-            phone-browser GPS can pause when the screen sleeps.
+            Recording keeps going as you move between screens, even with the
+            screen off. Finish or Discard stops it.
           </p>
           <div className="mt-3">
             <Button type="button" variant="outline" size="sm" onClick={start}>
-              {status === "saved" ? "Record another" : "Record this hike"}
+              {message.includes("Saved") ? "Record another" : "Record this hike"}
             </Button>
           </div>
         </>

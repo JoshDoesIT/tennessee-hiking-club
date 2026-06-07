@@ -3,15 +3,18 @@ import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RecordHike } from "./record-hike";
 import { readLog } from "@/lib/hikes/local-log";
+import { discardRecording, startRecording } from "@/lib/hikes/recording-store";
 
 function mockGeolocation() {
   let success: PositionCallback | null = null;
   let failure: PositionErrorCallback | null = null;
-  const watchPosition = vi.fn((s: PositionCallback, e: PositionErrorCallback) => {
-    success = s;
-    failure = e;
-    return 7;
-  });
+  const watchPosition = vi.fn(
+    (s: PositionCallback, e: PositionErrorCallback) => {
+      success = s;
+      failure = e;
+      return 7;
+    },
+  );
   const clearWatch = vi.fn();
   Object.defineProperty(navigator, "geolocation", {
     configurable: true,
@@ -30,7 +33,10 @@ function mockGeolocation() {
   };
 }
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+  localStorage.clear();
+  discardRecording(); // reset the module-level store between tests
+});
 afterEach(() =>
   Object.defineProperty(navigator, "geolocation", {
     configurable: true,
@@ -38,13 +44,16 @@ afterEach(() =>
   }),
 );
 
+const recordButton = () =>
+  screen.getByRole("button", { name: /record this hike/i });
+
 describe("RecordHike", () => {
   it("starts a watch and shows the live controls", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     expect(geo.watchPosition).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: /finish/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /pause/i })).toBeInTheDocument();
@@ -55,25 +64,48 @@ describe("RecordHike", () => {
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
     geo.emit(35.62, -83.44, 1100);
     expect(screen.getByText(/2 pts/)).toBeInTheDocument();
   });
 
-  it("saves the recorded track to the log and stops the watch on finish", async () => {
+  it("saves the track and stops the watch after confirming finish", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
     geo.emit(35.62, -83.44, 1100);
-    await user.click(screen.getByRole("button", { name: /finish/i }));
+    await user.click(screen.getByRole("button", { name: /^finish$/i }));
+    await user.click(screen.getByRole("button", { name: /finish & save/i }));
 
     expect(geo.clearWatch).toHaveBeenCalled();
     const entry = readLog().find((e) => e.trailSlug === "grotto-falls");
     expect(entry?.track?.points.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("requires confirmation before discarding, and can be cancelled", async () => {
+    const geo = mockGeolocation();
+    const user = userEvent.setup();
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
+
+    await user.click(recordButton());
+    geo.emit(35.6, -83.45, 1000);
+    geo.emit(35.62, -83.44, 1100);
+
+    // Discard asks first; "Keep recording" backs out without losing anything.
+    await user.click(screen.getByRole("button", { name: /^discard$/i }));
+    expect(screen.getByText(/can.t be undone/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /keep recording/i }));
+    expect(screen.getByText(/2 pts/)).toBeInTheDocument();
+
+    // Confirming actually discards.
+    await user.click(screen.getByRole("button", { name: /^discard$/i }));
+    await user.click(screen.getByRole("button", { name: /discard recording/i }));
+    expect(recordButton()).toBeInTheDocument();
+    expect(readLog()).toEqual([]);
   });
 
   it("does not save when too few points were recorded", async () => {
@@ -81,9 +113,10 @@ describe("RecordHike", () => {
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
-    await user.click(screen.getByRole("button", { name: /finish/i }));
+    await user.click(screen.getByRole("button", { name: /^finish$/i }));
+    await user.click(screen.getByRole("button", { name: /finish & save/i }));
 
     expect(readLog()).toEqual([]);
     expect(screen.getByText(/not enough/i)).toBeInTheDocument();
@@ -94,11 +127,23 @@ describe("RecordHike", () => {
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     await user.click(screen.getByRole("button", { name: /pause/i }));
 
     expect(geo.clearWatch).toHaveBeenCalled();
     expect(screen.getByRole("button", { name: /resume/i })).toBeInTheDocument();
+  });
+
+  it("warns when a recording is already in progress on another trail", () => {
+    mockGeolocation();
+    act(() => startRecording("abrams-falls", "Abrams Falls"));
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
+
+    expect(screen.getByText(/already recording on/i)).toBeInTheDocument();
+    expect(screen.getByText(/Abrams Falls/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /record this hike/i }),
+    ).toBeNull();
   });
 
   it("reports when location is unavailable", async () => {
@@ -109,7 +154,7 @@ describe("RecordHike", () => {
     const user = userEvent.setup();
     render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" />);
 
-    await user.click(screen.getByRole("button", { name: /record this hike/i }));
+    await user.click(recordButton());
     expect(screen.getByText(/isn.t available/i)).toBeInTheDocument();
   });
 });

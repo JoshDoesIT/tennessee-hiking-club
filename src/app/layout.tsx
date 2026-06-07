@@ -3,6 +3,7 @@ import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
+import { RecordingIndicator } from "@/components/hikes/recording-indicator";
 import { ApiOriginSetup } from "@/components/api-origin-setup";
 import { PwaRegister } from "@/components/pwa-register";
 import { SplashHider } from "@/components/splash-hider";
@@ -124,6 +125,7 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
+        <RecordingIndicator />
         <MobileTabBar />
         <Analytics />
         <SpeedInsights />
