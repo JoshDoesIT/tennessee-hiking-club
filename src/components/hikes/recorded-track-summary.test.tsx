@@ -40,6 +40,26 @@ describe("RecordedTrackSummary", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders both the route shape and the elevation profile for a moving track", () => {
+    const { container } = render(
+      <RecordedTrackSummary track={track} trailName="Grotto Falls" />,
+    );
+    expect(container.querySelectorAll("polyline")).toHaveLength(2);
+  });
+
+  it("omits the route shape when the track has no movement", () => {
+    const stationary = {
+      points: [
+        { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+        { lat: 35.6, lng: -83.45, elevationFt: 1000 },
+      ],
+    };
+    const { container } = render(
+      <RecordedTrackSummary track={stationary} trailName="Grotto Falls" />,
+    );
+    expect(container.querySelectorAll("polyline")).toHaveLength(1);
+  });
+
   it("renders nothing for a track with fewer than two points", () => {
     const { container } = render(
       <RecordedTrackSummary track={{ points: [] }} trailName="X" />,
