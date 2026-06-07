@@ -51,6 +51,22 @@ export function buildAuthConfig(): NextAuthConfig {
     },
   };
 
+  // In the native WebView (Capacitor), the OAuth state / PKCE / nonce cookies
+  // must survive the cross-site redirect back from the provider. SameSite=Lax
+  // can be dropped there, which surfaces as an Auth.js "Configuration" error in
+  // the app even though web sign-in works (#264). Loosen just those short-lived
+  // check cookies to SameSite=None in production, where they are also Secure
+  // (which None requires); the deep merge with Auth.js's defaults keeps their
+  // names, the secure flag, and max-age. Skipped outside production because
+  // None without Secure (local http) would be rejected.
+  if (process.env.NODE_ENV === "production") {
+    config.cookies = {
+      pkceCodeVerifier: { options: { sameSite: "none" } },
+      state: { options: { sameSite: "none" } },
+      nonce: { options: { sameSite: "none" } },
+    };
+  }
+
   if (process.env.DATABASE_URL) {
     config.adapter = DrizzleAdapter(getDb(), {
       usersTable: users,

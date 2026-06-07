@@ -20,6 +20,7 @@ afterEach(() => {
     if (ORIGINAL[k] === undefined) delete process.env[k];
     else process.env[k] = ORIGINAL[k];
   }
+  vi.unstubAllEnvs();
 });
 
 function providerIds(cfg: NextAuthConfig): string[] {
@@ -77,5 +78,23 @@ describe("buildAuthConfig", () => {
     const cfg = buildAuthConfig();
     expect(cfg.experimental?.enableWebAuthn).not.toBe(true);
     expect(providerIds(cfg)).not.toContain("passkey");
+  });
+
+  it("loosens the OAuth check cookies to SameSite=None in production", () => {
+    // In the native WebView the state/PKCE/nonce cookies must survive the
+    // cross-site redirect back from the provider, which SameSite=Lax can drop
+    // (#264). They stay Secure, which None requires, in production.
+    vi.stubEnv("NODE_ENV", "production");
+    const cfg = buildAuthConfig();
+    for (const key of ["state", "pkceCodeVerifier", "nonce"] as const) {
+      expect(cfg.cookies?.[key]?.options?.sameSite).toBe("none");
+    }
+  });
+
+  it("leaves Auth.js cookie defaults untouched outside production", () => {
+    // Setting SameSite=None without Secure (local http) would be rejected, so
+    // the override only applies in production.
+    vi.stubEnv("NODE_ENV", "development");
+    expect(buildAuthConfig().cookies).toBeUndefined();
   });
 });
