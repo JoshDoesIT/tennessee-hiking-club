@@ -22,3 +22,22 @@ export function routeLineFeature(
     },
   };
 }
+
+export type RouteLinesCollection = {
+  type: "FeatureCollection";
+  features: RouteLineFeature[];
+};
+
+/** Every trail's route as one GeoJSON FeatureCollection (each carrying its
+ *  `slug`), for drawing all the trail shapes on the state/Explore map (#270).
+ *  Trails without a drawable route are skipped. */
+export function routeLinesCollection(
+  trails: { slug?: string; route?: { lat: number; lng: number }[] }[],
+): RouteLinesCollection {
+  const features: RouteLineFeature[] = [];
+  for (const trail of trails) {
+    const feature = routeLineFeature(trail.route);
+    if (feature) features.push({ ...feature, properties: { slug: trail.slug ?? "" } });
+  }
+  return { type: "FeatureCollection", features };
+}

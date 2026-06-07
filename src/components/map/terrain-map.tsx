@@ -7,12 +7,15 @@ import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import { TENNESSEE_BOUNDS } from "@/lib/maps";
 import { ALERT_LABEL } from "@/lib/trails/conditions";
 import type { TrailAlert } from "@/lib/trails/schema";
+import { routeLinesCollection } from "@/lib/maps/route-line";
 
 export type TrailPin = {
   slug: string;
   name: string;
   region: string;
   coordinates: { lat: number; lng: number };
+  /** The trail's route geometry, drawn as its shape on the map (#270). */
+  route?: { lat: number; lng: number }[];
   /** Most severe active alert level, if any (drives a distinct pin). */
   alert?: TrailAlert["level"];
 };
@@ -89,6 +92,27 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
+
+          // Draw every trail's shape as a faint amber line beneath the pins, so
+          // the state map conveys the routes, not only their locations (#270).
+          const routes = routeLinesCollection(trails);
+          if (routes.features.length) {
+            map.addSource("trail-routes", {
+              type: "geojson",
+              data: routes as unknown as GeoJSON.FeatureCollection,
+            });
+            map.addLayer({
+              id: "trail-routes-line",
+              type: "line",
+              source: "trail-routes",
+              layout: { "line-join": "round", "line-cap": "round" },
+              paint: {
+                "line-color": "#e0a24c",
+                "line-width": 2.5,
+                "line-opacity": 0.75,
+              },
+            });
+          }
 
           for (const trail of trails) {
             const lngLat: [number, number] = [
