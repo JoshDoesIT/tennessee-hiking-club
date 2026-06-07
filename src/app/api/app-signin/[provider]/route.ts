@@ -22,8 +22,14 @@ export async function GET(
   if (!ALLOWED_PROVIDERS.has(provider)) {
     return NextResponse.redirect(new URL("/signin", request.url));
   }
+  // Where to land after sign-in. Native sign-in targets the native completion
+  // route; default to /hikes. Only same-site relative paths are allowed (no
+  // "//host" protocol-relative open redirects).
+  const to = new URL(request.url).searchParams.get("to");
+  const redirectTo =
+    to && to.startsWith("/") && !to.startsWith("//") ? to : "/hikes";
   try {
-    const url = await signIn(provider, { redirect: false, redirectTo: "/hikes" });
+    const url = await signIn(provider, { redirect: false, redirectTo });
     return NextResponse.redirect(url);
   } catch (error) {
     console.error("[app-signin] failed to start the OAuth flow", error);
