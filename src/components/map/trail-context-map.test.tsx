@@ -30,6 +30,7 @@ vi.mock("maplibre-gl", () => ({
     Map: mocks.Map,
     Marker: mocks.Marker,
     NavigationControl: vi.fn(),
+    GeolocateControl: vi.fn(),
   },
 }));
 

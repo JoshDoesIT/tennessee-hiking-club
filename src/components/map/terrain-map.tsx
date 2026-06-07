@@ -85,6 +85,16 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           "top-right",
         );
         map.addControl(new maplibregl.FullscreenControl(), "top-right");
+        // Opt-in "where am I": shows and tracks the member's position once they
+        // tap the control and allow location (#271).
+        map.addControl(
+          new maplibregl.GeolocateControl({
+            positionOptions: { enableHighAccuracy: true },
+            trackUserLocation: true,
+            showUserLocation: true,
+          }),
+          "top-right",
+        );
         map.on("error", () => {
           /* ignore transient tile errors */
         });
