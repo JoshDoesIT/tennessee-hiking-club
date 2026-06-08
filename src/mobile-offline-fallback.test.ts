@@ -11,6 +11,18 @@ function fallbackHtml(): string {
   return readFileSync(join(root, webDir, errorPath), "utf8");
 }
 
+/** The offline page plus the local scripts it loads: the bundle that actually
+ *  ships, so a guard on the way-back affordance follows it into reconnect.js. */
+function fallbackBundle(): string {
+  const dir = join(root, config.webDir ?? "");
+  const html = fallbackHtml();
+  const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)]
+    .map((m) => m[1])
+    .filter((src) => !/^https?:\/\//.test(src))
+    .map((src) => readFileSync(join(dir, src), "utf8"));
+  return [html, ...scripts].join("\n");
+}
+
 /**
  * Cold-launching the native app offline navigates to `server.url`, which fails
  * with no signal; without a local `errorPath` the WebView shows a black screen
@@ -29,8 +41,8 @@ describe("mobile offline fallback (#248)", () => {
   });
 
   it("offers a way back into the hosted app once a connection returns", () => {
-    const html = fallbackHtml();
-    expect(html).toMatch(/tnhiking\.club/);
-    expect(html).toMatch(/try again|retry|reload|reconnect/i);
+    expect(fallbackHtml()).toMatch(/try again|retry|reload|reconnect/i);
+    // The reopen target + reconnect logic live in the page's linked script.
+    expect(fallbackBundle()).toMatch(/tnhiking\.club/);
   });
 });
