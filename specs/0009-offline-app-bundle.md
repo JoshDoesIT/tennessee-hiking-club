@@ -1,6 +1,6 @@
 # 0009: Offline app bundle (open with no signal)
 
-- **Status:** in progress
+- **Status:** phases 1-4 code-complete; on-device verification pending (#324)
 - **Issue:** #248 (depends on the Capacitor shell #215)
 - **Supersedes** the "load the hosted site over the network" decision in spec
   0006 for the native app.
@@ -78,8 +78,26 @@ and the API backend.
    hosted OAuth flow and returning through a deep link, with the session carried
    back to the app. Until this lands, the app is usable signed-out (local-first
    logging still works; sync needs sign-in).
+   _Done in code (bearer token, the approved approach over cross-origin cookies
+   the WebView drops). Production `proxy.ts` answers CORS for the Capacitor
+   origins and translates `Authorization: Bearer <session>` into the cookie
+   `auth()` reads (#321); the client stores the token in the Keychain, attaches
+   it to the cross-origin `/api` calls, loads it on launch, and clears it on
+   sign-out (#323, #325). All gated to native + the local origin, so web is
+   unchanged._
 5. **Offline completeness.** Confirm trail content (static, in the bundle), the
    maps (tile precache, #244), and the local logs all work fully offline.
+
+## Verification status
+
+Phases 1-4 are implemented and behind `CAP_LOCAL_BUNDLE` (default off), so the
+live web and the current `server.url` app are untouched. Verified in the iOS
+simulator: the local bundle builds with all native plugins (including the new
+`capacitor-secure-storage-plugin`), launches, and renders the home page from the
+static export with no `server.url`. The interactive and offline checks the
+simulator cannot do (host taps are TCC-blocked) are consolidated in **#324**:
+offline cold launch, deep navigation, offline map tiles, the cross-origin
+sign-in round-trip, and the same on Android, followed by flipping the default.
 
 ## Acceptance criteria (#248)
 
