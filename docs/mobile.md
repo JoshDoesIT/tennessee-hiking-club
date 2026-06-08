@@ -39,6 +39,23 @@ Build outputs and machine-specific files (`build/`, `.gradle/`, `local.propertie
 git-ignored. Only regenerate from scratch (`pnpm cap:add:*`) if a project is
 deleted; re-apply the native customizations afterward (see the list below).
 
+## App icon and splash
+
+The native app icon and launch splash are generated from the TNHC badge
+(`assets/logo.png`, the 1024x1024 source) with `@capacitor/assets` (#299). To
+regenerate after a logo change, replace `assets/logo.png` and run:
+
+```bash
+npx capacitor-assets generate \
+  --iconBackgroundColor '#fbf6e9' --iconBackgroundColorDark '#161a12' \
+  --splashBackgroundColor '#2a3623' --splashBackgroundColorDark '#161a12'
+```
+
+It writes the icon + splash resources into `ios/` and `android/` (commit those).
+It also emits stray PWA icons at the repo root and a `public/manifest.webmanifest`;
+delete those (the web PWA icons are handled separately). Note: the bundled
+`sharp` needs the `sharp` pnpm override (Node 22 has no `sharp@0.32` prebuilt).
+
 ## Run
 
 ```bash
