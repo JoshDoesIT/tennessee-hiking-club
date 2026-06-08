@@ -25,13 +25,18 @@ const root = process.cwd();
 const STASH = join(root, ".capacitor-build-stash");
 
 const EXCLUDE = [
-  "src/app/api", // 26 API route handlers: live on the server
-  "src/app/sitemap.ts", // route handler, server-only
-  "src/app/robots.ts", // route handler, server-only
-  "src/app/trails/[slug]/opengraph-image.tsx", // OG image route, not needed in-app
+  // Server-only route handlers a static export cannot contain. They live on the
+  // production backend; the bundle reaches them over the network when online.
+  "src/app/api", // 26 API route handlers
+  "src/app/sitemap.ts",
+  "src/app/robots.ts",
+  "src/app/trails/[slug]/opengraph-image.tsx", // OG image route (link previews)
+  // Pages that are intentionally web-only, never reached inside the app bundle:
   "src/app/admin", // force-dynamic + DB; admins use the website
-  // Pages with request-time server work, client-convert pending (#308):
-  "src/app/share", // dynamic OG + catch-all without generateStaticParams
+  // Share links are built against the production origin (with the OG card for
+  // social previews) and the app only generates the URL to send, so the share
+  // page is opened on the web by recipients, never in-bundle (#308).
+  "src/app/share",
 ];
 
 const moved = [];
