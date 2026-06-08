@@ -63,6 +63,15 @@
       button:active {
         background: #c8852f;
       }
+      button:disabled {
+        opacity: 0.6;
+      }
+      .status {
+        margin: 1rem 0 0;
+        min-height: 1.25rem;
+        font-size: 0.875rem;
+        color: #c9bfa6;
+      }
     </style>
   </head>
   <body>
@@ -93,18 +102,11 @@
         inside.
       </p>
       <button type="button" id="retry">Try again</button>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
     </main>
-    <script>
-      // Re-attempt the hosted app. Capacitor serves this page from the local
-      // bundle only when the launch navigation fails, so going back means
-      // navigating to the production origin again.
-      var APP_URL = "https://www.tnhiking.club";
-      function reopen() {
-        window.location.href = APP_URL;
-      }
-      document.getElementById("retry").addEventListener("click", reopen);
-      // Auto-retry the moment the device reports it is back online.
-      window.addEventListener("online", reopen);
-    </script>
+    <!-- Probes the hosted origin before reopening so a premature `online` event
+         (or a tap while still offline) does not bounce back here. See
+         reconnect.js (#306). -->
+    <script type="module" src="reconnect.js"></script>
   </body>
 </html>
