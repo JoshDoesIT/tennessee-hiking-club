@@ -6,9 +6,8 @@ vi.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform } }));
 
 import { OfflinePrecache } from "./offline-precache";
 
-const fetchMock = vi.fn(
-  async (..._args: unknown[]) =>
-    ({ ok: true, text: async () => "" }) as unknown as Response,
+const fetchMock = vi.fn<(...args: unknown[]) => Promise<Response>>(
+  async () => ({ ok: true, text: async () => "" }) as unknown as Response,
 );
 
 function stubServiceWorker(value: unknown) {
