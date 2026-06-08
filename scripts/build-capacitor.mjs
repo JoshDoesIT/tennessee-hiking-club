@@ -28,6 +28,7 @@ const EXCLUDE = [
   // Server-only route handlers a static export cannot contain. They live on the
   // production backend; the bundle reaches them over the network when online.
   "src/app/api", // 26 API route handlers
+  "src/proxy.ts", // CORS + bearer auth; runs on the production server only
   "src/app/sitemap.ts",
   "src/app/robots.ts",
   "src/app/trails/[slug]/opengraph-image.tsx", // OG image route (link previews)

@@ -29,8 +29,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid code" }, { status: 401 });
   }
 
-  const cookie = sessionCookie(await createSession(db, userId));
-  const res = NextResponse.json({ ok: true });
+  const sessionToken = await createSession(db, userId);
+  const cookie = sessionCookie(sessionToken);
+  // The cookie serves the web / server.url build; `sessionToken` is also returned
+  // so the local bundle can store it and send it as a bearer header, where the
+  // cross-origin cookie does not flow (phase 4).
+  const res = NextResponse.json({ ok: true, sessionToken });
   res.cookies.set(cookie.name, cookie.value, cookie.options);
   return res;
 }

@@ -38,6 +38,9 @@ describe("POST /api/native-auth/exchange", () => {
     const setCookie = res.headers.get("set-cookie") ?? "";
     expect(setCookie).toContain("__Secure-authjs.session-token=sess-token");
     expect(createSession).toHaveBeenCalledWith(expect.anything(), "user-1");
+    // The token is also returned so the local bundle can store it and send it as
+    // a bearer header (the cookie does not flow cross-origin there; phase 4).
+    expect(await res.json()).toEqual({ ok: true, sessionToken: "sess-token" });
   });
 
   it("rejects an invalid or used code with 401 and no cookie", async () => {
