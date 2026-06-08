@@ -131,8 +131,14 @@ export default function RootLayout({
         <SiteFooter />
         <RecordingIndicator />
         <MobileTabBar />
-        <Analytics />
-        <SpeedInsights />
+        {/* Vercel analytics live on the hosted origin; their scripts 404 from
+            the local Capacitor bundle, so leave them out of that build. */}
+        {process.env.CAPACITOR_BUILD === "1" ? null : (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );
