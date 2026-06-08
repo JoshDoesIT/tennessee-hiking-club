@@ -1,9 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Capacitor native projects (generated locally via `pnpm cap:add:ios` /
-# `cap:add:android`; will be committed once we add native customizations).
-/ios
-/android
+# Capacitor native projects are committed (they carry native customizations:
+# the tnhc:// sign-in deep link, background-location permissions, splash). Build
+# outputs and machine-specific files are excluded by ios/.gitignore and
+# android/.gitignore. Regenerated source (web assets, synced config) below.
+/ios/App/App/public
+/android/app/src/main/assets/public
+/ios/App/App/capacitor.config.json
+/android/app/src/main/assets/capacitor.config.json
 
 # dependencies
 /node_modules
