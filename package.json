@@ -70,6 +70,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.3.4",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
@@ -101,7 +102,8 @@
   },
   "pnpm": {
     "overrides": {
-      "postcss@<8.5.10": ">=8.5.10"
+      "postcss@<8.5.10": ">=8.5.10",
+      "sharp": "^0.33.5"
     },
     "patchedDependencies": {
       "@capacitor-community/background-geolocation@1.2.26": "patches/@capacitor-community__background-geolocation@1.2.26.patch"
