@@ -71,3 +71,32 @@ is covered by automated tests.
 - The removed explicit-download design (the control, the `offline-regions`
   store including the #236 eviction work, the `tile-cache` bridge, and the
   service-worker clear/delete handler) was deleted with this change.
+
+## Service-worker-free caching for the local bundle (spec 0009)
+
+The caching above relies on the **service worker** intercepting tile `fetch()`s.
+When the app moves to the bundled local origin (spec 0009, phase 3), WKWebView
+will not run a service worker on the `capacitor://` scheme, so the SW path
+disappears and tiles would stop caching offline. We re-solve it natively before
+flipping, so going local-bundle does not regress offline maps.
+
+**Native tile cache via a MapLibre protocol.** MapLibre lets us register a
+custom protocol and rewrite tile requests to it (`addProtocol` + each map's
+`transformRequest`, native only). The handler is cache-first against on-device
+storage (`@capacitor/filesystem`): a cached tile is read from disk; a miss is
+fetched once, written to disk, and returned. This reproduces the service
+worker's cache-first behavior, including cache-as-you-browse, from the local
+bundle. On the web the maps are untouched (the service worker still caches).
+
+- `src/lib/maps/native-tile-cache.ts`: `createTileCache({ store, fetch })` with
+  `load(url)` (cache-first) and `warm(url)` (prefetch-only fill), plus a stable,
+  filesystem-safe `tileKey(url)`. The storage is injected (`TileStore`) so the
+  logic is unit-tested without a device; a thin `@capacitor/filesystem` adapter
+  implements it on native.
+- The maps register the protocol and route tile URLs through it on native; the
+  all-trailhead prefetch (`prefetch.ts`) fills the same store with `warm(...)`
+  instead of relying on the service worker.
+
+Phasing: this is the prerequisite the "re-solve tiles first" decision calls for.
+The core store lands first (unit-tested); wiring it into the three MapLibre maps
+and the prefetch, then the on-device offline verification, follow.
