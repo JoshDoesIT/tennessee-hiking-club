@@ -37,9 +37,8 @@
         max-width: 28rem;
       }
       .mark {
-        font-size: 2.5rem;
-        line-height: 1;
-        margin-bottom: 1rem;
+        display: block;
+        margin: 0 auto 1rem;
       }
       h1 {
         font-size: 1.5rem;
@@ -68,7 +67,25 @@
   </head>
   <body>
     <main>
-      <div class="mark" aria-hidden="true">⛰️</div>
+      <svg
+        class="mark"
+        width="96"
+        height="68"
+        viewBox="0 0 96 68"
+        fill="none"
+        aria-hidden="true"
+      >
+        <circle cx="68" cy="20" r="8" fill="#e0a24c" />
+        <!-- Layered, rolling low-poly ridges, like the Smokies. -->
+        <path
+          d="M0 44 L14 35 L25 41 L39 31 L50 39 L63 33 L76 41 L86 35 L96 43 L96 68 L0 68 Z"
+          fill="#8f9663"
+        />
+        <path
+          d="M0 68 L0 52 L16 46 L28 51 L42 43 L55 50 L69 45 L83 52 L96 47 L96 68 Z"
+          fill="#54603d"
+        />
+      </svg>
       <h1>You're offline</h1>
       <p>
         Tennessee Hiking Club needs a connection to open. Reconnect to the
