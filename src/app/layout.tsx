@@ -7,6 +7,7 @@ import { RecordingIndicator } from "@/components/hikes/recording-indicator";
 import { ApiOriginSetup } from "@/components/api-origin-setup";
 import { PwaRegister } from "@/components/pwa-register";
 import { SplashHider } from "@/components/splash-hider";
+import { NativeBackButton } from "@/components/native-back-button";
 import { OfflinePrecache } from "@/components/offline-precache";
 import { OfflineTilePrefetch } from "@/components/offline-tile-prefetch";
 import { SiteFooter } from "@/components/site-footer";
@@ -113,6 +114,7 @@ export default function RootLayout({
         <SkipLink />
         <ApiOriginSetup />
         <SplashHider />
+        <NativeBackButton />
         <PwaRegister />
         <OfflinePrecache routes={precacheRoutes} />
         <OfflineTilePrefetch trailheads={trailheads} />
