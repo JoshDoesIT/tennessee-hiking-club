@@ -143,6 +143,25 @@ Done (this is the foundation):
   grant location "Always", lock the screen and walk, then finish and confirm the
   track on My Hikes. Background GPS cannot be exercised on a simulator.
 
+- **Native sign-in** (#280): OAuth runs in the system browser and returns to the
+  app via a `tnhc://auth?code=...` deep link (`src/lib/auth/native-signin.ts`).
+  Each platform must register the `tnhc` URL scheme, or the redirect never
+  returns and sign-in fails. This was the Android gap found in device testing:
+  the scheme was on iOS but never added to a freshly generated `android/`.
+
+  Native config this needs (re-apply if the native projects are regenerated):
+  - **iOS** `ios/App/App/Info.plist`: a `CFBundleURLTypes` entry whose
+    `CFBundleURLSchemes` includes `tnhc` (already applied).
+  - **Android** `android/app/src/main/AndroidManifest.xml`: on `.MainActivity`
+    (already `launchMode="singleTask"`), an `<intent-filter>` with the `VIEW`
+    action, `DEFAULT` + `BROWSABLE` categories, and `<data android:scheme="tnhc" />`.
+
+  To test: rebuild (`pnpm cap:sync` then run), tap **Sign in -> GitHub/Google**,
+  and confirm the browser returns to the app signed in. Quick check that the
+  deep link is wired, no OAuth round-trip needed:
+  `adb shell am start -a android.intent.action.VIEW -d "tnhc://auth?code=test"`
+  should foreground the app.
+
 - **Offline maps** (#217): a "download this area" control and an offline-maps
   manager on `/explore`, on top of the service-worker tile cache. Downloaded
   regions are tracked locally and evicted precisely when removed.
