@@ -29,6 +29,9 @@
 /.next/
 /out/
 
+# capacitor static-export build (scripts/build-capacitor.mjs)
+/.capacitor-build-stash/
+
 # production
 /build
 
