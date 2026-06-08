@@ -25,14 +25,19 @@ This is the foundation (#215). Background GPS recording (#216), offline map tile
 
 ## Setup
 
-The native projects (`ios/`, `android/`) are generated locally and are currently
-git-ignored, so generate them after cloning:
+The native projects (`ios/`, `android/`) are committed, so their customizations
+(the `tnhc://` sign-in deep link, background-location permissions, splash) are
+version-controlled. After cloning, just install and sync:
 
 ```bash
 pnpm install
-pnpm cap:add:ios       # macOS + Xcode
-pnpm cap:add:android   # Android Studio
+pnpm cap:sync          # copy web config + plugins into the committed native projects
 ```
+
+Build outputs and machine-specific files (`build/`, `.gradle/`, `local.properties`,
+`Pods/`, `DerivedData/`, the synced `capacitor.config.json` and web assets) are
+git-ignored. Only regenerate from scratch (`pnpm cap:add:*`) if a project is
+deleted; re-apply the native customizations afterward (see the list below).
 
 ## Run
 
@@ -176,6 +181,7 @@ Next, within the mobile build:
 - Finish **push** (#218) transport + credentials, then **store submission**
   (#219).
 
-The native projects will be committed once we add the rest of the native
-customizations (icons and splash screens); until then, re-apply the location
-config above after a regeneration.
+The native projects are committed, so the native customizations above (the
+sign-in deep link, location permissions, splash) are version-controlled and no
+longer need re-applying per machine. Only re-apply them if a native project is
+deleted and regenerated from scratch.
