@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The page background (brand cream). Used as the window background so the
+         area Capacitor paints behind the transparent status/navigation bars on
+         the edge-to-edge layout is cream, not the system-default white (#294). -->
+    <color name="appBackground">#fbf6e9</color>
+</resources>
