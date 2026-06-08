@@ -62,13 +62,18 @@ and the API backend.
 3. **Load locally.** Drop `server.url` for the production app (keep it for
    `CAP_SERVER_URL` dev live-reload), point `webDir` at the export, and verify
    the app opens fully offline. Fold in the launch splash (#246).
-   _In progress: `capacitor.config.ts` now has the local-bundle mode behind
+   _In progress: `capacitor.config.ts` has the local-bundle mode behind
    `CAP_LOCAL_BUNDLE=1` (`webDir: "out"`, no `server.url`), default off. Build
-   and run it with `pnpm build:capacitor && CAP_LOCAL_BUNDLE=1 npx cap sync`.
-   The offline-tiles re-solve (#314) and the absolute API origin (#258) are in,
-   so the bundle should open and map offline; this needs an on-device pass
-   (open fully offline; maps render; sign-in still pending phase 4) before the
-   flag becomes the default._
+   and sync it with `pnpm cap:sync:local`._
+
+   _Verified on the iOS simulator: the local-bundle app builds, launches, and
+   renders the home page from the static export with no `server.url`, which is
+   the core fix (it opens from the bundle, not the network). Still to confirm on
+   a device (the simulator blocks host taps): deep navigation across bundled
+   pages, the maps rendering tiles from the native cache offline (#314), and a
+   true no-network launch. Sign-in from the local origin waits on phase 4. The
+   flag stays off by default until those pass._
+
 4. **Auth from a local origin.** Sign-in via the Capacitor Browser opening the
    hosted OAuth flow and returning through a deep link, with the session carried
    back to the app. Until this lands, the app is usable signed-out (local-first
