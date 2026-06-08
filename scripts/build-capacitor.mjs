@@ -31,7 +31,6 @@ const EXCLUDE = [
   "src/app/trails/[slug]/opengraph-image.tsx", // OG image route, not needed in-app
   "src/app/admin", // force-dynamic + DB; admins use the website
   // Pages with request-time server work, client-convert pending (#308):
-  "src/app/hikes", // auth() in render
   "src/app/leaderboard", // force-dynamic + DB
   "src/app/share", // dynamic OG + catch-all without generateStaticParams
 ];
