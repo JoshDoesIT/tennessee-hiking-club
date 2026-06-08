@@ -6,14 +6,13 @@ import { LogTransfer } from "@/components/hikes/log-transfer";
 import { SyncOnSignIn } from "@/components/hikes/sync-on-signin";
 import { FriendsAndSharing } from "@/components/hikes/friends-and-sharing";
 import { PasskeyManager } from "@/components/auth/passkey-manager";
+import { SignedInGate } from "@/components/auth/signed-in-gate";
 import { PushOptIn } from "@/components/push/push-opt-in";
-import { StewardBadge } from "@/components/stewardship/steward-badge";
+import { StewardBadgeLive } from "@/components/stewardship/steward-badge-live";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
 import { SITE_URL } from "@/lib/site";
 import { tennesseeMapData } from "@/components/map/map-data";
 import { getAllTrails } from "@/lib/trails";
-import { auth } from "@/auth";
-import { getContributionCountForUser } from "@/lib/stewardship/contributions-server";
 
 export const metadata = pageMetadata({
   title: "My hikes",
@@ -23,13 +22,11 @@ export const metadata = pageMetadata({
   noindex: true,
 });
 
-export default async function MyHikesPage() {
+// Static so it can be bundled into the native app (#308, spec 0009): the steward
+// badge and the passkey section resolve the signed-in member client-side.
+export default function MyHikesPage() {
   const trails = getAllTrails();
   const mapData = tennesseeMapData(trails);
-  const session = await auth();
-  const contributionCount = session?.user?.id
-    ? await getContributionCountForUser(session.user.id)
-    : 0;
 
   return (
     <Container className="py-12 sm:py-16">
@@ -41,7 +38,7 @@ export default async function MyHikesPage() {
           <h1 className="display text-forest text-4xl text-pretty sm:text-5xl">
             My hikes
           </h1>
-          <StewardBadge contributionCount={contributionCount} />
+          <StewardBadgeLive />
         </div>
         <p className="text-ink/70 mt-4 max-w-xl text-lg leading-relaxed">
           Everything you have logged, kept on this device by default. Sign in to
@@ -74,7 +71,9 @@ export default async function MyHikesPage() {
         </p>
         <div className="mt-6 space-y-8">
           <PushOptIn />
-          {session?.user ? <PasskeyManager /> : null}
+          <SignedInGate>
+            <PasskeyManager />
+          </SignedInGate>
           <LogTransfer trails={trails} />
         </div>
       </section>
