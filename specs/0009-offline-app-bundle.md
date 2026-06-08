@@ -46,13 +46,15 @@ and the API backend.
    `output: "export"` and skips those routes); the Vercel build is untouched.
    Make the 6 dynamic pages exportable by moving their request-time work to the
    client. Done when `pnpm build:capacitor` produces a static `out/`.
-   _Pipeline landed: `next.config.ts` flips to `output: "export"` (unoptimized
-   images, `trailingSlash`) under `CAPACITOR_BUILD`, and `scripts/build-capacitor.mjs`
+   _Done. `next.config.ts` flips to `output: "export"` (unoptimized images,
+   `trailingSlash`) under `CAPACITOR_BUILD`, and `scripts/build-capacitor.mjs`
    relocates the server-only routes around the export and restores them. The
-   bundle smoke-renders the static pages. The dynamic pages (`/trails` list,
-   `/hikes`, `/leaderboard`, `/share`) are still excluded pending their
-   client-conversion (#308); `/admin` stays web-only. Since the bundle is not
-   loaded until phase 3, an excluded page has no effect yet._
+   dynamic pages were client-converted into the bundle (#308): `/trails` (filter
+   on the device), `/hikes` (steward count + passkey gate client-side), and
+   `/leaderboard` (board over `GET /api/leaderboard`). `/admin` and `/share`
+   stay web-only by design (admins use the website; share links point to the
+   production origin with the OG card, and the app only generates the URL to
+   send). The API/OG/sitemap/robots route handlers are excluded as server-only._
 2. **Absolute API origin.** An `apiUrl(path)` helper that resolves to the
    production origin on native and stays relative on web; route the ~20 client
    `fetch("/api/...")` calls through it. Offline, these fail and the local-first
