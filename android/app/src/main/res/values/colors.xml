@@ -4,4 +4,8 @@
          area Capacitor paints behind the transparent status/navigation bars on
          the edge-to-edge layout is cream, not the system-default white (#294). -->
     <color name="appBackground">#fbf6e9</color>
+    <!-- Brand forest, for the Android 12+ system splash background so the launch
+         is a consistent forest splash (matches the @capacitor/splash-screen
+         splash) rather than flashing cream first. -->
+    <color name="splashBackground">#2a3623</color>
 </resources>
