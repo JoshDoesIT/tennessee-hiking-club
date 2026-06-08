@@ -47,6 +47,9 @@ export async function prefetchAllTrailAreas(
   centers: Array<{ lat: number; lng: number }>,
   opts: {
     fetchImpl?: typeof fetch;
+    /** Fill the native tile store instead of fetching for the service worker;
+     *  used on the local bundle, which has no worker (#314). */
+    warm?: (url: string) => Promise<void>;
     signal?: AbortSignal;
     isOnline?: () => boolean;
   } = {},
@@ -69,6 +72,7 @@ export async function prefetchAllTrailAreas(
     const result = await downloadTiles(urls, {
       concurrency: PREFETCH_CONCURRENCY,
       fetchImpl: opts.fetchImpl,
+      warm: opts.warm,
       signal: opts.signal,
     });
     ok += result.ok;

@@ -70,6 +70,25 @@ describe("downloadTiles", () => {
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(result.ok).toBe(0);
   });
+
+  it("warms each url through the native store instead of fetching, when given", async () => {
+    // The local bundle has no service worker, so tiles are written to the
+    // native cache instead of fetched for the worker to intercept (#314).
+    const warm = vi.fn(async () => {});
+    const fetchImpl = okFetch();
+    const result = await downloadTiles(["a", "b", "c"], { warm, fetchImpl });
+    expect(result).toEqual({ ok: 3, failed: 0, total: 3 });
+    expect(warm).toHaveBeenCalledTimes(3);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("counts a warm failure without rejecting", async () => {
+    const warm = vi.fn(async (url: string) => {
+      if (url === "bad") throw new Error("disk full");
+    });
+    const result = await downloadTiles(["a", "bad", "b"], { warm });
+    expect(result).toEqual({ ok: 2, failed: 1, total: 3 });
+  });
 });
 
 describe("regionTileUrls", () => {
