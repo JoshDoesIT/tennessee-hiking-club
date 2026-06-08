@@ -8,6 +8,12 @@ import type { WaypointType } from "@/lib/trails/schema";
 import { createWaypointMarkerEl } from "@/components/trails/waypoint-style";
 import { routeLineFeature } from "@/lib/maps/route-line";
 import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
+import { Capacitor } from "@capacitor/core";
+import {
+  offlineTilesActive,
+  makeTileTransformRequest,
+  installOfflineTileProtocol,
+} from "@/lib/maps/offline-tiles";
 
 type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
 
@@ -86,9 +92,18 @@ export function TrailContextMap({
           baseStyle,
         ) as unknown as StyleSpecification;
 
+        // Native + loaded from the local bundle: route tiles through the
+        // on-device cache instead of the (now absent) service worker (#314).
+        const useOfflineTiles = offlineTilesActive(
+          Capacitor.isNativePlatform(),
+          window.location.origin,
+        );
+        if (useOfflineTiles) installOfflineTileProtocol(maplibregl);
+
         map = new maplibregl.Map({
           container: containerRef.current,
           style,
+          transformRequest: makeTileTransformRequest(useOfflineTiles),
           center,
           zoom: 11,
           pitch: 0,

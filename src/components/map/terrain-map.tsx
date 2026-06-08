@@ -9,6 +9,12 @@ import { ALERT_LABEL } from "@/lib/trails/conditions";
 import type { TrailAlert } from "@/lib/trails/schema";
 import { routeLinesCollection } from "@/lib/maps/route-line";
 import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
+import { Capacitor } from "@capacitor/core";
+import {
+  offlineTilesActive,
+  makeTileTransformRequest,
+  installOfflineTileProtocol,
+} from "@/lib/maps/offline-tiles";
 
 export type TrailPin = {
   slug: string;
@@ -69,9 +75,18 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
           baseStyle,
         ) as unknown as StyleSpecification;
 
+        // Native + loaded from the local bundle: route tiles through the
+        // on-device cache instead of the (now absent) service worker (#314).
+        const useOfflineTiles = offlineTilesActive(
+          Capacitor.isNativePlatform(),
+          window.location.origin,
+        );
+        if (useOfflineTiles) installOfflineTileProtocol(maplibregl);
+
         map = new maplibregl.Map({
           container: containerRef.current,
           style,
+          transformRequest: makeTileTransformRequest(useOfflineTiles),
           bounds: TN_BOUNDS,
           fitBoundsOptions: { padding: 24 },
           pitch: 0,
