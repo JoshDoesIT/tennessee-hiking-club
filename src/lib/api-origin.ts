@@ -1,4 +1,5 @@
 import { Capacitor } from "@capacitor/core";
+import { getCachedToken } from "@/lib/auth/token-store";
 
 /** The production origin that hosts the API (and the website). */
 export const API_ORIGIN = "https://www.tnhiking.club";
@@ -29,6 +30,15 @@ export function installApiOriginRewrite(
   const original = win.fetch.bind(win);
   const patched: PatchedFetch = ((input, init) => {
     if (typeof input === "string" && input.startsWith("/api/")) {
+      // Carry the session as a bearer header: from this local origin the
+      // session cookie does not flow cross-origin (phase 4). The production
+      // proxy translates it back into the cookie auth() reads.
+      const token = getCachedToken();
+      if (token) {
+        const headers = new Headers(init?.headers);
+        headers.set("authorization", `Bearer ${token}`);
+        return original(`${API_ORIGIN}${input}`, { ...init, headers });
+      }
       return original(`${API_ORIGIN}${input}`, init);
     }
     return original(input, init);
