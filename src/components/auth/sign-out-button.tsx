@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import { appSignOut } from "@/lib/auth/native-signout";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
@@ -8,7 +8,7 @@ export function SignOutButton() {
   return (
     <button
       type="button"
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={() => void appSignOut()}
       className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
     >
       Sign out
