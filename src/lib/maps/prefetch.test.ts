@@ -59,4 +59,17 @@ describe("prefetchAllTrailAreas", () => {
     });
     expect(result!.trails).toBe(0);
   });
+
+  it("warms the native store instead of fetching, when given a warm fn", async () => {
+    const warm = vi.fn(async () => {});
+    const fetchImpl = vi.fn(async () => ({ ok: true }) as Response);
+    const result = await prefetchAllTrailAreas(centers, {
+      isOnline: () => true,
+      warm,
+      fetchImpl,
+    });
+    expect(result!.ok).toBeGreaterThan(0);
+    expect(warm).toHaveBeenCalled();
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
 });

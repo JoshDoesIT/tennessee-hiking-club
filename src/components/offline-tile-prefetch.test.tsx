@@ -9,6 +9,9 @@ const prefetchAllTrailAreas = vi.hoisted(() =>
 );
 vi.mock("@/lib/maps/prefetch", () => ({ prefetchAllTrailAreas }));
 
+const offlineTilesActive = vi.hoisted(() => vi.fn(() => false));
+vi.mock("@/lib/maps/offline-tiles", () => ({ offlineTilesActive }));
+
 import { OfflineTilePrefetch } from "./offline-tile-prefetch";
 
 const trailheads = [
@@ -23,22 +26,46 @@ function stubServiceWorker(value: unknown) {
   });
 }
 
+const firstCall = () =>
+  prefetchAllTrailAreas.mock.calls[0] as unknown as [
+    unknown,
+    { warm?: unknown },
+  ];
+
 afterEach(() => {
   stubServiceWorker(undefined);
   vi.clearAllMocks();
+  isNativePlatform.mockReturnValue(true);
+  offlineTilesActive.mockReturnValue(false);
 });
 
 describe("OfflineTilePrefetch", () => {
-  it("prefetches every trailhead's map area on a native build", async () => {
+  it("prefetches via the service worker on the networked native build", async () => {
     isNativePlatform.mockReturnValue(true);
+    offlineTilesActive.mockReturnValue(false);
     stubServiceWorker({ ready: Promise.resolve({}) });
 
     render(<OfflineTilePrefetch trailheads={trailheads} />);
 
     await waitFor(() => expect(prefetchAllTrailAreas).toHaveBeenCalled());
-    expect(
-      (prefetchAllTrailAreas.mock.calls[0] as unknown as [unknown])[0],
-    ).toEqual(trailheads);
+    const [centers, opts] = firstCall();
+    expect(centers).toEqual(trailheads);
+    // No warm: the worker does the caching here.
+    expect(opts.warm).toBeUndefined();
+  });
+
+  it("warms the native store on the local bundle, with no service worker", async () => {
+    isNativePlatform.mockReturnValue(true);
+    offlineTilesActive.mockReturnValue(true);
+    // Deliberately no service worker stubbed: the local-bundle path must not
+    // depend on one.
+
+    render(<OfflineTilePrefetch trailheads={trailheads} />);
+
+    await waitFor(() => expect(prefetchAllTrailAreas).toHaveBeenCalled());
+    const [centers, opts] = firstCall();
+    expect(centers).toEqual(trailheads);
+    expect(typeof opts.warm).toBe("function");
   });
 
   it("does nothing on the web", async () => {

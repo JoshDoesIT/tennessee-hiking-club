@@ -22,6 +22,9 @@ export type DownloadResult = { ok: number; failed: number; total: number };
 
 export type DownloadOptions = {
   fetchImpl?: typeof fetch;
+  /** When set, fill this cache for each tile instead of `fetch()`ing it for the
+   *  service worker. Used by the local bundle, which has no worker (#314). */
+  warm?: (url: string) => Promise<void>;
   concurrency?: number;
   onProgress?: (progress: DownloadProgress) => void;
   signal?: AbortSignal;
@@ -59,7 +62,7 @@ export async function downloadTiles(
   urls: string[],
   opts: DownloadOptions = {},
 ): Promise<DownloadResult> {
-  const { fetchImpl = fetch, concurrency = 6, onProgress, signal } = opts;
+  const { fetchImpl = fetch, warm, concurrency = 6, onProgress, signal } = opts;
   const total = urls.length;
   let ok = 0;
   let failed = 0;
@@ -71,9 +74,14 @@ export async function downloadTiles(
       if (signal?.aborted) return;
       const url = urls[index++];
       try {
-        const res = await fetchImpl(url, signal ? { signal } : undefined);
-        if (res && res.ok) ok++;
-        else failed++;
+        if (warm) {
+          await warm(url);
+          ok++;
+        } else {
+          const res = await fetchImpl(url, signal ? { signal } : undefined);
+          if (res && res.ok) ok++;
+          else failed++;
+        }
       } catch {
         failed++;
       }
