@@ -165,7 +165,7 @@ export function MobileTabBar() {
       // safe-area inset minus a little, with a small floor for phones that have
       // no inset, rather than the full inset (which left a wide empty strip on
       // devices with a large bottom inset).
-      className="border-forest/12 bg-cream/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[max(0.375rem,calc(env(safe-area-inset-bottom)-0.75rem))] backdrop-blur"
+      className="border-forest/12 bg-cream fixed inset-x-0 bottom-0 z-50 border-t pb-[max(0.125rem,calc(env(safe-area-inset-bottom)-1.25rem))]"
     >
       <ul className="flex">
         {TABS.map((tab) => {
