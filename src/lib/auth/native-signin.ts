@@ -1,5 +1,6 @@
 import { API_ORIGIN } from "@/lib/api-origin";
 import { appSignInPath } from "@/lib/auth/app-signin";
+import { storeToken } from "@/lib/auth/token-store";
 
 /**
  * Native sign-in (#276). Runs OAuth in the system browser, where cookies behave
@@ -35,6 +36,20 @@ export async function startNativeSignIn(providerId: string): Promise<void> {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
     }).catch(() => null);
+    if (res?.ok) {
+      // Store the session token so the local bundle can send it as a bearer
+      // header; the cookie set on this response only sticks on the server.url
+      // build, not the cross-origin local bundle (phase 4).
+      try {
+        const data = (await res.json()) as { sessionToken?: string };
+        if (typeof data.sessionToken === "string") {
+          const { capacitorSecureStore } = await import("./secure-store");
+          await storeToken(capacitorSecureStore, data.sessionToken);
+        }
+      } catch {
+        /* ignore: the cookie path still signs the WebView in on server.url */
+      }
+    }
     window.location.assign(res?.ok ? "/hikes" : "/signin?error=oauth");
   });
 

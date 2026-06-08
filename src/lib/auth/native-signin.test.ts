@@ -22,6 +22,10 @@ vi.mock("@capacitor/app", () => ({
   },
 }));
 
+const storeToken = vi.hoisted(() => vi.fn());
+vi.mock("./token-store", () => ({ storeToken }));
+vi.mock("./secure-store", () => ({ capacitorSecureStore: { fake: true } }));
+
 import { startNativeSignIn } from "./native-signin";
 
 let assign: ReturnType<typeof vi.fn>;
@@ -32,8 +36,15 @@ beforeEach(() => {
   browserOpen.mockClear();
   browserClose.mockClear();
   remove.mockClear();
+  storeToken.mockClear();
   assign = vi.fn();
-  fetchMock = vi.fn(async () => ({ ok: true }) as Response);
+  fetchMock = vi.fn(
+    async () =>
+      ({
+        ok: true,
+        json: async () => ({ sessionToken: "sess-tok" }),
+      }) as unknown as Response,
+  );
   vi.stubGlobal("location", { assign });
   vi.stubGlobal("fetch", fetchMock);
 });
@@ -59,6 +70,8 @@ describe("startNativeSignIn", () => {
     );
     const init = (fetchMock.mock.calls[0] as unknown as [string, { body: string }])[1];
     expect(JSON.parse(init.body)).toEqual({ code: "abc123" });
+    // The returned session token is stored for the bearer-header path (phase 4).
+    expect(storeToken).toHaveBeenCalledWith(expect.anything(), "sess-tok");
     expect(assign).toHaveBeenCalledWith("/hikes");
   });
 
