@@ -11,6 +11,12 @@ import {
   boundsOf,
 } from "@/lib/maps/recording-map";
 import type { RoutePoint } from "@/lib/trails/elevation";
+import { Capacitor } from "@capacitor/core";
+import {
+  offlineTilesActive,
+  makeTileTransformRequest,
+  installOfflineTileProtocol,
+} from "@/lib/maps/offline-tiles";
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
@@ -123,9 +129,18 @@ export function RecordingMap({
         ) as unknown as StyleSpecification;
         const startRoute = routeKey ? (JSON.parse(routeKey) as typeof route) : [];
 
+        // Native + loaded from the local bundle: route tiles through the
+        // on-device cache instead of the (now absent) service worker (#314).
+        const useOfflineTiles = offlineTilesActive(
+          Capacitor.isNativePlatform(),
+          window.location.origin,
+        );
+        if (useOfflineTiles) installOfflineTileProtocol(maplibregl);
+
         const map = new maplibregl.Map({
           container: containerRef.current,
           style,
+          transformRequest: makeTileTransformRequest(useOfflineTiles),
           center: currentPosition(pointsRef.current, center),
           zoom: 14,
           pitch: 0,

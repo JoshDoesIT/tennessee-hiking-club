@@ -1,5 +1,6 @@
 import { createTileCache, type TileCache } from "./native-tile-cache";
 import { createFilesystemTileStore } from "./tile-store-fs";
+import { API_ORIGIN } from "@/lib/api-origin";
 
 /**
  * The MapLibre side of the service-worker-free tile cache (spec 0007 / 0009,
@@ -23,16 +24,28 @@ export function unwrapTileUrl(wrapped: string): string {
   return wrapped.startsWith(PREFIX) ? wrapped.slice(PREFIX.length) : wrapped;
 }
 
+/**
+ * Whether the offline tile protocol should be active: only on native AND only
+ * when the app is loaded from the local bundle (origin is not the production
+ * site). On the networked `server.url` build the service worker still caches
+ * tiles, so the protocol stays off until the app loads locally (spec 0009,
+ * phase 3). Keeping this off-origin gate means wiring the maps now is inert
+ * until that flip.
+ */
+export function offlineTilesActive(native: boolean, origin: string): boolean {
+  return native && origin !== API_ORIGIN;
+}
+
 type TransformRequest = (
   url: string,
   resourceType?: string,
 ) => { url: string } | undefined;
 
 /** A MapLibre `transformRequest` that routes tile requests through the offline
- *  protocol on native, and is a no-op otherwise. */
-export function makeTileTransformRequest(native: boolean): TransformRequest {
+ *  protocol when active, and is a no-op otherwise. */
+export function makeTileTransformRequest(active: boolean): TransformRequest {
   return (url, resourceType) => {
-    if (native && resourceType === "Tile") return { url: rewriteTileUrl(url) };
+    if (active && resourceType === "Tile") return { url: rewriteTileUrl(url) };
     return undefined;
   };
 }
