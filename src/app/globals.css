@@ -160,6 +160,15 @@ body::after {
   mix-blend-mode: screen;
 }
 
+/* The paper grain lightens (dark) / darkens (light) every surface a few levels
+ * via its blend mode, which the flat native system-bar background can't match,
+ * leaving a visible seam under the tab bar and at the top. Drop it on the native
+ * app so every surface is flat and the edge-to-edge bars match (#294). The web
+ * keeps the texture. */
+.has-mobile-tabbar body::after {
+  display: none;
+}
+
 ::selection {
   background-color: var(--color-amber);
   color: var(--color-forest);
