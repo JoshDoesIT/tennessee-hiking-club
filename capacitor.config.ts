@@ -24,17 +24,17 @@ const config: CapacitorConfig = {
     errorPath: "index.html",
   },
   plugins: {
-    // A branded launch splash so the app does not flash a black/white screen
-    // while the hosted app loads (#246). It stays up (no auto-hide) until the
-    // web app is ready and calls `SplashScreen.hide()` (see SplashHider), and
-    // shows the brand forest with a cream spinner meanwhile.
+    // A branded forest launch splash so the app does not flash a black/white
+    // screen while the hosted app loads (#246). It stays up (no auto-hide)
+    // until the web app is ready and calls `SplashScreen.hide()` (see
+    // SplashHider). No spinner: on Android 12+ the launch splash is the OS
+    // system splash (an icon on a colour), which has no place for the plugin
+    // spinner, so a configured spinner showed on iOS but never on Android. A
+    // clean, spinner-free branded splash is consistent across both (#295).
     SplashScreen: {
       launchAutoHide: false,
       backgroundColor: "#2a3623",
-      showSpinner: true,
-      spinnerColor: "#fbf6e9",
-      androidSpinnerStyle: "large",
-      iosSpinnerStyle: "large",
+      showSpinner: false,
     },
   },
 };
