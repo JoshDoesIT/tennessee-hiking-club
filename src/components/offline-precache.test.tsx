@@ -6,7 +6,10 @@ vi.mock("@capacitor/core", () => ({ Capacitor: { isNativePlatform } }));
 
 import { OfflinePrecache } from "./offline-precache";
 
-const fetchMock = vi.fn(async () => ({ ok: true }) as Response);
+const fetchMock = vi.fn(
+  async (..._args: unknown[]) =>
+    ({ ok: true, text: async () => "" }) as unknown as Response,
+);
 
 function stubServiceWorker(value: unknown) {
   Object.defineProperty(navigator, "serviceWorker", {
@@ -36,6 +39,28 @@ describe("OfflinePrecache", () => {
     expect(fetchMock).toHaveBeenCalledWith("/trails/a", {
       headers: { Accept: "text/html" },
     });
+  });
+
+  it("also warms each page's images so photos load offline (#244)", async () => {
+    isNativePlatform.mockReturnValue(true);
+    stubServiceWorker({ ready: Promise.resolve({}) });
+    const html = `<img src="/_next/image?url=%2Fp.jpg&amp;w=750&amp;q=75" />`;
+    fetchMock.mockImplementation(
+      async (input: unknown) =>
+        ({
+          ok: true,
+          text: async () =>
+            String(input).startsWith("/_next/image") ? "" : html,
+        }) as unknown as Response,
+    );
+
+    render(<OfflinePrecache routes={["/trails/a"]} />);
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/_next/image?url=%2Fp.jpg&w=750&q=75",
+      ),
+    );
   });
 
   it("does nothing on the web (lazy caching stays the default there)", async () => {
