@@ -19,3 +19,6 @@ project(':capacitor-share').projectDir = new File('../node_modules/.pnpm/@capaci
 
 include ':capacitor-splash-screen'
 project(':capacitor-splash-screen').projectDir = new File('../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.3.4/node_modules/@capacitor/splash-screen/android')
+
+include ':capacitor-secure-storage-plugin'
+project(':capacitor-secure-storage-plugin').projectDir = new File('../node_modules/.pnpm/capacitor-secure-storage-plugin@0.13.0_@capacitor+core@8.3.4/node_modules/capacitor-secure-storage-plugin/android')
