@@ -34,7 +34,6 @@ const EXCLUDE = [
   "src/app/hikes", // auth() in render
   "src/app/leaderboard", // force-dynamic + DB
   "src/app/share", // dynamic OG + catch-all without generateStaticParams
-  "src/app/trails/page.tsx", // searchParams filtering
 ];
 
 const moved = [];
