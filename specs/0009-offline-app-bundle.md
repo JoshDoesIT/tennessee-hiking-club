@@ -1,6 +1,7 @@
 # 0009: Offline app bundle (open with no signal)
 
-- **Status:** phases 1-4 code-complete; on-device verification pending (#324)
+- **Status:** phases 1-4 complete and the local bundle is the default load mode;
+  on-device verification + the final offline-completeness pass pending (#324)
 - **Issue:** #248 (depends on the Capacitor shell #215)
 - **Supersedes** the "load the hosted site over the network" decision in spec
   0006 for the native app.
@@ -62,17 +63,19 @@ and the API backend.
 3. **Load locally.** Drop `server.url` for the production app (keep it for
    `CAP_SERVER_URL` dev live-reload), point `webDir` at the export, and verify
    the app opens fully offline. Fold in the launch splash (#246).
-   _In progress: `capacitor.config.ts` has the local-bundle mode behind
-   `CAP_LOCAL_BUNDLE=1` (`webDir: "out"`, no `server.url`), default off. Build
-   and sync it with `pnpm cap:sync:local`._
+   _Done: `capacitor.config.ts` loads the local bundle (`webDir: "out"`, no
+   `server.url`) by **default**; `CAP_LOCAL_BUNDLE=0` is the escape hatch back to
+   the hosted `server.url` mode, and `CAP_SERVER_URL` still overrides for dev
+   live-reload. Build and sync with `pnpm cap:sync` (it runs `build:capacitor`
+   first); `pnpm cap:sync:hosted` syncs the fallback mode._
 
    _Verified on the iOS simulator: the local-bundle app builds, launches, and
    renders the home page from the static export with no `server.url`, which is
-   the core fix (it opens from the bundle, not the network). Still to confirm on
-   a device (the simulator blocks host taps): deep navigation across bundled
-   pages, the maps rendering tiles from the native cache offline (#314), and a
-   true no-network launch. Sign-in from the local origin waits on phase 4. The
-   flag stays off by default until those pass._
+   the core fix (it opens from the bundle, not the network). The device pass that
+   the simulator cannot do (deep navigation across bundled pages, the maps
+   rendering tiles from the native cache offline (#314), a true no-network
+   launch, and the cross-origin sign-in round-trip) is tracked in #324. The
+   default flipped to local now so that pass verifies exactly what ships._
 
 4. **Auth from a local origin.** Sign-in via the Capacitor Browser opening the
    hosted OAuth flow and returning through a deep link, with the session carried
@@ -90,14 +93,21 @@ and the API backend.
 
 ## Verification status
 
-Phases 1-4 are implemented and behind `CAP_LOCAL_BUNDLE` (default off), so the
-live web and the current `server.url` app are untouched. Verified in the iOS
-simulator: the local bundle builds with all native plugins (including the new
+Phases 1-4 are implemented and the local bundle is now the **default** load mode
+(`CAP_LOCAL_BUNDLE=0` falls back to the hosted `server.url` app). Verified in the
+iOS simulator: the local bundle builds with all native plugins (including
 `capacitor-secure-storage-plugin`), launches, and renders the home page from the
 static export with no `server.url`. The interactive and offline checks the
 simulator cannot do (host taps are TCC-blocked) are consolidated in **#324**:
 offline cold launch, deep navigation, offline map tiles, the cross-origin
-sign-in round-trip, and the same on Android, followed by flipping the default.
+sign-in round-trip, and the same on Android. The default was flipped ahead of
+that pass so it verifies exactly the configuration that ships; if the device pass
+finds a blocker, `CAP_LOCAL_BUNDLE=0` is the one-flag fallback.
+
+The update trade-off this locks in: trail content and UI ship frozen in the
+bundle and change only with an app release, while user data stays live through
+the production API (#258). Restoring over-the-air refresh (a live-update plugin
+that swaps the bundle when online) is tracked separately in #335.
 
 ## Acceptance criteria (#248)
 
