@@ -31,7 +31,7 @@ version-controlled. After cloning, just install and sync:
 
 ```bash
 pnpm install
-pnpm cap:sync          # copy web config + plugins into the committed native projects
+pnpm cap:sync          # build the offline bundle + copy it and plugins into the committed native projects
 ```
 
 Build outputs and machine-specific files (`build/`, `.gradle/`, `local.properties`,
@@ -63,7 +63,7 @@ delete those (the web PWA icons are handled separately). Note: the bundled
 ## Run
 
 ```bash
-pnpm cap:sync          # copy web config + plugins into the native projects
+pnpm cap:sync          # build the offline bundle + copy it and plugins into the native projects
 pnpm cap:ios           # build and run on an iOS simulator/device
 pnpm cap:android       # build and run on an Android emulator/device
 # or open the native IDE:
@@ -71,12 +71,13 @@ pnpm cap:open:ios
 pnpm cap:open:android
 ```
 
-By default the app points at production (`https://www.tnhiking.club`). To point at
-a preview deployment or a local backend, set `CAP_SERVER_URL` before
-`pnpm cap:sync`:
+By default the app loads its own bundled copy (`out/`) and works with no signal;
+when online it calls the production API (`https://www.tnhiking.club`) for live
+data (#258). Two ways to change the load mode:
 
 ```bash
-CAP_SERVER_URL="https://<preview>.vercel.app" pnpm cap:sync
+pnpm cap:sync:hosted                                  # load the hosted site over server.url instead (old behaviour)
+CAP_SERVER_URL="https://<preview>.vercel.app" pnpm cap:sync   # point at a preview/local backend for dev live-reload
 ```
 
 For a local `http://` backend during development, also set `cleartext: true` in
