@@ -42,8 +42,12 @@ deleted; re-apply the native customizations afterward (see the list below).
 ## App icon and splash
 
 The native app icon and launch splash are generated from the TNHC badge
-(`assets/logo.png`, the 1024x1024 source) with `@capacitor/assets` (#299). To
-regenerate after a logo change, replace `assets/logo.png` and run:
+(`assets/logo.png`, the 1024x1024 source) with `@capacitor/assets` (#299). It is
+run on demand rather than pinned as a dev dependency, the tool bundles an old
+Capacitor CLI 5.x and trapeze toolchain that carried several flagged transitive
+advisories (tar/minimatch/uuid), and the generated resources are committed, so
+there is no need to keep it installed between logo changes. To regenerate after a
+logo change, replace `assets/logo.png` and run (npx fetches it on demand):
 
 ```bash
 npx capacitor-assets generate \
