@@ -7,6 +7,7 @@ import { SyncOnSignIn } from "@/components/hikes/sync-on-signin";
 import { FriendsAndSharing } from "@/components/hikes/friends-and-sharing";
 import { PasskeyManager } from "@/components/auth/passkey-manager";
 import { SignedInGate } from "@/components/auth/signed-in-gate";
+import { DeleteAccount } from "@/components/account/delete-account";
 import { PushOptIn } from "@/components/push/push-opt-in";
 import { StewardBadgeLive } from "@/components/stewardship/steward-badge-live";
 import { YourTennesseeMap } from "@/components/map/your-tennessee-map";
@@ -75,6 +76,9 @@ export default function MyHikesPage() {
             <PasskeyManager />
           </SignedInGate>
           <LogTransfer trails={trails} />
+          <SignedInGate>
+            <DeleteAccount />
+          </SignedInGate>
         </div>
       </section>
     </Container>

@@ -94,9 +94,34 @@ export default function PrivacyPage() {
             >
               My hikes
             </Link>
-            , and import it on another device. You can remove individual hikes,
-            and if you signed in you can delete your account and the data we
-            synced for you. Deleting locally clears the copy in your browser.
+            , and import it on another device.
+          </p>
+        </section>
+
+        <section id="deleting-your-data" className="scroll-mt-24">
+          <h2 className="display text-forest text-2xl">Deleting your data</h2>
+          <p className="mt-3">
+            To remove individual hikes, open{" "}
+            <Link
+              href="/hikes"
+              className="text-pine hover:text-forest underline underline-offset-4"
+            >
+              My hikes
+            </Link>{" "}
+            and delete them; that also clears the copy stored in your browser.
+          </p>
+          <p className="mt-3">
+            If you signed in, you can permanently delete your account and
+            everything synced to it (hikes, cleanups, your profile, contribution
+            records, and sign-in connections) under{" "}
+            <strong>Account &amp; data</strong> in{" "}
+            <Link
+              href="/hikes"
+              className="text-pine hover:text-forest underline underline-offset-4"
+            >
+              My hikes
+            </Link>{" "}
+            &rarr; <strong>Delete account</strong>. This cannot be undone.
           </p>
         </section>
 
