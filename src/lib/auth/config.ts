@@ -38,7 +38,17 @@ export function buildAuthConfig(): NextAuthConfig {
   // it does not guarantee a verified email, so it is left without
   // `allowDangerousEmailAccountLinking` to avoid linking into an account made
   // with a verified-email provider.
-  if (process.env.AUTH_FACEBOOK_ID) providers.push(Facebook);
+  //
+  // Held behind an explicit `AUTH_FACEBOOK_ENABLED=true` flag (not just the
+  // presence of credentials): the Meta app is wired, but its login only works
+  // for app admins until Meta business verification is completed, so showing
+  // members a Facebook button that fails for them is worse than hiding it. The
+  // credentials can stay set; flip the flag to re-enable once verified (#234).
+  if (
+    process.env.AUTH_FACEBOOK_ID &&
+    process.env.AUTH_FACEBOOK_ENABLED === "true"
+  )
+    providers.push(Facebook);
 
   const config: NextAuthConfig = {
     providers,

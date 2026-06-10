@@ -13,6 +13,7 @@ const ENV_KEYS = [
   "AUTH_GITHUB_ID",
   "AUTH_GOOGLE_ID",
   "AUTH_FACEBOOK_ID",
+  "AUTH_FACEBOOK_ENABLED",
 ] as const;
 const ORIGINAL = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
 afterEach(() => {
@@ -56,11 +57,23 @@ describe("buildAuthConfig", () => {
     }
   });
 
-  it("adds Facebook only when its credentials exist, without email linking", () => {
-    delete process.env.AUTH_FACEBOOK_ID;
+  it("adds Facebook only when explicitly enabled and its credentials exist, without email linking", () => {
+    // Credentials present but not explicitly enabled: held off. The Meta app is
+    // wired but its login only works for app admins until business verification
+    // is resolved, so it stays gated to avoid showing members a broken button
+    // (#234).
+    process.env.AUTH_FACEBOOK_ID = "fb";
+    delete process.env.AUTH_FACEBOOK_ENABLED;
     expect(providerIds(buildAuthConfig())).not.toContain("facebook");
 
+    // Enabled flag set but no credentials: still off.
+    delete process.env.AUTH_FACEBOOK_ID;
+    process.env.AUTH_FACEBOOK_ENABLED = "true";
+    expect(providerIds(buildAuthConfig())).not.toContain("facebook");
+
+    // Both the credentials and the explicit enable flag present: on.
     process.env.AUTH_FACEBOOK_ID = "fb";
+    process.env.AUTH_FACEBOOK_ENABLED = "true";
     const cfg = buildAuthConfig();
     expect(providerIds(cfg)).toContain("facebook");
     // Facebook does not guarantee a verified email, so it must not
