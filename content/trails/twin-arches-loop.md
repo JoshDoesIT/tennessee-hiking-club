@@ -13,7 +13,10 @@ routeType: loop
 dogFriendly: true
 feeRequired: false
 tags: [arch, geology, bluffs, backcountry]
-photos: []
+photos:
+  - src: /trails/twin-arches-loop.jpg
+    alt: The trail passing beneath the massive sandstone span of the South Arch at Twin Arches
+    credit: Photo by NPS staff, Big South Fork NRRA, public domain, via Wikimedia Commons
 summary: A 4.6-mile plateau loop in Big South Fork that drops past the massive North and South Arches, two of the largest natural bridges in the eastern United States, then circles the mesa beneath the bluff line.
 parking:
   lat: 36.54442

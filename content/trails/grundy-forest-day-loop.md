@@ -13,6 +13,10 @@ routeType: loop
 dogFriendly: true
 feeRequired: false
 tags: [waterfall, gorge, state-park]
+photos:
+  - src: /trails/grundy-forest-day-loop.jpg
+    alt: A small waterfall spilling into the green Blue Hole swimming pool beneath hemlocks on the Grundy Forest Day Loop
+    credit: Photo by J. Michael Scarborough, CC BY-SA 3.0, via Wikimedia Commons
 summary: A compact two-mile loop through the Grundy Forest pocket of South Cumberland State Park, dropping past Hanes Hole Falls and Blue Hole Falls with an optional spur to Sycamore Falls.
 parking:
   lat: 35.25217

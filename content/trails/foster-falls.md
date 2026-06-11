@@ -13,6 +13,10 @@ routeType: loop
 dogFriendly: true
 feeRequired: false
 tags: [waterfall, gorge, swimming, state-park]
+photos:
+  - src: /trails/foster-falls.jpg
+    alt: Foster Falls plunging 60 feet off a dark sandstone cliff into its pool, framed by spring-green trees
+    credit: Photo by Casey Fleser, CC BY 2.0, via Wikimedia Commons
 summary: A short, steep loop from the plateau rim to the base of 60-foot Foster Falls, the tallest single plunge in South Cumberland State Park.
 parking:
   lat: 35.18269
