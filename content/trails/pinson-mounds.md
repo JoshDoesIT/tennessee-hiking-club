@@ -14,7 +14,10 @@ dogFriendly: true
 kidFriendly: true
 feeRequired: false
 tags: [historic, family, boardwalk, state-park]
-photos: []
+photos:
+  - src: /trails/pinson-mounds.jpg
+    alt: Tree-covered Sauls Mound rising 72 feet above the surrounding lawn at Pinson Mounds
+    credit: Photo by Brian Stansberry, CC BY 3.0, via Wikimedia Commons
 summary: A flat loop through the largest Middle Woodland mound complex in North America, passing 72-foot Sauls Mound and a bottomland boardwalk south of Jackson.
 parking:
   lat: 35.49810

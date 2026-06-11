@@ -14,7 +14,10 @@ dogFriendly: true
 kidFriendly: true
 feeRequired: false
 tags: [lake, forest, family, state-park]
-photos: []
+photos:
+  - src: /trails/cub-lake-trail.jpg
+    alt: Cub Lake’s calm water reflecting the wooded shoreline at Natchez Trace State Park
+    credit: Photo by Skye A. Marthaler, CC BY-SA 4.0, via Wikimedia Commons
 summary: A gentle loop around Cub Lake at Natchez Trace State Park, circling the water on footbridges and quiet oak-and-pine shoreline a few minutes off I-40 at Wildersville.
 parking:
   lat: 35.78041

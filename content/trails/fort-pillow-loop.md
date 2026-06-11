@@ -14,7 +14,10 @@ dogFriendly: true
 kidFriendly: true
 feeRequired: false
 tags: [historic, river, views, state-park]
-photos: []
+photos:
+  - src: /trails/fort-pillow-loop.jpg
+    alt: Cannons behind the reconstructed wooden palisade of the restored fort at Fort Pillow
+    credit: Photo by Hal Jespersen, public domain, via Wikimedia Commons
 summary: A boardwalk-and-stairs walk from the Fort Pillow museum to the restored 1864 fortifications on the First Chickasaw Bluff, with views over the Mississippi River floodplain.
 parking:
   lat: 35.64045

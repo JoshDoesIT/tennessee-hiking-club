@@ -14,7 +14,10 @@ dogFriendly: true
 kidFriendly: true
 feeRequired: false
 tags: [river, forest, family, state-park]
-photos: []
+photos:
+  - src: /trails/lucius-burch-trail.jpg
+    alt: An ice-glazed tangle of branches arching over the leaf-covered trail at Lucius Burch State Natural Area
+    credit: Photo by Thomas R Machnitzki, CC BY 3.0, via Wikimedia Commons
 summary: A flat bottomland-hardwood loop along the Wolf River on the yellow- and blue-blazed trails of Lucius Burch State Natural Area, next door to Shelby Farms in Memphis.
 parking:
   lat: 35.11881

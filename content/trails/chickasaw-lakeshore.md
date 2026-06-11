@@ -14,7 +14,10 @@ dogFriendly: true
 kidFriendly: true
 feeRequired: false
 tags: [lake, forest, family, state-park]
-photos: []
+photos:
+  - src: /trails/chickasaw-lakeshore.jpg
+    alt: The wooden footbridge crossing Lake Placid toward the day-use lawn at Chickasaw State Park
+    credit: Photo by Thomas R Machnitzki, CC BY 3.0, via Wikimedia Commons
 summary: An easy wooded loop around Lake Placid in CCC-built Chickasaw State Park, crossing a footbridge over the lake's upper arm and passing the lakeside day-use areas.
 parking:
   lat: 35.39219
