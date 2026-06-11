@@ -8,7 +8,7 @@ coordinates:
   lng: -87.12256
 lengthMiles: 0.8
 elevationGainFt: 370
-difficulty: easy
+difficulty: moderate
 routeType: out-and-back
 dogFriendly: true
 feeRequired: false
