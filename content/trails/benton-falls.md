@@ -7,13 +7,17 @@ coordinates:
   lat: 35.14971
   lng: -84.60783
 lengthMiles: 2.8
-elevationGainFt: 40
+elevationGainFt: 240
 difficulty: easy
 routeType: out-and-back
 dogFriendly: true
 kidFriendly: true
 feeRequired: true
 tags: [waterfall, family, lake]
+photos:
+  - src: /trails/benton-falls.jpg
+    alt: Benton Falls fanning down its broad, stepped sandstone face beneath overhanging rhododendron
+    credit: Photo by Ronaldsun1, CC BY-SA 4.0, via Wikimedia Commons
 summary: A gentle 2.8-mile round trip from the Chilhowee Recreation Area atop Chilhowee Mountain to 65-foot Benton Falls, where Rock Creek slides down a broad sandstone staircase.
 parking:
   lat: 35.15039

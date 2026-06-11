@@ -7,12 +7,16 @@ coordinates:
   lat: 36.26500
   lng: -82.12347
 lengthMiles: 2.2
-elevationGainFt: 120
+elevationGainFt: 640
 difficulty: moderate
 routeType: out-and-back
 dogFriendly: true
 feeRequired: false
 tags: [waterfall, gorge, appalachian-trail, backcountry]
+photos:
+  - src: /trails/laurel-fork-falls.jpg
+    alt: Laurel Fork Falls spilling in white braids over dark ledges into a rocky pool walled by cliffs
+    credit: Photo by fPat Murray, CC BY 2.0, via Wikimedia Commons
 summary: A 2.2-mile round trip on the Appalachian Trail from Dennis Cove into the Laurel Fork Gorge of the Pond Mountain Wilderness, ending at the 55-foot plunge of Laurel Fork Falls.
 parking:
   lat: 36.26500

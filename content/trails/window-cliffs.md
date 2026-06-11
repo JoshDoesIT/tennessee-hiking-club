@@ -7,7 +7,7 @@ coordinates:
   lat: 36.05273
   lng: -85.61869
 lengthMiles: 5.5
-elevationGainFt: 300
+elevationGainFt: 720
 difficulty: hard
 routeType: out-and-back
 feeRequired: false

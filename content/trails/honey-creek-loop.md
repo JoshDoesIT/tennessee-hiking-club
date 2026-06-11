@@ -13,6 +13,10 @@ routeType: loop
 kidFriendly: false
 feeRequired: false
 tags: [backcountry, gorge, river, waterfall]
+photos:
+  - src: /trails/honey-creek-loop.jpg
+    alt: The Big South Fork winding through its forested gorge far below the Honey Creek Overlook
+    credit: Photo by ChristopherM, CC BY 2.5, via Wikimedia Commons
 summary: Big South Fork's most rugged short hike, a loop of just under four miles through the Honey Creek gorge that threads slot canyons and rock houses, climbs wooden ladders, and tops out at an overlook high above the Big South Fork.
 parking:
   lat: 36.42132

@@ -13,7 +13,10 @@ routeType: loop
 dogFriendly: true
 feeRequired: false
 tags: [wildflowers, views, forest]
-photos: []
+photos:
+  - src: /trails/mossy-ridge.jpg
+    alt: Morning fog over the steeplechase fields of Percy Warner Park, with the wooded ridges that carry the Mossy Ridge Trail rising behind
+    credit: Photo by Michael Brown, CC BY 2.0, via Wikimedia Commons
 summary: Nashville's classic in-town workout hike, a red-blazed 4.5-mile loop from the Deep Well trailhead that rolls over wooded ridges and hollows in Percy Warner Park.
 parking:
   lat: 36.07551
