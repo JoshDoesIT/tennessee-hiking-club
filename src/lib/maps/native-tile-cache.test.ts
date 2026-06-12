@@ -17,8 +17,7 @@ const bytes = (s: string): ArrayBuffer => {
   const u8 = new TextEncoder().encode(s);
   return u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength);
 };
-const text = (buf: ArrayBuffer) =>
-  new TextDecoder().decode(new Uint8Array(buf));
+const text = (buf: ArrayBuffer) => new TextDecoder().decode(new Uint8Array(buf));
 const res = (ok: boolean, body: string) =>
   ({ ok, arrayBuffer: async () => bytes(body) }) as unknown as Response;
 const asFetch = (fn: unknown) => fn as unknown as typeof fetch;

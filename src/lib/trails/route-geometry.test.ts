@@ -11,10 +11,7 @@ import {
 const p = (lat: number, lng: number) => ({ lat, lng });
 
 /** A stitched chain is valid in either direction; assert it equals one or the other. */
-function expectChain(
-  result: { lat: number; lng: number }[],
-  forward: typeof result,
-) {
+function expectChain(result: { lat: number; lng: number }[], forward: typeof result) {
   const reverse = [...forward].reverse();
   expect([forward, reverse]).toContainEqual(result);
 }
@@ -74,26 +71,8 @@ describe("npsSegments", () => {
   it("reads LineString and MultiLineString features as lat/lng segments", () => {
     const fc = {
       features: [
-        {
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              [-83.45, 35.6],
-              [-83.44, 35.61],
-            ],
-          },
-        },
-        {
-          geometry: {
-            type: "MultiLineString",
-            coordinates: [
-              [
-                [-83.4, 35.5],
-                [-83.41, 35.52],
-              ],
-            ],
-          },
-        },
+        { geometry: { type: "LineString", coordinates: [[-83.45, 35.6], [-83.44, 35.61]] } },
+        { geometry: { type: "MultiLineString", coordinates: [[[-83.4, 35.5], [-83.41, 35.52]]] } },
       ],
     };
     const segs = npsSegments(fc);
@@ -107,13 +86,7 @@ describe("overpassSegments", () => {
   it("reads way geometry as lat/lng segments", () => {
     const json = {
       elements: [
-        {
-          type: "way",
-          geometry: [
-            { lat: 35.6, lon: -83.45 },
-            { lat: 35.61, lon: -83.44 },
-          ],
-        },
+        { type: "way", geometry: [{ lat: 35.6, lon: -83.45 }, { lat: 35.61, lon: -83.44 }] },
         { type: "node", lat: 1, lon: 2 },
       ],
     };
@@ -134,10 +107,7 @@ describe("combineNamedSegments", () => {
   ];
 
   it("collects the segments of the named ways, case-insensitively", () => {
-    const segs = combineNamedSegments(groups, [
-      "river trail",
-      "Ridgetop Trail",
-    ]);
+    const segs = combineNamedSegments(groups, ["river trail", "Ridgetop Trail"]);
     expect(segs).toEqual([
       [p(1, 1), p(1, 2)],
       [p(1, 2), p(1, 3)],

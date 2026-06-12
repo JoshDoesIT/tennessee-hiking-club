@@ -17,9 +17,7 @@ const startNativeSignInMock = vi.mocked(startNativeSignIn);
 function mockProviders(data: unknown) {
   vi.stubGlobal(
     "fetch",
-    vi.fn(
-      async () => ({ ok: true, json: async () => data }) as unknown as Response,
-    ),
+    vi.fn(async () => ({ ok: true, json: async () => data }) as unknown as Response),
   );
 }
 
@@ -61,9 +59,7 @@ describe("SignInOptions", () => {
     await user.click(
       await screen.findByRole("button", { name: /continue with github/i }),
     );
-    expect(signInMock).toHaveBeenCalledWith("github", {
-      callbackUrl: "/hikes",
-    });
+    expect(signInMock).toHaveBeenCalledWith("github", { callbackUrl: "/hikes" });
   });
 
   it("on a native build starts native sign-in instead of fetch-based signIn", async () => {

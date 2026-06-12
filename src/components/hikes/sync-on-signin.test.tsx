@@ -66,11 +66,7 @@ describe("SyncOnSignIn", () => {
     render(<SyncOnSignIn />);
 
     await waitFor(() =>
-      expect(
-        readLog()
-          .map((e) => e.trailSlug)
-          .sort(),
-      ).toEqual(["a", "b"]),
+      expect(readLog().map((e) => e.trailSlug).sort()).toEqual(["a", "b"]),
     );
     expect(getSyncBody()?.hikes[0].trailSlug).toBe("a");
   });
@@ -112,9 +108,7 @@ describe("SyncOnSignIn", () => {
 
   it("uploads local-only photos after sign-in and records their URLs", async () => {
     addHike("a", "2026-01-01", { photoId: "ph-1" });
-    vi.mocked(getPhoto).mockResolvedValue(
-      new Blob(["x"], { type: "image/jpeg" }),
-    );
+    vi.mocked(getPhoto).mockResolvedValue(new Blob(["x"], { type: "image/jpeg" }));
     vi.mocked(uploadPhoto).mockResolvedValue("https://b/p.jpg");
     const { fetchMock } = setupFetch(
       { user: { id: "u1" } },

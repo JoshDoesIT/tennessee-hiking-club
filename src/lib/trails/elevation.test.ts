@@ -29,9 +29,7 @@ describe("routeHasElevation", () => {
 
 describe("haversineMiles", () => {
   it("is zero for the same point", () => {
-    expect(haversineMiles({ lat: 35, lng: -84 }, { lat: 35, lng: -84 })).toBe(
-      0,
-    );
+    expect(haversineMiles({ lat: 35, lng: -84 }, { lat: 35, lng: -84 })).toBe(0);
   });
 
   it("is about 69 miles for one degree of latitude", () => {

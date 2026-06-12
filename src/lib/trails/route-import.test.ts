@@ -65,11 +65,7 @@ describe("parseGpxTrack", () => {
     expect(track.name).toBe("Sample Trail");
     // The point with no <ele> is skipped.
     expect(track.points).toHaveLength(3);
-    expect(track.points[0]).toEqual({
-      lat: 35.6,
-      lng: -83.45,
-      elevationFt: 4000,
-    });
+    expect(track.points[0]).toEqual({ lat: 35.6, lng: -83.45, elevationFt: 4000 });
   });
 });
 

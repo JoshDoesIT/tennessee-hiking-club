@@ -41,11 +41,7 @@ export type SendRequestCheck =
   | { ok: true }
   | {
       ok: false;
-      reason:
-        | "self"
-        | "already-requested"
-        | "already-friends"
-        | "respond-to-theirs";
+      reason: "self" | "already-requested" | "already-friends" | "respond-to-theirs";
     };
 
 /**
@@ -64,8 +60,7 @@ export function canSendRequest(
       (r.requesterId === viewerId && r.addresseeId === targetId) ||
       (r.requesterId === targetId && r.addresseeId === viewerId);
     if (!involves) continue;
-    if (r.status === "accepted")
-      return { ok: false, reason: "already-friends" };
+    if (r.status === "accepted") return { ok: false, reason: "already-friends" };
     if (r.requesterId === viewerId)
       return { ok: false, reason: "already-requested" };
     return { ok: false, reason: "respond-to-theirs" };

@@ -111,13 +111,12 @@ export function ConditionReviewList({
                     <div className="border-forest/15 mt-3 rounded-xl border p-4">
                       <p className="text-forest text-sm font-medium">
                         Add under{" "}
-                        <code className="text-ink/80">conditionReports:</code>{" "}
-                        in{" "}
+                        <code className="text-ink/80">conditionReports:</code> in{" "}
                         <code className="text-ink/80">
                           content/trails/{r.trailSlug}.md
                         </code>
                       </p>
-                      <pre className="border-forest/10 text-ink/80 bg-cream-50 mt-3 overflow-x-auto rounded-lg border p-3 text-xs">
+                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-cream-50 p-3 text-xs">
                         {r.entry.yaml}
                       </pre>
                     </div>

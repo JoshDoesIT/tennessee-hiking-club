@@ -260,10 +260,7 @@ export const friendships = pgTable(
     respondedAt: timestamp("responded_at", { withTimezone: true }),
   },
   (table) => [
-    uniqueIndex("friendships_pair_idx").on(
-      table.requesterId,
-      table.addresseeId,
-    ),
+    uniqueIndex("friendships_pair_idx").on(table.requesterId, table.addresseeId),
     index("friendships_addressee_idx").on(table.addresseeId),
     index("friendships_requester_idx").on(table.requesterId),
   ],

@@ -145,8 +145,6 @@ describe("local hike log", () => {
     expect(log.find((e) => e.hikedOn === "2026-02-01")?.photoUrl).toBe(
       "https://blob/p.jpg",
     );
-    expect(
-      log.find((e) => e.hikedOn === "2026-01-01")?.photoUrl,
-    ).toBeUndefined();
+    expect(log.find((e) => e.hikedOn === "2026-01-01")?.photoUrl).toBeUndefined();
   });
 });

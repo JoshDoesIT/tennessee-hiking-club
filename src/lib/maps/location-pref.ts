@@ -31,10 +31,7 @@ export function setLocationEnabled(enabled: boolean, storage?: Storage): void {
  *  they already have. Only auto-triggers when previously enabled, so it never
  *  prompts unexpectedly. */
 export function rememberAndApplyLocation(
-  control: {
-    on: (type: string, cb: () => void) => void;
-    trigger: () => boolean;
-  },
+  control: { on: (type: string, cb: () => void) => void; trigger: () => boolean },
   storage?: Storage,
 ): void {
   control.on("geolocate", () => setLocationEnabled(true, storage));

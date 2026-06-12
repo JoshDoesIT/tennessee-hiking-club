@@ -61,13 +61,7 @@ describe("RecordHike", () => {
   it("starts a watch and shows the live controls", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     expect(geo.watchPosition).toHaveBeenCalledTimes(1);
@@ -78,13 +72,7 @@ describe("RecordHike", () => {
   it("shows the live point count as positions arrive", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
@@ -95,13 +83,7 @@ describe("RecordHike", () => {
   it("saves the track and stops the watch after confirming finish", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
@@ -117,13 +99,7 @@ describe("RecordHike", () => {
   it("requires confirmation before discarding, and can be cancelled", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
@@ -137,9 +113,7 @@ describe("RecordHike", () => {
 
     // Confirming actually discards.
     await user.click(screen.getByRole("button", { name: /^discard$/i }));
-    await user.click(
-      screen.getByRole("button", { name: /discard recording/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /discard recording/i }));
     expect(recordButton()).toBeInTheDocument();
     expect(readLog()).toEqual([]);
   });
@@ -147,13 +121,7 @@ describe("RecordHike", () => {
   it("does not save when too few points were recorded", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     geo.emit(35.6, -83.45, 1000);
@@ -167,13 +135,7 @@ describe("RecordHike", () => {
   it("pauses the watch and offers resume", async () => {
     const geo = mockGeolocation();
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     await user.click(screen.getByRole("button", { name: /pause/i }));
@@ -185,13 +147,7 @@ describe("RecordHike", () => {
   it("warns when a recording is already in progress on another trail", () => {
     mockGeolocation();
     act(() => startRecording("abrams-falls", "Abrams Falls"));
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     expect(screen.getByText(/already recording on/i)).toBeInTheDocument();
     expect(screen.getByText(/Abrams Falls/)).toBeInTheDocument();
@@ -206,13 +162,7 @@ describe("RecordHike", () => {
       value: undefined,
     });
     const user = userEvent.setup();
-    render(
-      <RecordHike
-        slug="grotto-falls"
-        trailName="Grotto Falls"
-        coordinates={coords}
-      />,
-    );
+    render(<RecordHike slug="grotto-falls" trailName="Grotto Falls" coordinates={coords} />);
 
     await user.click(recordButton());
     expect(screen.getByText(/isn.t available/i)).toBeInTheDocument();

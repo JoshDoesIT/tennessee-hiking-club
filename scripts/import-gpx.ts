@@ -33,9 +33,7 @@ if (points.length < 2) {
 const route = downsampleRoute(points, maxPoints);
 const profile = buildElevationProfile(route);
 
-console.error(
-  `# ${name ?? "(unnamed track)"}: ${points.length} points -> ${route.length} sampled`,
-);
+console.error(`# ${name ?? "(unnamed track)"}: ${points.length} points -> ${route.length} sampled`);
 console.error(
   `# sourced gain ${profile.gainFt} ft, length ${profile.totalMiles.toFixed(2)} mi ` +
     `(sanity-check against the trail's stated elevationGainFt / lengthMiles)`,

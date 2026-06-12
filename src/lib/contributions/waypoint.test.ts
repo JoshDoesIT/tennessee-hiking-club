@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
-import { validateWaypointSubmission, generateWaypointEntry } from "./waypoint";
+import {
+  validateWaypointSubmission,
+  generateWaypointEntry,
+} from "./waypoint";
 
 describe("validateWaypointSubmission", () => {
   const valid = {
@@ -14,8 +17,7 @@ describe("validateWaypointSubmission", () => {
   it("accepts a valid suggestion, with an optional description", () => {
     expect(validateWaypointSubmission(valid).success).toBe(true);
     expect(
-      validateWaypointSubmission({ ...valid, description: "110-ft drop" })
-        .success,
+      validateWaypointSubmission({ ...valid, description: "110-ft drop" }).success,
     ).toBe(true);
   });
 
@@ -32,9 +34,7 @@ describe("validateWaypointSubmission", () => {
   });
 
   it("rejects missing required fields", () => {
-    expect(validateWaypointSubmission({ ...valid, name: "" }).success).toBe(
-      false,
-    );
+    expect(validateWaypointSubmission({ ...valid, name: "" }).success).toBe(false);
     const noLat: Record<string, unknown> = { ...valid };
     delete noLat.lat;
     expect(validateWaypointSubmission(noLat).success).toBe(false);

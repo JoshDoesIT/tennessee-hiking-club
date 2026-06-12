@@ -50,12 +50,7 @@ describe("notifyTrailAlert", () => {
 
   it("does nothing when there are no subscribers", async () => {
     const send = vi.fn<PushSender>(async () => true);
-    const result = await notifyTrailAlert({
-      trail,
-      alert,
-      db: dbWith([]),
-      send,
-    });
+    const result = await notifyTrailAlert({ trail, alert, db: dbWith([]), send });
     expect(result).toEqual({ recipients: 0, sent: 0, failed: 0 });
     expect(send).not.toHaveBeenCalled();
   });

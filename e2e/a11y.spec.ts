@@ -41,13 +41,9 @@ for (const { name, path } of pages) {
 
 // Dark mode must also meet AA contrast (#167). Cover a representative subset.
 const darkPages = pages.filter((p) =>
-  [
-    "home",
-    "trail directory",
-    "trail detail",
-    "leaderboard",
-    "leave no trace",
-  ].includes(p.name),
+  ["home", "trail directory", "trail detail", "leaderboard", "leave no trace"].includes(
+    p.name,
+  ),
 );
 
 for (const { name, path } of darkPages) {

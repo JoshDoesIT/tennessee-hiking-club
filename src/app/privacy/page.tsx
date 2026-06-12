@@ -29,9 +29,9 @@ export default function PrivacyPage() {
           <h2 className="display text-forest text-2xl">What we collect</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5">
             <li>
-              <strong>Browsing:</strong> nothing is required to explore the
-              site. Our host keeps standard, short-lived request logs for
-              security and reliability.
+              <strong>Browsing:</strong> nothing is required to explore the site.
+              Our host keeps standard, short-lived request logs for security and
+              reliability.
             </li>
             <li>
               <strong>Your hike log:</strong> when you mark trails hiked, that
@@ -39,16 +39,14 @@ export default function PrivacyPage() {
               local storage). It never leaves your device unless you sign in.
             </li>
             <li>
-              <strong>When you sign in:</strong> we store the basic identity
-              your provider shares (name, email, avatar), and we sync your
-              hikes, profile, cleanup log, and per-hike photos so they follow
-              you across devices. Photos are kept in private storage and shown
-              only to you.
+              <strong>When you sign in:</strong> we store the basic identity your
+              provider shares (name, email, avatar), and we sync your hikes,
+              profile, cleanup log, and per-hike photos so they follow you across
+              devices. Photos are kept in private storage and shown only to you.
             </li>
             <li>
               <strong>Analytics:</strong> privacy-friendly, aggregate usage and
-              performance metrics. No cross-site tracking and no selling of
-              data.
+              performance metrics. No cross-site tracking and no selling of data.
             </li>
           </ul>
         </section>
@@ -63,8 +61,8 @@ export default function PrivacyPage() {
               choose to sign in with them.
             </li>
             <li>
-              <strong>Vercel</strong>, our host, for serving the site, aggregate
-              analytics, and private photo storage.
+              <strong>Vercel</strong>, our host, for serving the site,
+              aggregate analytics, and private photo storage.
             </li>
             <li>
               <strong>Neon</strong>, our database, for your synced hikes and
@@ -78,9 +76,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="display text-forest text-2xl">
-            Public only by choice
-          </h2>
+          <h2 className="display text-forest text-2xl">Public only by choice</h2>
           <p className="mt-3">
             Leaderboards are opt-in. Nothing about your hikes is shown publicly
             unless you explicitly turn sharing on, and you can turn it off again

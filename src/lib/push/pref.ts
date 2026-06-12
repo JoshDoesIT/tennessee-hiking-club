@@ -21,11 +21,7 @@ function store(storage?: Storage): Storage | null {
 function parse(raw: string | null): PushPref {
   try {
     const parsed = JSON.parse(raw ?? "");
-    if (
-      parsed &&
-      typeof parsed === "object" &&
-      typeof parsed.optedIn === "boolean"
-    ) {
+    if (parsed && typeof parsed === "object" && typeof parsed.optedIn === "boolean") {
       const pref: PushPref = { optedIn: parsed.optedIn };
       if (typeof parsed.token === "string") pref.token = parsed.token;
       return pref;

@@ -13,9 +13,7 @@ const sample = (latitude: number, longitude: number, altitude = 100) => ({
 });
 
 const route = (n: number) =>
-  Array.from({ length: n }, (_, i) =>
-    sample(35.9 + i * 0.001, -83.9 - i * 0.001),
-  );
+  Array.from({ length: n }, (_, i) => sample(35.9 + i * 0.001, -83.9 - i * 0.001));
 
 describe("healthWorkoutToTrack", () => {
   it("converts a workout's GPS route into a RecordedTrack", () => {

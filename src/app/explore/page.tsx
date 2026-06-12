@@ -59,7 +59,7 @@ export default function ExplorePage() {
                 </Link>
                 <span className="text-ink/70 shrink-0 text-sm">
                   {alertLevel ? (
-                    <span className="font-medium text-amber-700">
+                    <span className="text-amber-700 font-medium">
                       {ALERT_LABEL[alertLevel]} ·{" "}
                     </span>
                   ) : null}

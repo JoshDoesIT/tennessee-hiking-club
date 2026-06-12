@@ -26,9 +26,7 @@ describe("ElevationProfile", () => {
 
   it("renders nothing for a route too short to chart", () => {
     const { container } = render(
-      <ElevationProfile
-        route={[{ lat: 35.6, lng: -83.45, elevationFt: 4000 }]}
-      />,
+      <ElevationProfile route={[{ lat: 35.6, lng: -83.45, elevationFt: 4000 }]} />,
     );
     expect(container).toBeEmptyDOMElement();
   });

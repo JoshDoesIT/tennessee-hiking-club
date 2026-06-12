@@ -13,9 +13,7 @@ const req = (opts: { method?: string; origin?: string; auth?: string }) =>
 
 describe("proxy (native API access)", () => {
   it("answers CORS preflight for a Capacitor origin", () => {
-    const res = proxy(
-      req({ method: "OPTIONS", origin: "capacitor://localhost" }),
-    );
+    const res = proxy(req({ method: "OPTIONS", origin: "capacitor://localhost" }));
     expect(res.status).toBe(204);
     expect(res.headers.get("access-control-allow-origin")).toBe(
       "capacitor://localhost",
@@ -26,9 +24,7 @@ describe("proxy (native API access)", () => {
   });
 
   it("adds CORS headers to a Capacitor-origin request", () => {
-    const res = proxy(
-      req({ origin: "capacitor://localhost", auth: "Bearer tok" }),
-    );
+    const res = proxy(req({ origin: "capacitor://localhost", auth: "Bearer tok" }));
     expect(res.headers.get("access-control-allow-origin")).toBe(
       "capacitor://localhost",
     );
@@ -40,9 +36,7 @@ describe("proxy (native API access)", () => {
   });
 
   it("does not add CORS for a preflight from an unknown origin", () => {
-    const res = proxy(
-      req({ method: "OPTIONS", origin: "https://evil.example" }),
-    );
+    const res = proxy(req({ method: "OPTIONS", origin: "https://evil.example" }));
     expect(res.headers.get("access-control-allow-origin")).toBeNull();
   });
 });

@@ -16,9 +16,7 @@ export const ALLOWED_ORIGINS = [
 ] as const;
 
 export function isAllowedOrigin(origin: string | null): origin is string {
-  return (
-    origin != null && (ALLOWED_ORIGINS as readonly string[]).includes(origin)
-  );
+  return origin != null && (ALLOWED_ORIGINS as readonly string[]).includes(origin);
 }
 
 /** CORS headers for an allowed origin. No credentials: the session rides the

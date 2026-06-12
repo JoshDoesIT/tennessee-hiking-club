@@ -22,10 +22,7 @@ export async function POST(req: Request) {
   try {
     body = registerSchema.parse(await req.json());
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const session = await auth();
@@ -49,10 +46,7 @@ export async function DELETE(req: Request) {
   try {
     body = unregisterSchema.parse(await req.json());
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const db = getDb();

@@ -34,9 +34,7 @@ describe("NativeEdgeToEdge", () => {
   it("paints it the night colour when the app is in dark mode", async () => {
     document.documentElement.classList.add("dark");
     render(<NativeEdgeToEdge />);
-    await waitFor(() =>
-      expect(setColor).toHaveBeenCalledWith({ color: NIGHT }),
-    );
+    await waitFor(() => expect(setColor).toHaveBeenCalledWith({ color: NIGHT }));
   });
 
   it("repaints when the theme toggles", async () => {
@@ -47,9 +45,7 @@ describe("NativeEdgeToEdge", () => {
     setColor.mockClear();
 
     document.documentElement.classList.add("dark");
-    await waitFor(() =>
-      expect(setColor).toHaveBeenCalledWith({ color: NIGHT }),
-    );
+    await waitFor(() => expect(setColor).toHaveBeenCalledWith({ color: NIGHT }));
   });
 
   it("does nothing on iOS or the web", () => {

@@ -8,13 +8,11 @@ import { startLocationWatch } from "./geo-watcher";
 function mockGeolocation() {
   let success: PositionCallback = () => {};
   let failure: PositionErrorCallback = () => {};
-  const watchPosition = vi.fn(
-    (s: PositionCallback, e: PositionErrorCallback) => {
-      success = s;
-      failure = e;
-      return 42;
-    },
-  );
+  const watchPosition = vi.fn((s: PositionCallback, e: PositionErrorCallback) => {
+    success = s;
+    failure = e;
+    return 42;
+  });
   const clearWatch = vi.fn();
   Object.defineProperty(navigator, "geolocation", {
     configurable: true,
@@ -24,9 +22,7 @@ function mockGeolocation() {
     watchPosition,
     clearWatch,
     emit: (lat: number, lng: number, altitude: number | null = null) =>
-      success({
-        coords: { latitude: lat, longitude: lng, altitude },
-      } as GeolocationPosition),
+      success({ coords: { latitude: lat, longitude: lng, altitude } } as GeolocationPosition),
     fail: () => failure({} as GeolocationPositionError),
   };
 }

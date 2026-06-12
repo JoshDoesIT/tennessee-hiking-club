@@ -21,9 +21,7 @@ test("guard captures console.error output and uncaught exceptions", async ({
   await expect
     .poll(() => problems.consoleErrors.length + problems.pageErrors.length)
     .toBeGreaterThan(0);
-  expect(problems.consoleErrors.join("\n")).toContain(
-    "synthetic console error",
-  );
+  expect(problems.consoleErrors.join("\n")).toContain("synthetic console error");
   expect(problems.pageErrors.join("\n")).toContain("synthetic uncaught error");
 });
 
@@ -42,7 +40,13 @@ for (const route of CORE_ROUTES) {
     const problems = watchForProblems(page);
     const res = await page.goto(route, { waitUntil: "networkidle" });
     expect(res?.status()).toBe(200);
-    expect(problems.pageErrors, `uncaught exceptions on ${route}`).toEqual([]);
-    expect(problems.consoleErrors, `console errors on ${route}`).toEqual([]);
+    expect(
+      problems.pageErrors,
+      `uncaught exceptions on ${route}`,
+    ).toEqual([]);
+    expect(
+      problems.consoleErrors,
+      `console errors on ${route}`,
+    ).toEqual([]);
   });
 }

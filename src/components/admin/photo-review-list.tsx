@@ -83,7 +83,9 @@ export function PhotoReviewList({ photos }: { photos: PendingPhoto[] }) {
               className="border-forest/10 mt-3 max-h-64 w-full rounded-lg border object-cover"
             />
             <p className="text-ink/70 mt-2 text-sm">{p.alt}</p>
-            {p.credit && <p className="text-ink/60 mt-1 text-xs">{p.credit}</p>}
+            {p.credit && (
+              <p className="text-ink/60 mt-1 text-xs">{p.credit}</p>
+            )}
 
             {decided ? (
               <div className="mt-4">

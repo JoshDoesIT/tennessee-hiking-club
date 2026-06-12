@@ -27,10 +27,7 @@ export async function POST(req: Request) {
   try {
     form = await req.formData();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const trailSlug = String(form.get("trailSlug") ?? "").trim();
@@ -43,10 +40,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Attach a GPX file" }, { status: 400 });
   }
   if (file.size > MAX_GPX_BYTES) {
-    return NextResponse.json(
-      { error: "GPX file is too large" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "GPX file is too large" }, { status: 400 });
   }
 
   const prepared = prepareRouteSubmission(await file.text());

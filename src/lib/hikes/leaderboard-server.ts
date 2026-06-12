@@ -38,19 +38,14 @@ async function buildEntries(
   const opted = people;
   const db = getDb();
   const ids = opted.map((p) => p.userId);
-  const [
-    hikeRows,
-    cleanupRows,
-    submissionCounts,
-    conditionCounts,
-    photoCounts,
-  ] = await Promise.all([
-    db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
-    db.select().from(cleanupsTable).where(inArray(cleanupsTable.userId, ids)),
-    getApprovedSubmissionCounts(ids),
-    getApprovedConditionCounts(ids),
-    getApprovedPhotoCounts(ids),
-  ]);
+  const [hikeRows, cleanupRows, submissionCounts, conditionCounts, photoCounts] =
+    await Promise.all([
+      db.select().from(hikesTable).where(inArray(hikesTable.userId, ids)),
+      db.select().from(cleanupsTable).where(inArray(cleanupsTable.userId, ids)),
+      getApprovedSubmissionCounts(ids),
+      getApprovedConditionCounts(ids),
+      getApprovedPhotoCounts(ids),
+    ]);
 
   const hikesByUser = new Map<string, ReturnType<typeof rowToEntry>[]>();
   for (const row of hikeRows) {

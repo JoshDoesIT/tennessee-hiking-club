@@ -35,9 +35,7 @@ export function TrailResults({ trails }: { trails: Trail[] }) {
           lng: pos.coords.longitude,
         }),
       );
-      setStatus(
-        "Sorted by distance from you. Your location stayed on this device.",
-      );
+      setStatus("Sorted by distance from you. Your location stayed on this device.");
       setBusy(false);
     },
     [trails],

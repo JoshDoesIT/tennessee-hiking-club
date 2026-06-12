@@ -19,20 +19,8 @@ const net = {
         { lat: 0, lon: 0.002 }, // C
       ],
     },
-    {
-      type: "way",
-      geometry: [
-        { lat: 0, lon: 0.002 },
-        { lat: 0.001, lon: 0.002 },
-      ],
-    }, // C-D
-    {
-      type: "way",
-      geometry: [
-        { lat: 0, lon: 0.002 },
-        { lat: 0, lon: 0.003 },
-      ],
-    }, // C-E
+    { type: "way", geometry: [{ lat: 0, lon: 0.002 }, { lat: 0.001, lon: 0.002 }] }, // C-D
+    { type: "way", geometry: [{ lat: 0, lon: 0.002 }, { lat: 0, lon: 0.003 }] }, // C-E
   ],
 };
 
@@ -59,20 +47,8 @@ describe("networkRoute", () => {
   it("returns an empty path when start and end are in disconnected components", () => {
     const disconnected = {
       elements: [
-        {
-          type: "way",
-          geometry: [
-            { lat: 0, lon: 0 },
-            { lat: 0, lon: 0.001 },
-          ],
-        },
-        {
-          type: "way",
-          geometry: [
-            { lat: 5, lon: 5 },
-            { lat: 5, lon: 5.001 },
-          ],
-        },
+        { type: "way", geometry: [{ lat: 0, lon: 0 }, { lat: 0, lon: 0.001 }] },
+        { type: "way", geometry: [{ lat: 5, lon: 5 }, { lat: 5, lon: 5.001 }] },
       ],
     };
     expect(
@@ -81,42 +57,21 @@ describe("networkRoute", () => {
   });
 
   it("returns an empty path when there are no ways", () => {
-    expect(
-      networkRoute({ elements: [] }, { lat: 0, lng: 0 }, { lat: 1, lng: 1 }),
-    ).toEqual([]);
+    expect(networkRoute({ elements: [] }, { lat: 0, lng: 0 }, { lat: 1, lng: 1 })).toEqual([]);
   });
 
   it("bridges a small gap between ways when a snap distance is given", () => {
     // Two ways that nearly meet: B is at (0, 0.001), B' at (0, 0.0011) ~ 11 m away.
     const gappy = {
       elements: [
-        {
-          type: "way",
-          geometry: [
-            { lat: 0, lon: 0 },
-            { lat: 0, lon: 0.001 },
-          ],
-        },
-        {
-          type: "way",
-          geometry: [
-            { lat: 0, lon: 0.0011 },
-            { lat: 0, lon: 0.002 },
-          ],
-        },
+        { type: "way", geometry: [{ lat: 0, lon: 0 }, { lat: 0, lon: 0.001 }] },
+        { type: "way", geometry: [{ lat: 0, lon: 0.0011 }, { lat: 0, lon: 0.002 }] },
       ],
     };
     // Exact keying leaves them disconnected.
-    expect(
-      networkRoute(gappy, { lat: 0, lng: 0 }, { lat: 0, lng: 0.002 }),
-    ).toEqual([]);
+    expect(networkRoute(gappy, { lat: 0, lng: 0 }, { lat: 0, lng: 0.002 })).toEqual([]);
     // A 25 m snap merges B and B', so the path connects end to end.
-    const path = networkRoute(
-      gappy,
-      { lat: 0, lng: 0 },
-      { lat: 0, lng: 0.002 },
-      25,
-    );
+    const path = networkRoute(gappy, { lat: 0, lng: 0 }, { lat: 0, lng: 0.002 }, 25);
     expect(path.length).toBeGreaterThanOrEqual(3);
     expect(path[0]).toEqual({ lat: 0, lng: 0 });
     expect(path[path.length - 1]).toEqual({ lat: 0, lng: 0.002 });
@@ -139,11 +94,7 @@ describe("networkLoop", () => {
   };
 
   it("returns a closed loop from the trailhead out to a via point and back a different way", () => {
-    const loop = networkLoop(
-      square,
-      { lat: 0, lng: 0 },
-      { lat: 0.001, lng: 0.001 },
-    );
+    const loop = networkLoop(square, { lat: 0, lng: 0 }, { lat: 0.001, lng: 0.001 });
     // Starts and ends at the trailhead.
     expect(loop[0]).toEqual({ lat: 0, lng: 0 });
     expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
@@ -160,11 +111,7 @@ describe("networkLoop", () => {
     const spur = {
       elements: [{ type: "way", geometry: [A, B, C] }],
     };
-    const loop = networkLoop(
-      spur,
-      { lat: 0, lng: 0 },
-      { lat: 0.001, lng: 0.001 },
-    );
+    const loop = networkLoop(spur, { lat: 0, lng: 0 }, { lat: 0.001, lng: 0.001 });
     expect(loop[0]).toEqual({ lat: 0, lng: 0 });
     expect(loop[loop.length - 1]).toEqual({ lat: 0, lng: 0 });
   });
@@ -195,12 +142,7 @@ describe("proximityRoute", () => {
   });
 
   it("returns an empty path when the cloud is too sparse to connect", () => {
-    const path = proximityRoute(
-      cloud,
-      { lat: 0, lng: 0 },
-      { lat: 0, lng: 0.004 },
-      10,
-    );
+    const path = proximityRoute(cloud, { lat: 0, lng: 0 }, { lat: 0, lng: 0.004 }, 10);
     expect(path).toEqual([]);
   });
 });

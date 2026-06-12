@@ -52,10 +52,7 @@ describe("generateConditionEntry", () => {
   });
 
   it("omits an absent note", () => {
-    const entry = generateConditionEntry({
-      date: "2026-05-29",
-      status: "Open",
-    });
+    const entry = generateConditionEntry({ date: "2026-05-29", status: "Open" });
     expect(entry.yaml).not.toContain("note:");
     expect(entry.valid).toBe(true);
   });

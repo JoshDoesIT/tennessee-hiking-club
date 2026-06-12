@@ -28,8 +28,7 @@ import {
 import { getTrailBySlug } from "../src/lib/trails";
 
 const UA = {
-  "User-Agent":
-    "TennesseeHikingClub-waypoint-discovery (contact: tnhiking.club)",
+  "User-Agent": "TennesseeHikingClub-waypoint-discovery (contact: tnhiking.club)",
 };
 
 function arg(flag: string): string | undefined {
@@ -138,10 +137,8 @@ async function main() {
   // Pad the bbox by roughly the buffer (deg) plus a little slack.
   const bbox = routeBbox(route, buffer / 111_000 + 0.002);
 
-  const sources: Record<
-    WaypointSource,
-    (b: Bbox) => Promise<WaypointCandidate[]>
-  > = { gnis: fetchGnis, nps: fetchNps, osm: fetchOsm };
+  const sources: Record<WaypointSource, (b: Bbox) => Promise<WaypointCandidate[]>> =
+    { gnis: fetchGnis, nps: fetchNps, osm: fetchOsm };
 
   const all: WaypointCandidate[] = [];
   for (const [name, fetcher] of Object.entries(sources) as [

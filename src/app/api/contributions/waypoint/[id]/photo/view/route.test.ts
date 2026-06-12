@@ -69,8 +69,9 @@ describe("GET /api/contributions/waypoint/[id]/photo/view", () => {
     const res = await GET(req(), ctx("w1"));
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("image/jpeg");
-    expect(mocks.get).toHaveBeenCalledWith("contributions/waypoints/u1/x.jpg", {
-      access: "private",
-    });
+    expect(mocks.get).toHaveBeenCalledWith(
+      "contributions/waypoints/u1/x.jpg",
+      { access: "private" },
+    );
   });
 });

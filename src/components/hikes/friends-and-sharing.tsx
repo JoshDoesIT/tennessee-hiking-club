@@ -44,8 +44,8 @@ export function FriendsAndSharing({ origin }: { origin: string }) {
         Friends &amp; sharing
       </h2>
       <p className="text-ink/70 mt-1 max-w-xl text-sm leading-relaxed">
-        Opt in to the community leaderboard, connect with friends, and share
-        your map. All off by default.
+        Opt in to the community leaderboard, connect with friends, and share your
+        map. All off by default.
       </p>
       <div className="mt-6 space-y-8">
         <LeaderboardOptIn />

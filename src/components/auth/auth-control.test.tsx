@@ -10,7 +10,8 @@ function mockSession(user: unknown) {
       async () =>
         ({
           ok: true,
-          json: async () => (user ? { user, expires: "2099-01-01" } : {}),
+          json: async () =>
+            user ? { user, expires: "2099-01-01" } : {},
         }) as unknown as Response,
     ),
   );

@@ -83,8 +83,8 @@ export function RouteReviewList({
               <p className="text-olive mt-1 text-sm font-medium">{c.name}</p>
             )}
             <p className="text-ink/70 mt-1 text-sm">
-              {c.lengthMiles.toFixed(1)} mi · {c.gainFt.toLocaleString()} ft
-              gain · {c.pointCount.toLocaleString()} points
+              {c.lengthMiles.toFixed(1)} mi · {c.gainFt.toLocaleString()} ft gain
+              · {c.pointCount.toLocaleString()} points
             </p>
 
             {decided ? (
@@ -103,7 +103,7 @@ export function RouteReviewList({
                       (and credit {c.submittedBy} in{" "}
                       <code className="text-ink/80">contributors:</code>)
                     </p>
-                    <pre className="border-forest/10 text-ink/80 bg-cream-50 mt-3 overflow-x-auto rounded-lg border p-3 text-xs">
+                    <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-cream-50 p-3 text-xs">
                       {c.entry.yaml}
                     </pre>
                   </div>

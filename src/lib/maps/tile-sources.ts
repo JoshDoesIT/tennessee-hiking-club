@@ -26,10 +26,7 @@ const DEM_MAXZOOM = 13;
 export async function resolveTileSources(
   fetchImpl: typeof fetch = fetch,
 ): Promise<TileSource[]> {
-  const dem: TileSource = {
-    template: TERRARIUM_DEM_TEMPLATE,
-    maxzoom: DEM_MAXZOOM,
-  };
+  const dem: TileSource = { template: TERRARIUM_DEM_TEMPLATE, maxzoom: DEM_MAXZOOM };
   try {
     const res = await fetchImpl(PLANET_TILEJSON);
     if (res.ok) {

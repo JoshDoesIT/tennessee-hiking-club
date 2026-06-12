@@ -12,13 +12,7 @@ describe("TrailHighlights", () => {
     render(
       <TrailHighlights
         waypoints={[
-          {
-            lat: 35.8,
-            lng: -85.2,
-            name: "Big Falls",
-            type: "waterfall",
-            description: "110-ft drop",
-          },
+          { lat: 35.8, lng: -85.2, name: "Big Falls", type: "waterfall", description: "110-ft drop" },
           { lat: 35.81, lng: -85.21, name: "The Overlook", type: "viewpoint" },
         ]}
       />,

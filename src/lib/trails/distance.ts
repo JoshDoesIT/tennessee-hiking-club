@@ -7,10 +7,7 @@ import { haversineMiles } from "./elevation";
  */
 export function trailsByDistance<
   T extends { coordinates: { lat: number; lng: number } },
->(
-  trails: T[],
-  from: { lat: number; lng: number },
-): (T & { distanceMi: number })[] {
+>(trails: T[], from: { lat: number; lng: number }): (T & { distanceMi: number })[] {
   return trails
     .map((trail) => ({
       ...trail,

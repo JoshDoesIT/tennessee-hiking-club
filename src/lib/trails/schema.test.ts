@@ -26,13 +26,7 @@ describe("trailSchema", () => {
     const withWaypoints = {
       ...validTrail,
       waypoints: [
-        {
-          lat: 35.83,
-          lng: -85.29,
-          name: "Big Branch Falls",
-          type: "waterfall",
-          description: "110-ft drop",
-        },
+        { lat: 35.83, lng: -85.29, name: "Big Branch Falls", type: "waterfall", description: "110-ft drop" },
         { lat: 35.84, lng: -85.3, name: "Overlook", type: "viewpoint" },
       ],
     };
@@ -40,18 +34,12 @@ describe("trailSchema", () => {
   });
 
   it("rejects an unknown waypoint type", () => {
-    const bad = {
-      ...validTrail,
-      waypoints: [{ lat: 35.83, lng: -85.29, name: "X", type: "dragon" }],
-    };
+    const bad = { ...validTrail, waypoints: [{ lat: 35.83, lng: -85.29, name: "X", type: "dragon" }] };
     expect(trailSchema.safeParse(bad).success).toBe(false);
   });
 
   it("rejects a waypoint outside Tennessee", () => {
-    const bad = {
-      ...validTrail,
-      waypoints: [{ lat: 40, lng: -100, name: "X", type: "summit" }],
-    };
+    const bad = { ...validTrail, waypoints: [{ lat: 40, lng: -100, name: "X", type: "summit" }] };
     expect(trailSchema.safeParse(bad).success).toBe(false);
   });
 
@@ -178,9 +166,7 @@ describe("trailSchema", () => {
       trailSchema.safeParse({
         ...validTrail,
         contributors: ["octocat"],
-        conditionReports: [
-          { date: "2026-05-20", status: "Open", by: "octocat" },
-        ],
+        conditionReports: [{ date: "2026-05-20", status: "Open", by: "octocat" }],
         photos: [
           { src: "/p.jpg", alt: "x", credit: "Octocat, CC0", by: "octocat" },
         ],

@@ -31,9 +31,7 @@ describe("myTennesseeShareUrl", () => {
         ["mt-leconte-alum-cave", "virgin-falls"],
         "https://x.test",
       ),
-    ).toBe(
-      "https://x.test/share/my-tennessee/mt-leconte-alum-cave,virgin-falls",
-    );
+    ).toBe("https://x.test/share/my-tennessee/mt-leconte-alum-cave,virgin-falls");
   });
 
   it("returns null when there is nothing to share", () => {

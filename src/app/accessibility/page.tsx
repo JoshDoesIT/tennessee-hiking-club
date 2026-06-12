@@ -26,9 +26,7 @@ export default function AccessibilityPage() {
         <section>
           <h2 className="display text-forest text-2xl">What is in place</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5">
-            <li>
-              Full keyboard navigation, with visible focus and skip links.
-            </li>
+            <li>Full keyboard navigation, with visible focus and skip links.</li>
             <li>
               Screen reader support, including keyboard and screen-reader access
               for the interactive map.
@@ -48,9 +46,9 @@ export default function AccessibilityPage() {
           <p className="mt-3">
             The interactive trail map and the stylized state map are inherently
             visual. Wherever we use a map we also provide a non-visual path: the
-            full trail list, direct &ldquo;directions&rdquo; links, the
-            trailhead and parking coordinates, and the elevation summary. If any
-            of these fall short for you, we want to know.
+            full trail list, direct &ldquo;directions&rdquo; links, the trailhead
+            and parking coordinates, and the elevation summary. If any of these
+            fall short for you, we want to know.
           </p>
         </section>
 

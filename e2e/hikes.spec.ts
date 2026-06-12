@@ -48,3 +48,4 @@ test("logging a hike with a photo shows a thumbnail on My hikes (signed out)", a
     }),
   ).toBeVisible();
 });
+

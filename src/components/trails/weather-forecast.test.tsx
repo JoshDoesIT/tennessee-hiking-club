@@ -6,30 +6,9 @@ import type { TrailWeather } from "@/lib/weather/forecast";
 const weather: TrailWeather = {
   current: { tempF: 72, code: 2, label: "Partly cloudy" },
   daily: [
-    {
-      date: "2026-05-26",
-      code: 3,
-      label: "Overcast",
-      highF: 78,
-      lowF: 55,
-      precipProbPct: 10,
-    },
-    {
-      date: "2026-05-27",
-      code: 61,
-      label: "Rain",
-      highF: 70,
-      lowF: 52,
-      precipProbPct: 80,
-    },
-    {
-      date: "2026-05-28",
-      code: 0,
-      label: "Clear",
-      highF: 81,
-      lowF: 59,
-      precipProbPct: 0,
-    },
+    { date: "2026-05-26", code: 3, label: "Overcast", highF: 78, lowF: 55, precipProbPct: 10 },
+    { date: "2026-05-27", code: 61, label: "Rain", highF: 70, lowF: 52, precipProbPct: 80 },
+    { date: "2026-05-28", code: 0, label: "Clear", highF: 81, lowF: 59, precipProbPct: 0 },
   ],
   sunrise: "2026-05-26T06:12",
   sunset: "2026-05-26T20:34",

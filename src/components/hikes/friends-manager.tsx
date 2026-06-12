@@ -167,7 +167,7 @@ export function FriendsManager() {
             maxLength={50}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="How friends see you"
-            className="border-forest/20 text-ink bg-cream-50 rounded-lg border px-3 py-2 text-sm"
+            className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
           />
         </div>
         <Button type="button" variant="outline" size="sm" onClick={saveName}>
@@ -181,10 +181,7 @@ export function FriendsManager() {
         Shown to friends. Setting it does not turn on the public leaderboard.
       </p>
 
-      <form
-        onSubmit={addFriend}
-        className="mt-4 flex flex-wrap items-end gap-2"
-      >
+      <form onSubmit={addFriend} className="mt-4 flex flex-wrap items-end gap-2">
         <div className="flex flex-col gap-1">
           <label
             htmlFor="friend-code"
@@ -197,7 +194,7 @@ export function FriendsManager() {
             name="code"
             maxLength={16}
             placeholder="Their friend code"
-            className="border-forest/20 text-ink bg-cream-50 rounded-lg border px-3 py-2 text-sm uppercase"
+            className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm uppercase"
           />
         </div>
         <Button type="submit" variant="outline" size="sm">
@@ -250,10 +247,7 @@ export function FriendsManager() {
         ) : (
           <ul className="mt-2 space-y-2">
             {data.friends.map((f) => (
-              <li
-                key={f.friendshipId}
-                className="flex items-center gap-3 text-sm"
-              >
+              <li key={f.friendshipId} className="flex items-center gap-3 text-sm">
                 <span className="text-forest flex-1 font-medium">
                   {name(f, "A friend")}
                 </span>
@@ -274,8 +268,7 @@ export function FriendsManager() {
 
       {data.outgoing.length > 0 && (
         <p className="text-ink/70 mt-4 text-xs">
-          Pending sent:{" "}
-          {data.outgoing.map((o) => name(o, "a hiker")).join(", ")}
+          Pending sent: {data.outgoing.map((o) => name(o, "a hiker")).join(", ")}
         </p>
       )}
     </section>

@@ -68,20 +68,14 @@ describe("parseForecast", () => {
 describe("fetchTrailWeather", () => {
   it("returns parsed weather on success", async () => {
     const fakeFetch = (async () =>
-      ({
-        ok: true,
-        json: async () => sample,
-      }) as unknown as Response) as typeof fetch;
+      ({ ok: true, json: async () => sample }) as unknown as Response) as typeof fetch;
     const w = await fetchTrailWeather(35.66, -83.44, fakeFetch);
     expect(w?.daily).toHaveLength(3);
   });
 
   it("returns null when the API responds not-ok", async () => {
     const fakeFetch = (async () =>
-      ({
-        ok: false,
-        json: async () => ({}),
-      }) as unknown as Response) as typeof fetch;
+      ({ ok: false, json: async () => ({}) }) as unknown as Response) as typeof fetch;
     expect(await fetchTrailWeather(1, 1, fakeFetch)).toBeNull();
   });
 

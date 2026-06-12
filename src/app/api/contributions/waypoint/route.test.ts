@@ -114,10 +114,7 @@ describe("POST /api/contributions/waypoint", () => {
     expect(res.status).toBe(201);
     const [path, , opts] = (mocks.put as Mock).mock.calls[0];
     expect(path).toMatch(/^contributions\/waypoints\/u1\//);
-    expect(opts).toMatchObject({
-      access: "private",
-      contentType: "image/jpeg",
-    });
+    expect(opts).toMatchObject({ access: "private", contentType: "image/jpeg" });
     const row = (mocks.values as Mock).mock.calls[0][0];
     expect(row.photoUrl).toBe(
       "https://store.private.blob.vercel-storage.com/contributions/waypoints/u1/x.jpg",

@@ -19,10 +19,8 @@ const report = {
 };
 
 function setupFetch({ prUrl = null }: { prUrl?: string | null } = {}) {
-  const calls: Array<{
-    url: string;
-    body: { action?: string; type?: string } | null;
-  }> = [];
+  const calls: Array<{ url: string; body: { action?: string; type?: string } | null }> =
+    [];
   const f = vi.fn(async (url: string, init?: RequestInit) => {
     calls.push({
       url: String(url),

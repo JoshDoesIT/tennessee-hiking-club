@@ -2,7 +2,8 @@ import { describe, it, expect, vi } from "vitest";
 import { downloadTiles, regionTileUrls } from "./download-region";
 import { countTiles, type LngLatBounds } from "./tiles";
 
-const okFetch = () => vi.fn(async () => ({ ok: true }) as unknown as Response);
+const okFetch = () =>
+  vi.fn(async () => ({ ok: true }) as unknown as Response);
 
 const BOX: LngLatBounds = {
   west: -84.05,
@@ -92,14 +93,8 @@ describe("downloadTiles", () => {
 
 describe("regionTileUrls", () => {
   it("expands every source/tile and honours each source's max zoom", () => {
-    const vector = {
-      template: "https://t/planet/v/{z}/{x}/{y}.pbf",
-      maxzoom: 14,
-    };
-    const dem = {
-      template: "https://t/terrarium/{z}/{x}/{y}.png",
-      maxzoom: 11,
-    };
+    const vector = { template: "https://t/planet/v/{z}/{x}/{y}.pbf", maxzoom: 14 };
+    const dem = { template: "https://t/terrarium/{z}/{x}/{y}.png", maxzoom: 11 };
     const urls = regionTileUrls([vector, dem], BOX, 10, 12);
 
     const expected = countTiles(BOX, 10, 12) + countTiles(BOX, 10, 11);

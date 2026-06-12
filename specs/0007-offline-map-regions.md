@@ -17,7 +17,7 @@ to list and clear regions. On device that proved redundant and awkward
 (browsing already caches silently, the WebView keeps its own HTTP cache so
 "Clear all" could not fully reclaim, and it put work on the user). **The
 implemented design is silent and complete:** the native app caches the map area
-around _every_ trailhead on the first online launch, so all the maps work
+around *every* trailhead on the first online launch, so all the maps work
 offline with no action from the member.
 
 ## Tiles we depend on

@@ -127,9 +127,7 @@ export function RecordingMap({
         const style = buildTennesseeStyle(
           baseStyle,
         ) as unknown as StyleSpecification;
-        const startRoute = routeKey
-          ? (JSON.parse(routeKey) as typeof route)
-          : [];
+        const startRoute = routeKey ? (JSON.parse(routeKey) as typeof route) : [];
 
         // Native + loaded from the local bundle: route tiles through the
         // on-device cache instead of the (now absent) service worker (#314).
@@ -222,14 +220,7 @@ export function RecordingMap({
 
           loadedRef.current = true;
           // Initial framing: overview shows the whole route + position.
-          frameMap(
-            map,
-            modeRef.current,
-            pointsRef.current,
-            startRoute,
-            center,
-            false,
-          );
+          frameMap(map, modeRef.current, pointsRef.current, startRoute, center, false);
         });
       } catch {
         if (!cancelled) setFailed(true);

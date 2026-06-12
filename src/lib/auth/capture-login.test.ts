@@ -20,29 +20,18 @@ describe("captureGithubLogin", () => {
   it("upserts the github login for a github sign-in", async () => {
     const { db, calls } = fakeDb();
     await captureGithubLogin(
-      {
-        user: { id: "u1" },
-        account: { provider: "github" },
-        profile: { login: "Octocat" },
-      },
+      { user: { id: "u1" }, account: { provider: "github" }, profile: { login: "Octocat" } },
       db,
     );
     expect(calls).toHaveLength(1);
-    expect(calls[0].values).toMatchObject({
-      userId: "u1",
-      githubLogin: "Octocat",
-    });
+    expect(calls[0].values).toMatchObject({ userId: "u1", githubLogin: "Octocat" });
     expect(calls[0].set).toMatchObject({ githubLogin: "Octocat" });
   });
 
   it("no-ops for a non-github provider", async () => {
     const { db, calls } = fakeDb();
     await captureGithubLogin(
-      {
-        user: { id: "u1" },
-        account: { provider: "google" },
-        profile: { login: "x" },
-      },
+      { user: { id: "u1" }, account: { provider: "google" }, profile: { login: "x" } },
       db,
     );
     expect(calls).toHaveLength(0);

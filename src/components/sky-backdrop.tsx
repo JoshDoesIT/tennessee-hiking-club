@@ -54,7 +54,7 @@ export function SkyBackdrop() {
         {STARS.map((star, i) => (
           <span
             key={i}
-            className="animate-twinkle absolute rounded-full bg-[#e9efe9]"
+            className="animate-twinkle absolute rounded-full bg-[#eef0e2]"
             style={{
               top: `${star.top}%`,
               left: `${star.left}%`,
@@ -82,13 +82,13 @@ export function SkyBackdrop() {
         >
           <defs>
             <radialGradient id="sky-sun" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#f9a45f" />
-              <stop offset="45%" stopColor="#f47c20" />
-              <stop offset="100%" stopColor="#f47c20" stopOpacity="0" />
+              <stop offset="0%" stopColor="#f4c074" />
+              <stop offset="45%" stopColor="#e0a24c" />
+              <stop offset="100%" stopColor="#e0a24c" stopOpacity="0" />
             </radialGradient>
           </defs>
           <circle cx="80" cy="80" r="80" fill="url(#sky-sun)" />
-          <circle cx="80" cy="80" r="40" fill="#f98b36" />
+          <circle cx="80" cy="80" r="40" fill="#eab35e" />
         </svg>
       </div>
 
@@ -135,7 +135,7 @@ export function SkyBackdrop() {
           <path
             d="M68 22 A43 43 0 0 1 68 108"
             fill="none"
-            stroke="#f9a45f"
+            stroke="#e9b870"
             strokeWidth="2"
             strokeLinecap="round"
             opacity="0.4"

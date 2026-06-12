@@ -42,10 +42,7 @@ export function AuthControl({ className }: { className?: string }) {
     return (
       <Link
         href="/signin"
-        className={cn(
-          buttonVariants({ variant: "ghost", size: "sm" }),
-          className,
-        )}
+        className={cn(buttonVariants({ variant: "ghost", size: "sm" }), className)}
       >
         Sign in
       </Link>

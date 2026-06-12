@@ -9,36 +9,9 @@ import {
 import type { Trail } from "@/lib/trails/schema";
 
 const entries: LeaderboardEntry[] = [
-  {
-    user: "ann",
-    regions: 3,
-    trails: 9,
-    challenges: 2,
-    contributions: 0,
-    trailsContributed: 1,
-    conditionsReported: 0,
-    photoCredits: 5,
-  },
-  {
-    user: "bob",
-    regions: 3,
-    trails: 5,
-    challenges: 4,
-    contributions: 1,
-    trailsContributed: 3,
-    conditionsReported: 2,
-    photoCredits: 1,
-  },
-  {
-    user: "cy",
-    regions: 2,
-    trails: 5,
-    challenges: 1,
-    contributions: 5,
-    trailsContributed: 0,
-    conditionsReported: 4,
-    photoCredits: 0,
-  },
+  { user: "ann", regions: 3, trails: 9, challenges: 2, contributions: 0, trailsContributed: 1, conditionsReported: 0, photoCredits: 5 },
+  { user: "bob", regions: 3, trails: 5, challenges: 4, contributions: 1, trailsContributed: 3, conditionsReported: 2, photoCredits: 1 },
+  { user: "cy", regions: 2, trails: 5, challenges: 1, contributions: 5, trailsContributed: 0, conditionsReported: 4, photoCredits: 0 },
 ];
 
 const make = (slug: string, region: Trail["region"]): Trail => ({

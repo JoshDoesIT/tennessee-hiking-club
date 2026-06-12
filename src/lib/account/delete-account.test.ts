@@ -23,7 +23,9 @@ function fakeDb(hikePhotos: (string | null)[] = []) {
     deleted,
     select: vi.fn(() => ({
       from: vi.fn(() => ({
-        where: vi.fn(async () => hikePhotos.map((photoUrl) => ({ photoUrl }))),
+        where: vi.fn(async () =>
+          hikePhotos.map((photoUrl) => ({ photoUrl })),
+        ),
       })),
     })),
     delete: vi.fn((table: unknown) => ({

@@ -37,17 +37,13 @@ async function main() {
     if (route.length < 2) continue;
     if (route.every((p) => typeof p.elevationFt === "number")) continue;
 
-    const missing = route.filter(
-      (p) => typeof p.elevationFt !== "number",
-    ).length;
+    const missing = route.filter((p) => typeof p.elevationFt !== "number").length;
     process.stderr.write(`${file}: sampling DEM for ${missing} point(s)...\n`);
     const elevations = await sampleElevationFeet(
       route.map((p) => ({ lat: p.lat, lng: p.lng })),
     );
     if (elevations.some((v) => v == null)) {
-      process.stderr.write(
-        `  skipped: the DEM has no coverage for every point\n`,
-      );
+      process.stderr.write(`  skipped: the DEM has no coverage for every point\n`);
       continue;
     }
     const filled = route.map((p, i) => ({
@@ -55,10 +51,7 @@ async function main() {
       lng: p.lng,
       elevationFt: elevations[i] as number,
     }));
-    fs.writeFileSync(
-      full,
-      replaceRouteBlock(text, routeFrontmatterYaml(filled)),
-    );
+    fs.writeFileSync(full, replaceRouteBlock(text, routeFrontmatterYaml(filled)));
     enriched++;
     process.stderr.write(`  filled elevation\n`);
   }

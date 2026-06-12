@@ -22,7 +22,10 @@ test("trail detail shows conditions, a pinned alert, and a report link", async (
     name: /report current conditions/i,
   });
   await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute("href", /template=trail_condition\.yml/);
+  await expect(link).toHaveAttribute(
+    "href",
+    /template=trail_condition\.yml/,
+  );
 });
 
 test("the in-app condition form is gated to signed-in members", async ({

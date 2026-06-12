@@ -30,10 +30,7 @@ export async function POST(req: Request) {
   try {
     local = bodySchema.parse(await req.json()).cleanups;
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const db = getDb();

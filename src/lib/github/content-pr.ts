@@ -15,8 +15,7 @@ export type GithubConfig = {
 export function githubConfigFromEnv(): GithubConfig | null {
   const token = process.env.GITHUB_CONTENT_TOKEN;
   if (!token) return null;
-  const repo =
-    process.env.GITHUB_CONTENT_REPO || "JoshDoesIT/tennessee-hiking-club";
+  const repo = process.env.GITHUB_CONTENT_REPO || "JoshDoesIT/tennessee-hiking-club";
   const [owner, name] = repo.split("/");
   if (!owner || !name) return null;
   return {
@@ -30,10 +29,7 @@ export function githubConfigFromEnv(): GithubConfig | null {
 export interface GithubApi {
   getBranchSha(branch: string): Promise<string>;
   createBranch(branch: string, sha: string): Promise<void>;
-  getFile(
-    path: string,
-    ref: string,
-  ): Promise<{ content: string; sha: string } | null>;
+  getFile(path: string, ref: string): Promise<{ content: string; sha: string } | null>;
   putFile(args: {
     path: string;
     content: string;
@@ -73,9 +69,7 @@ export function createGithubApi(config: GithubConfig): GithubApi {
       headers: { ...headers, ...(init?.headers ?? {}) },
     });
     if (!res.ok) {
-      throw new Error(
-        `GitHub ${init?.method ?? "GET"} ${path} failed: ${res.status}`,
-      );
+      throw new Error(`GitHub ${init?.method ?? "GET"} ${path} failed: ${res.status}`);
     }
     return res.json();
   }

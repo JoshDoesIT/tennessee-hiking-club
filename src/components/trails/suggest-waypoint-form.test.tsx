@@ -51,10 +51,7 @@ describe("SuggestWaypointForm", () => {
       await screen.findByLabelText(/landmark name/i),
       "Big Branch Falls",
     );
-    await user.selectOptions(
-      screen.getByLabelText(/landmark type/i),
-      "waterfall",
-    );
+    await user.selectOptions(screen.getByLabelText(/landmark type/i), "waterfall");
     await user.type(screen.getByLabelText(/latitude/i), "35.83");
     await user.type(screen.getByLabelText(/longitude/i), "-85.29");
     await user.click(screen.getByRole("button", { name: /suggest/i }));

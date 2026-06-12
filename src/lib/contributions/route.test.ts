@@ -27,8 +27,7 @@ describe("prepareRouteSubmission", () => {
   it("downsamples a long track to the point cap", () => {
     const many = Array.from(
       { length: 500 },
-      (_, i) =>
-        `<trkpt lat="${35.6 + i * 0.0001}" lon="-83.45"><ele>${1000 + i}</ele></trkpt>`,
+      (_, i) => `<trkpt lat="${35.6 + i * 0.0001}" lon="-83.45"><ele>${1000 + i}</ele></trkpt>`,
     ).join("");
     const r = prepareRouteSubmission(gpx(many), 70);
     expect(r.ok).toBe(true);
@@ -41,9 +40,7 @@ describe("prepareRouteSubmission", () => {
   it("rejects a GPX with no usable track points", () => {
     expect(prepareRouteSubmission("<gpx></gpx>").ok).toBe(false);
     expect(
-      prepareRouteSubmission(
-        gpx(`<trkpt lat="35.6" lon="-83.45"><ele>1000</ele></trkpt>`),
-      ).ok,
+      prepareRouteSubmission(gpx(`<trkpt lat="35.6" lon="-83.45"><ele>1000</ele></trkpt>`)).ok,
     ).toBe(false); // a single point is not a route
   });
 

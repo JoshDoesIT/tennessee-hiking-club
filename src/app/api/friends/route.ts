@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import {
-  getFriendsData,
-  sendFriendRequest,
-} from "@/lib/friends/friends-server";
+import { getFriendsData, sendFriendRequest } from "@/lib/friends/friends-server";
 
 /** The signed-in user's friends, incoming/outgoing requests, and friend code. */
 export async function GET() {
@@ -30,10 +27,7 @@ export async function POST(req: Request) {
   try {
     code = bodySchema.parse(await req.json()).code;
   } catch {
-    return NextResponse.json(
-      { error: "A friend code is required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "A friend code is required" }, { status: 400 });
   }
 
   return NextResponse.json(await sendFriendRequest(userId, code));

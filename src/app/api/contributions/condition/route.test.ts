@@ -40,9 +40,7 @@ describe("POST /api/contributions/condition", () => {
   });
 
   it("returns 400 for an invalid report and never inserts", async () => {
-    const res = await POST(
-      postReq({ trailSlug: "virgin-falls", status: "  " }),
-    );
+    const res = await POST(postReq({ trailSlug: "virgin-falls", status: "  " }));
     expect(res.status).toBe(400);
     expect(mocks.values).not.toHaveBeenCalled();
   });

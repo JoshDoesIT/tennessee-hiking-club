@@ -64,9 +64,7 @@ export function generateWaypointEntry(entry: WaypointEntry): {
     lng: entry.lng,
     name: entry.name,
     type: entry.type,
-    ...(entry.description?.trim()
-      ? { description: entry.description.trim() }
-      : {}),
+    ...(entry.description?.trim() ? { description: entry.description.trim() } : {}),
   });
 
   return { yaml: lines.join("\n"), valid: parsed.success };
@@ -74,9 +72,5 @@ export function generateWaypointEntry(entry: WaypointEntry): {
 
 /** Append a waypoint entry to a trail Markdown file's `waypoints[]` (#155 style). */
 export function appendWaypoint(fileText: string, entry: WaypointEntry): string {
-  return appendListItem(
-    fileText,
-    "waypoints",
-    generateWaypointEntry(entry).yaml,
-  );
+  return appendListItem(fileText, "waypoints", generateWaypointEntry(entry).yaml);
 }

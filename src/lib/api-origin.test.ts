@@ -13,9 +13,7 @@ type FakeWin = { location: { origin: string }; fetch: typeof fetch };
 function fakeWindow(origin: string): FakeWin {
   return {
     location: { origin },
-    fetch: vi.fn(
-      async () => ({ ok: true }) as Response,
-    ) as unknown as typeof fetch,
+    fetch: vi.fn(async () => ({ ok: true }) as Response) as unknown as typeof fetch,
   };
 }
 
@@ -49,9 +47,10 @@ describe("installApiOriginRewrite", () => {
     expect(win.fetch).not.toBe(original);
 
     await win.fetch("/api/hikes/sync", { method: "POST" });
-    expect(original).toHaveBeenCalledWith(`${API_ORIGIN}/api/hikes/sync`, {
-      method: "POST",
-    });
+    expect(original).toHaveBeenCalledWith(
+      `${API_ORIGIN}/api/hikes/sync`,
+      { method: "POST" },
+    );
 
     await win.fetch("/trails/foo");
     expect(original).toHaveBeenLastCalledWith("/trails/foo", undefined);

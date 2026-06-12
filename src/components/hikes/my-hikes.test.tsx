@@ -66,7 +66,9 @@ describe("MyHikes", () => {
       conditions: "Muddy",
     });
     render(<MyHikes trails={trails} />);
-    expect(await screen.findByText(/spring wildflowers/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/spring wildflowers/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/muddy/i)).toBeInTheDocument();
   });
 
@@ -120,9 +122,7 @@ describe("MyHikes", () => {
     expect(screen.getByText("May 20, 2026")).toBeInTheDocument();
 
     await user.click(
-      screen.getByRole("button", {
-        name: /delete your Alpha hike on Feb 10, 2026/i,
-      }),
+      screen.getByRole("button", { name: /delete your Alpha hike on Feb 10, 2026/i }),
     );
 
     // The other hike remains; the deleted date is gone; a remote delete fired.

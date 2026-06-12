@@ -46,9 +46,7 @@ beforeEach(() => {
 describe("POST /api/hikes/sync", () => {
   it("returns 401 when not signed in and never inserts", async () => {
     mocks.auth.mockResolvedValue(null);
-    const res = await POST(
-      syncReq([{ trailSlug: "a", hikedOn: "2026-01-01" }]),
-    );
+    const res = await POST(syncReq([{ trailSlug: "a", hikedOn: "2026-01-01" }]));
     expect(res.status).toBe(401);
     expect(mocks.values).not.toHaveBeenCalled();
   });

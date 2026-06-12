@@ -14,10 +14,7 @@ import type { LatLng } from "./route-geometry";
  */
 
 type OverpassGeom = {
-  elements?: Array<{
-    type?: string;
-    geometry?: Array<{ lat: number; lon: number }>;
-  }>;
+  elements?: Array<{ type?: string; geometry?: Array<{ lat: number; lon: number }> }>;
 };
 
 type Edge = { to: string; w: number };

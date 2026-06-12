@@ -3,9 +3,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 
 // Vercel Blob, auth, and the db are mocked so no live calls happen in tests.
 const mocks = vi.hoisted(() => ({
-  put: vi.fn(async () => ({
-    url: "https://store.private.blob.vercel-storage.com/hikes/u1/x.jpg",
-  })),
+  put: vi.fn(async () => ({ url: "https://store.private.blob.vercel-storage.com/hikes/u1/x.jpg" })),
   del: vi.fn(async () => undefined),
   get: vi.fn(async () => ({
     statusCode: 200,
@@ -14,16 +12,10 @@ const mocks = vi.hoisted(() => ({
   })),
   auth: vi.fn(),
 }));
-vi.mock("@vercel/blob", () => ({
-  put: mocks.put,
-  del: mocks.del,
-  get: mocks.get,
-}));
+vi.mock("@vercel/blob", () => ({ put: mocks.put, del: mocks.del, get: mocks.get }));
 vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/db", () => ({
-  getDb: () => ({
-    update: () => ({ set: () => ({ where: async () => undefined }) }),
-  }),
+  getDb: () => ({ update: () => ({ set: () => ({ where: async () => undefined }) }) }),
 }));
 
 import { POST, DELETE, GET } from "./route";
@@ -31,9 +23,7 @@ import { POST, DELETE, GET } from "./route";
 const BLOB_HOST = "https://store.private.blob.vercel-storage.com";
 function viewReq(u?: string) {
   const qs = u === undefined ? "" : `?u=${encodeURIComponent(u)}`;
-  return new Request(`http://localhost/api/hikes/photo${qs}`, {
-    method: "GET",
-  });
+  return new Request(`http://localhost/api/hikes/photo${qs}`, { method: "GET" });
 }
 function deleteReq(url: unknown) {
   return new Request("http://localhost/api/hikes/photo", {
@@ -77,10 +67,7 @@ describe("POST /api/hikes/photo", () => {
     expect(mocks.put).toHaveBeenCalledTimes(1);
     const [path, , opts] = (mocks.put as Mock).mock.calls[0];
     expect(path).toMatch(/^hikes\/u1\//);
-    expect(opts).toMatchObject({
-      access: "private",
-      contentType: "image/jpeg",
-    });
+    expect(opts).toMatchObject({ access: "private", contentType: "image/jpeg" });
   });
 
   it("returns a null url (200) and does not upload when the token is absent", async () => {
@@ -104,9 +91,7 @@ describe("POST /api/hikes/photo", () => {
   });
 
   it("returns 400 for an oversized image", async () => {
-    const big = new Blob([new Uint8Array(5 * 1024 * 1024)], {
-      type: "image/jpeg",
-    });
+    const big = new Blob([new Uint8Array(5 * 1024 * 1024)], { type: "image/jpeg" });
     const res = await POST(photoReq(big));
     expect(res.status).toBe(400);
     expect(mocks.put).not.toHaveBeenCalled();
@@ -129,9 +114,7 @@ describe("DELETE /api/hikes/photo", () => {
   });
 
   it("refuses to delete a blob outside the user's namespace", async () => {
-    const res = await DELETE(
-      deleteReq(`${BLOB_HOST}/hikes/someone-else/x.jpg`),
-    );
+    const res = await DELETE(deleteReq(`${BLOB_HOST}/hikes/someone-else/x.jpg`));
     expect(res.status).toBe(403);
     expect(mocks.del).not.toHaveBeenCalled();
   });

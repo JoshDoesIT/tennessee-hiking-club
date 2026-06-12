@@ -93,7 +93,8 @@ type GeoJson = {
  *  `outSR=4326`), as [lng, lat] is flipped to {lat, lng}. */
 export function npsSegments(fc: GeoJson): LatLng[][] {
   const segs: LatLng[][] = [];
-  const toSeg = (line: number[][]) => line.map(([lng, lat]) => ({ lat, lng }));
+  const toSeg = (line: number[][]) =>
+    line.map(([lng, lat]) => ({ lat, lng }));
   for (const f of fc.features ?? []) {
     const g = f.geometry;
     if (!g) continue;

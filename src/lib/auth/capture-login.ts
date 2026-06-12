@@ -26,8 +26,5 @@ export async function captureGithubLogin(
   await db
     .insert(profiles)
     .values({ userId, githubLogin: login })
-    .onConflictDoUpdate({
-      target: profiles.userId,
-      set: { githubLogin: login },
-    });
+    .onConflictDoUpdate({ target: profiles.userId, set: { githubLogin: login } });
 }

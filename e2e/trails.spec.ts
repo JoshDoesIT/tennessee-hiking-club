@@ -55,7 +55,9 @@ test("a shareable search URL renders matching trails on the server", async ({
   page,
 }) => {
   await page.goto("/trails?q=virgin");
-  await expect(page.getByRole("link", { name: /virgin falls/i })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /virgin falls/i }),
+  ).toBeVisible();
   expect(await results(page).count()).toBe(1);
 });
 
@@ -87,9 +89,9 @@ test("filtering to kid-friendly narrows to the easy family trails", async ({
   await expect(page).toHaveURL(/kid=1/);
   // Radnor Lake is flagged kid-friendly; Mount LeConte (strenuous) is not.
   await expect(page.getByRole("link", { name: /radnor lake/i })).toBeVisible();
-  await expect(page.getByRole("link", { name: /mount leconte/i })).toHaveCount(
-    0,
-  );
+  await expect(
+    page.getByRole("link", { name: /mount leconte/i }),
+  ).toHaveCount(0);
   expect(await results(page).count()).toBeLessThan(total);
 });
 

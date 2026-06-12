@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import {
-  fitWithin,
-  blobToDataUrl,
-  dataUrlToBlob,
-  compressImage,
-} from "./image";
+import { fitWithin, blobToDataUrl, dataUrlToBlob, compressImage } from "./image";
 
 describe("fitWithin", () => {
   it("leaves dimensions untouched when within the max edge", () => {
@@ -74,6 +69,12 @@ describe("compressImage", () => {
 
     expect(out.type).toBe("image/jpeg");
     expect(canvases.at(-1)).toMatchObject({ width: 1280, height: 960 });
-    expect(drawImage).toHaveBeenCalledWith(expect.anything(), 0, 0, 1280, 960);
+    expect(drawImage).toHaveBeenCalledWith(
+      expect.anything(),
+      0,
+      0,
+      1280,
+      960,
+    );
   });
 });

@@ -32,21 +32,11 @@ export async function POST(req: Request) {
   try {
     file = (await req.formData()).get("file");
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  if (
-    !(file instanceof Blob) ||
-    file.size === 0 ||
-    !file.type.startsWith("image/")
-  ) {
-    return NextResponse.json(
-      { error: "Expected an image file" },
-      { status: 400 },
-    );
+  if (!(file instanceof Blob) || file.size === 0 || !file.type.startsWith("image/")) {
+    return NextResponse.json({ error: "Expected an image file" }, { status: 400 });
   }
   if (file.size > MAX_BYTES) {
     return NextResponse.json({ error: "Image too large" }, { status: 400 });
@@ -57,14 +47,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: null });
   }
 
-  const { url } = await put(
-    `hikes/${userId}/${crypto.randomUUID()}.jpg`,
-    file,
-    {
-      access: "private",
-      contentType: "image/jpeg",
-    },
-  );
+  const { url } = await put(`hikes/${userId}/${crypto.randomUUID()}.jpg`, file, {
+    access: "private",
+    contentType: "image/jpeg",
+  });
   return NextResponse.json({ url });
 }
 
@@ -83,10 +69,7 @@ export async function DELETE(req: Request) {
   try {
     url = (await req.json())?.url;
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
   if (typeof url !== "string" || !url) {
     return NextResponse.json({ error: "Expected a url" }, { status: 400 });

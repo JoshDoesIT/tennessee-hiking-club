@@ -34,10 +34,7 @@ export async function POST(req: Request) {
   try {
     form = await req.formData();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
   const parsed = validateTrailSubmission({
@@ -55,10 +52,7 @@ export async function POST(req: Request) {
   });
   if (!parsed.success) {
     return NextResponse.json(
-      {
-        error: "Invalid submission",
-        issues: parsed.error.flatten().fieldErrors,
-      },
+      { error: "Invalid submission", issues: parsed.error.flatten().fieldErrors },
       { status: 400 },
     );
   }

@@ -39,9 +39,7 @@ export default async function ShareMyTennesseePage({ params }: Params) {
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">
-        Shared from Tennessee Hiking Club
-      </p>
+      <p className="eyebrow text-amber-700">Shared from Tennessee Hiking Club</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         My Tennessee
       </h1>
@@ -67,7 +65,9 @@ export default async function ShareMyTennesseePage({ params }: Params) {
             >
               {t.name}
             </Link>{" "}
-            <span className="text-ink/60 text-sm">· {t.region} Tennessee</span>
+            <span className="text-ink/60 text-sm">
+              · {t.region} Tennessee
+            </span>
           </li>
         ))}
       </ul>

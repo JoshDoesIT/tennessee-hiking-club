@@ -31,10 +31,7 @@ function setupFetch() {
       url: String(url),
       body: init?.body ? JSON.parse(String(init.body)) : null,
     });
-    return {
-      ok: true,
-      json: async () => ({ ok: true, prUrl: null }),
-    } as unknown as Response;
+    return { ok: true, json: async () => ({ ok: true, prUrl: null }) } as unknown as Response;
   });
   vi.stubGlobal("fetch", f as unknown as typeof fetch);
   return { calls };

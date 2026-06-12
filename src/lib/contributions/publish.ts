@@ -235,13 +235,7 @@ export async function publishOnApproval({
     credit: row.credit,
     by: submitter.handle,
   });
-  await api.putFile({
-    path: contentPath,
-    content: updated,
-    message,
-    branch,
-    sha: file.sha,
-  });
+  await api.putFile({ path: contentPath, content: updated, message, branch, sha: file.sha });
 
   const result = await api.openPullRequest({
     title: `Photo: ${row.trailSlug}`,

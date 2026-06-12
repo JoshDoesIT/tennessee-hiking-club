@@ -32,9 +32,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("PhotoSubmissionForm", () => {
   it("does not render the form when signed out", async () => {
     const { f } = setupFetch({});
-    render(
-      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
-    );
+    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
     await waitFor(() =>
       expect(
         f.mock.calls.some((c) => String(c[0]).includes("/api/auth/session")),
@@ -46,9 +44,7 @@ describe("PhotoSubmissionForm", () => {
   it("submits a photo with alt text and trail slug when signed in", async () => {
     const user = userEvent.setup();
     const { getBody } = setupFetch({ user: { id: "u1" } });
-    render(
-      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
-    );
+    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
 
     await user.upload(await screen.findByLabelText(/choose a photo/i), file());
     await user.type(
@@ -69,18 +65,14 @@ describe("PhotoSubmissionForm", () => {
   it("does not submit until the rights box is checked", async () => {
     const user = userEvent.setup();
     const { f } = setupFetch({ user: { id: "u1" } });
-    render(
-      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
-    );
+    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
 
     await user.upload(await screen.findByLabelText(/choose a photo/i), file());
     await user.type(screen.getByLabelText(/describe the photo/i), "Alt");
     await user.click(screen.getByRole("button", { name: /add photo/i }));
 
     expect(
-      f.mock.calls.some((c) =>
-        String(c[0]).includes("/api/contributions/photo"),
-      ),
+      f.mock.calls.some((c) => String(c[0]).includes("/api/contributions/photo")),
     ).toBe(false);
   });
 });

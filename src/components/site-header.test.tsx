@@ -65,6 +65,8 @@ describe("SiteHeader mobile menu", () => {
     // No hamburger toggle and no mobile menu: navigation lives in the bottom
     // tab bar and the More tab instead.
     expect(screen.queryByRole("button", { name: /menu/i })).toBeNull();
-    expect(screen.queryByRole("navigation", { name: /mobile/i })).toBeNull();
+    expect(
+      screen.queryByRole("navigation", { name: /mobile/i }),
+    ).toBeNull();
   });
 });
