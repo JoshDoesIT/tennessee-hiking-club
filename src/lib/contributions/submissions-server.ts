@@ -34,7 +34,10 @@ export async function getApprovedSubmissionCounts(
   if (!process.env.DATABASE_URL || userIds.length === 0) return counts;
   const db = getDb();
   const rows = await db
-    .select({ userId: trailSubmissions.userId, status: trailSubmissions.status })
+    .select({
+      userId: trailSubmissions.userId,
+      status: trailSubmissions.status,
+    })
     .from(trailSubmissions)
     .where(
       and(

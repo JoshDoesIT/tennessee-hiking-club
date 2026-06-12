@@ -1,28 +1,38 @@
 @import "tailwindcss";
 
 /* Dark mode is toggled by a `.dark` class on <html> (set before paint by the
- * no-flash script in the layout). It is dusk turning to night: the same warm,
- * earthy identity after sundown, not a cold inverted theme. */
+ * no-flash script in the layout). It is dusk turning to night: the same
+ * deep-pine identity after sundown, not a cold inverted theme. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------ *
- *  Tennessee Hiking Club: design tokens
- *  Palette sampled directly from the badge logo.
+ *  Tennessee Hiking Club: design tokens — "Peak + Pin" (spec 0010)
+ *  Palette verbatim from the Concept 5 brand sheet. Legacy token names
+ *  (forest/pine/sage/cream/amber/…) are re-valued so the whole app wears
+ *  the new identity; canonical aliases below are for new code.
  *  Full guidelines: docs/brand/BRAND.md
  * ------------------------------------------------------------------ */
 @theme {
-  --color-forest: #2a3623; /* primary dark, ring, headings on light */
-  --color-pine: #475036; /* secondary green */
-  --color-olive: #6c724a;
-  --color-sage: #959760;
-  --color-sage-100: #c6c680; /* light sage, borders, fills */
-  --color-cream: #fbf6e9; /* page background (warm paper) */
-  --color-cream-50: #fefcf5;
-  --color-parchment: #f1e9d6;
-  --color-amber: #e0a24c; /* trail-sun accent / CTAs */
-  --color-amber-600: #c8852f; /* amber on dark / hover fills */
-  --color-amber-700: #8a5a1c; /* AA-safe amber for text on light (>=4.5:1) */
-  --color-ink: #1e2419; /* body text */
+  /* Canonical Concept-5 names */
+  --color-deep-pine: #15352a; /* darkest ground, headings, dark panels */
+  --color-forest-green: #1e4d3a; /* primary green */
+  --color-mist: #c7d2c1; /* borders, fills, quiet surfaces */
+  --color-stone: #f5f6f3; /* page background */
+  --color-tn-orange: #f47c20; /* the accent: one vivid orange, used sparingly */
+
+  /* Legacy token names, re-valued to Concept 5 */
+  --color-forest: #15352a; /* deep pine: headings, primary, dark sections */
+  --color-pine: #1e4d3a; /* forest green: hover / secondary */
+  --color-olive: #5c7567; /* muted labels, derived sage→pine midpoint */
+  --color-sage: #8ba888;
+  --color-sage-100: #c7d2c1; /* mist: borders, fills */
+  --color-cream: #f5f6f3; /* stone: page background */
+  --color-cream-50: #fcfdfb; /* cards, raised surfaces */
+  --color-parchment: #e8ede7; /* alternating section bands (mist-tinged) */
+  --color-amber: #f47c20; /* TN orange: CTAs, pings, highlights */
+  --color-amber-600: #d96510; /* orange hover */
+  --color-amber-700: #a14a08; /* AA-safe orange for text on stone (>=4.5:1) */
+  --color-ink: #22332b; /* body text */
 
   --color-background: var(--color-cream);
   --color-foreground: var(--color-ink);
@@ -34,45 +44,52 @@
   --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-sun: sun-glow 7s ease-in-out infinite;
   --animate-twinkle: twinkle 4.5s ease-in-out infinite;
+  /* The brand moment: the mark drops like a map pin… */
+  --animate-pin-drop: pin-drop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  /* …then pings like a located trailhead (start it after the landing). */
+  --animate-pin-ping: pin-ping 1.4s cubic-bezier(0, 0, 0.2, 1) 0.8s both;
+  --animate-marquee: marquee 32s linear infinite;
 }
 
 /* Night palette: the same token names re-valued, so every `bg-cream`,
- * `text-ink`, `text-forest`, etc. across the site shifts to dusk without
- * touching components. Deep warm forest-black ground, moonlit-cream ink,
- * light "forest" for headings/primary, amber accents brightened for contrast. */
+ * `text-ink`, `text-forest`, etc. across the site shifts to deep-pine night
+ * without touching components. */
 .dark {
   color-scheme: dark;
-  --color-cream: #161a12; /* page background: deep forest night */
-  --color-cream-50: #1e2318; /* raised surfaces / cards */
-  --color-parchment: #262c1d;
-  --color-ink: #ebe6d6; /* body text: warm moonlit off-white */
-  --color-forest: #eef1e3; /* headings, primary, rings -> light */
-  --color-pine: #bcc4a0; /* secondary text / links -> light sage-green */
-  --color-olive: #9aa178;
-  --color-sage: #aab07e;
-  --color-sage-100: #39402a; /* subtle borders / fills -> dark */
-  --color-amber: #eab35e; /* accent stays warm, a touch brighter */
-  --color-amber-600: #e0a24c;
-  --color-amber-700: #edb86a; /* amber text readable on the night ground */
+  --color-cream: #0e1c16; /* page background: deep pine night */
+  --color-cream-50: #142420; /* raised surfaces / cards */
+  --color-parchment: #182a23;
+  --color-ink: #e2eae4; /* body text: cool moonlit off-white */
+  --color-forest: #edf3ee; /* headings, primary, rings -> light */
+  --color-pine: #a9c6b6; /* secondary text / links -> light green */
+  --color-olive: #8aa697;
+  --color-sage: #93b3a2;
+  --color-sage-100: #273b32; /* subtle borders / fills -> dark */
+  --color-amber: #f98b36; /* the orange warms up a touch for contrast */
+  --color-amber-600: #f47c20;
+  --color-amber-700: #ffa45c; /* orange text readable on the night ground */
+  --color-tn-orange: #f98b36;
 }
 
-/* A "day island": a surface designed as a dark forest panel by day (e.g. the
+/* A "day island": a surface designed as a dark deep-pine panel by day (the
  * footer, the hero mission/contribute bands, map tooltips) would otherwise
  * invert to a bright light panel at night. Restore the full set of light-theme
  * token values within it so it stays as designed instead of inverting. */
 .dark .night-panel {
-  --color-cream: #fbf6e9;
-  --color-cream-50: #fefcf5;
-  --color-parchment: #f1e9d6;
-  --color-ink: #1e2419;
-  --color-forest: #2a3623;
-  --color-pine: #475036;
-  --color-olive: #6c724a;
-  --color-sage: #959760;
-  --color-sage-100: #c6c680;
-  --color-amber: #e0a24c;
-  --color-amber-600: #c8852f;
-  --color-amber-700: #8a5a1c;
+  --color-cream: #f5f6f3;
+  --color-cream-50: #fcfdfb;
+  --color-parchment: #e8ede7;
+  --color-ink: #22332b;
+  --color-forest: #15352a;
+  --color-pine: #1e4d3a;
+  --color-olive: #5c7567;
+  --color-sage: #8ba888;
+  --color-sage-100: #c7d2c1;
+  --color-amber: #f47c20;
+  --color-amber-600: #d96510;
+  --color-amber-700: #a14a08;
+  --color-tn-orange: #f47c20;
+  --color-mist: #c7d2c1;
 }
 
 @keyframes rise {
@@ -105,6 +122,40 @@
   }
   50% {
     opacity: 1;
+  }
+}
+
+/* The pin falls from above and settles with a single soft overshoot (the
+ * spring lives in the cubic-bezier, so reduced-motion zeroes it cleanly). */
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-56px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The radar ripple emitted from the pin tip once it lands. Applied to a
+ * border-only ellipse positioned at the tip. */
+@keyframes pin-ping {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.25);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* The tagline divider band: a slow, continuous trail-marker marquee. The
+ * track holds its content twice; -50% loops seamlessly. */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
 
@@ -142,36 +193,100 @@ body {
   font-size: 0.75rem;
 }
 
-/* Subtle printed-paper grain across the whole page */
+/* ------------------------------------------------------------------ *
+ *  Motion system (spec 0010): deliberate, one idea per surface.
+ * ------------------------------------------------------------------ */
+
+/* One-shot scroll entrances driven by the Reveal component. Blocks start in a
+ * lowered, transparent pose and settle in once when they enter the viewport.
+ * If scripting is unavailable the hidden pose never applies, so content is
+ * always readable. Reduced motion zeroes the transition globally. */
+[data-revealed="false"] {
+  opacity: 0;
+  transform: translateY(28px);
+}
+[data-revealed] {
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+}
+@media (scripting: none) {
+  [data-revealed="false"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Marquee band. Pauses on hover/focus so the tagline can be read at rest. */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.marquee-track {
+  display: inline-flex;
+  width: max-content;
+  animation: var(--animate-marquee);
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Hero ridgeline parallax: progressive enhancement only. Where scroll-driven
+ * animations exist, the far ridges climb slightly slower than the page so the
+ * horizon recedes; everywhere else this is a static scene. */
+@supports (animation-timeline: scroll()) {
+  .parallax-drift-far {
+    animation: parallax-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120vh;
+    --parallax-shift: 46px;
+  }
+  .parallax-drift-mid {
+    animation: parallax-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 120vh;
+    --parallax-shift: 22px;
+  }
+}
+@keyframes parallax-drift {
+  to {
+    transform: translateY(var(--parallax-shift, 0px));
+  }
+}
+
+/* Subtle topographic contour texture across the page: the map made ambient.
+ * (Replaces the old paper grain; the multiply blend tints it into any
+ * surface.) */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.05;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280'%3E%3Cg fill='none' stroke='%2315352A' stroke-width='1'%3E%3Cpath d='M70 140c0-44 28-74 70-74s70 30 70 74-28 74-70 74-70-30-70-74z'/%3E%3Cpath d='M92 140c0-32 20-54 48-54s48 22 48 54-20 54-48 54-48-22-48-54z'/%3E%3Cpath d='M114 140c0-20 12-34 26-34s26 14 26 34-12 34-26 34-26-14-26-34z'/%3E%3Cpath d='M-10 20C30 6 64 28 96 16s64-26 96-12 66 30 98 18' /%3E%3Cpath d='M-10 264c40-14 74 8 106-4s64-26 96-12 66 30 98 18'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* On the night ground, multiply would crush the grain; let it glint instead. */
+/* On the night ground, multiply would crush the contours; let them glint. */
 .dark body::after {
-  opacity: 0.05;
+  opacity: 0.06;
   mix-blend-mode: screen;
 }
 
-/* The paper grain lightens (dark) / darkens (light) every surface a few levels
- * via its blend mode, which the flat native system-bar background can't match,
- * leaving a visible seam under the tab bar and at the top. Drop it on the native
- * app so every surface is flat and the edge-to-edge bars match (#294). The web
- * keeps the texture. */
+/* The contour texture lightens (dark) / darkens (light) every surface a few
+ * levels via its blend mode, which the flat native system-bar background can't
+ * match, leaving a visible seam under the tab bar and at the top. Drop it on
+ * the native app so every surface is flat and the edge-to-edge bars match
+ * (#294). The web keeps the texture. */
 .has-mobile-tabbar body::after {
   display: none;
 }
 
 ::selection {
   background-color: var(--color-amber);
-  color: var(--color-forest);
+  color: var(--color-cream-50);
 }
 
 :focus-visible {
@@ -191,7 +306,7 @@ body::after {
 }
 
 /* Dark mode: darken the interactive terrain map's tiles (the canvas only, so the
- * amber pins and controls keep their colors). A lightness invert with a hue
+ * orange pins and controls keep their colors). A lightness invert with a hue
  * rotate keeps water blue and land green while turning the bright basemap dark. */
 .dark .maplibregl-canvas {
   filter: invert(0.9) hue-rotate(180deg) brightness(1.05);
@@ -217,7 +332,7 @@ body::after {
 }
 
 /* The live "you are here" heading puck on the recording map (#271): a forest dot
- * with a cream ring, a pulsing accuracy halo, and an amber heading cone. The map
+ * with a cream ring, a pulsing accuracy halo, and an orange heading cone. The map
  * is kept course-up, so the screen-fixed cone always points the way you're
  * travelling, like a GPS app. Tokens keep it visible in dark mode (the dot/ring
  * invert) while the puck sits above the tinted canvas. */

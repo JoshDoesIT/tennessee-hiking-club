@@ -46,7 +46,10 @@ describe("cleanup log", () => {
   it("replaceCleanups swaps the whole log (used by account sync)", () => {
     const s = memStorage();
     logCleanup("2026-05-27", s);
-    replaceCleanups([{ loggedOn: "2026-01-01" }, { loggedOn: "2026-02-02" }], s);
+    replaceCleanups(
+      [{ loggedOn: "2026-01-01" }, { loggedOn: "2026-02-02" }],
+      s,
+    );
     expect(getCleanups(s)).toEqual([
       { loggedOn: "2026-01-01" },
       { loggedOn: "2026-02-02" },

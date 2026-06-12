@@ -46,7 +46,10 @@ describe("POST /api/friends/[id]/respond", () => {
   });
 
   it("returns 400 when the action is not allowed", async () => {
-    mocks.respondToRequest.mockResolvedValue({ ok: false, reason: "not-allowed" });
+    mocks.respondToRequest.mockResolvedValue({
+      ok: false,
+      reason: "not-allowed",
+    });
     const res = await POST(req("accept"), ctx("f1"));
     expect(res.status).toBe(400);
   });

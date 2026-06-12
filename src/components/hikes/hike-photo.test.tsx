@@ -14,7 +14,10 @@ beforeEach(() => {
 describe("HikePhoto", () => {
   it("serves a remote (private) photoUrl through the auth-gated view proxy", () => {
     render(
-      <HikePhoto photoUrl="https://store.private.blob/hikes/u1/p.jpg" alt="My hike photo" />,
+      <HikePhoto
+        photoUrl="https://store.private.blob/hikes/u1/p.jpg"
+        alt="My hike photo"
+      />,
     );
     const img = screen.getByRole("img", { name: "My hike photo" });
     expect(img).toHaveAttribute(
@@ -25,8 +28,12 @@ describe("HikePhoto", () => {
   });
 
   it("loads a local photo from IndexedDB and revokes the object URL on unmount", async () => {
-    vi.mocked(getPhoto).mockResolvedValue(new Blob(["x"], { type: "image/jpeg" }));
-    const { unmount } = render(<HikePhoto photoId="p1" alt="Local hike photo" />);
+    vi.mocked(getPhoto).mockResolvedValue(
+      new Blob(["x"], { type: "image/jpeg" }),
+    );
+    const { unmount } = render(
+      <HikePhoto photoId="p1" alt="Local hike photo" />,
+    );
 
     const img = await screen.findByRole("img", { name: "Local hike photo" });
     expect(img).toHaveAttribute("src", "blob:mock");
@@ -37,9 +44,15 @@ describe("HikePhoto", () => {
   });
 
   it("prefers the local copy when both a photoId and photoUrl are present", async () => {
-    vi.mocked(getPhoto).mockResolvedValue(new Blob(["x"], { type: "image/jpeg" }));
+    vi.mocked(getPhoto).mockResolvedValue(
+      new Blob(["x"], { type: "image/jpeg" }),
+    );
     render(
-      <HikePhoto photoId="p1" photoUrl="https://store.private.blob/hikes/u1/p.jpg" alt="Both" />,
+      <HikePhoto
+        photoId="p1"
+        photoUrl="https://store.private.blob/hikes/u1/p.jpg"
+        alt="Both"
+      />,
     );
     const img = await screen.findByRole("img", { name: "Both" });
     expect(img).toHaveAttribute("src", "blob:mock");

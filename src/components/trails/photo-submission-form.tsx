@@ -125,8 +125,8 @@ export function PhotoSubmissionForm({
           onChange={(e) => setConsent(e.target.checked)}
           className="accent-forest mt-0.5 h-4 w-4"
         />
-        I have the right to share this photo and agree it may be published on the
-        trail page.
+        I have the right to share this photo and agree it may be published on
+        the trail page.
       </label>
       <div className="flex items-center gap-3">
         <Button

@@ -125,8 +125,14 @@ describe("buildTennesseeStyle", () => {
     expect(s.sources["terrain-dem"]).toBeDefined();
 
     // Both sources point at the same Terrarium tiles, just under different ids.
-    const hill = s.sources["hillshade-dem"] as { type: string; tiles: string[] };
-    const terrain = s.sources["terrain-dem"] as { type: string; tiles: string[] };
+    const hill = s.sources["hillshade-dem"] as {
+      type: string;
+      tiles: string[];
+    };
+    const terrain = s.sources["terrain-dem"] as {
+      type: string;
+      tiles: string[];
+    };
     expect(hill.type).toBe("raster-dem");
     expect(terrain.type).toBe("raster-dem");
   });

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-const browserOpen = vi.fn<(...args: unknown[]) => Promise<void>>(async () => {});
+const browserOpen = vi.fn<(...args: unknown[]) => Promise<void>>(
+  async () => {},
+);
 const browserClose = vi.fn<(...args: unknown[]) => Promise<void>>(
   async () => {},
 );
@@ -54,9 +56,13 @@ describe("startNativeSignIn", () => {
   it("opens the system browser to the OAuth flow targeting the completion route", async () => {
     await startNativeSignIn("github");
     expect(browserOpen).toHaveBeenCalledTimes(1);
-    const { url } = (browserOpen.mock.calls[0] as unknown as [{ url: string }])[0];
+    const { url } = (
+      browserOpen.mock.calls[0] as unknown as [{ url: string }]
+    )[0];
     expect(url).toContain("/api/app-signin/github");
-    expect(url).toContain(`to=${encodeURIComponent("/api/native-auth/complete")}`);
+    expect(url).toContain(
+      `to=${encodeURIComponent("/api/native-auth/complete")}`,
+    );
   });
 
   it("exchanges the deep-linked code for a session and lands on My Hikes", async () => {
@@ -68,7 +74,9 @@ describe("startNativeSignIn", () => {
       "/api/native-auth/exchange",
       expect.objectContaining({ method: "POST" }),
     );
-    const init = (fetchMock.mock.calls[0] as unknown as [string, { body: string }])[1];
+    const init = (
+      fetchMock.mock.calls[0] as unknown as [string, { body: string }]
+    )[1];
     expect(JSON.parse(init.body)).toEqual({ code: "abc123" });
     // The returned session token is stored for the bearer-header path (phase 4).
     expect(storeToken).toHaveBeenCalledWith(expect.anything(), "sess-tok");

@@ -94,7 +94,7 @@ export function LeaderboardBoard() {
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-semibold",
               s.key === scope
-                ? "border-amber-600 bg-amber/10 text-amber-700"
+                ? "bg-amber/10 border-amber-600 text-amber-700"
                 : "border-forest/20 text-forest hover:bg-forest/5",
             )}
           >
@@ -145,7 +145,9 @@ export function LeaderboardBoard() {
         </p>
       ) : needsSignIn ? (
         <div className="border-forest/15 mt-8 rounded-2xl border border-dashed p-10 text-center">
-          <p className="text-forest font-medium">Sign in to see your friends.</p>
+          <p className="text-forest font-medium">
+            Sign in to see your friends.
+          </p>
           <p className="text-ink/70 mt-1 text-sm">
             The friends board is private to you. Sign in and add friends from{" "}
             <Link

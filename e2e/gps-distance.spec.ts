@@ -14,9 +14,7 @@ test("sort by distance from me reorders trails and shows distances", async ({
   // No distances until the user opts in.
   await expect(page.getByText(/mi away/i)).toHaveCount(0);
 
-  await page
-    .getByRole("button", { name: /sort by distance from me/i })
-    .click();
+  await page.getByRole("button", { name: /sort by distance from me/i }).click();
 
   // Distances appear and the status confirms the location stayed on-device.
   await expect(page.getByText(/mi away/i).first()).toBeVisible();

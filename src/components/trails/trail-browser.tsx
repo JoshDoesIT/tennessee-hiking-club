@@ -32,11 +32,11 @@ export function TrailBrowser({ trails }: { trails: Trail[] }) {
   const matches = filterTrails(trails, filters);
   const isFiltered = Boolean(
     filters.region ||
-      filters.difficulty ||
-      filters.length ||
-      filters.query ||
-      filters.dogFriendly ||
-      filters.kidFriendly,
+    filters.difficulty ||
+    filters.length ||
+    filters.query ||
+    filters.dogFriendly ||
+    filters.kidFriendly,
   );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -149,7 +149,9 @@ export function TrailBrowser({ trails }: { trails: Trail[] }) {
             <p className="text-forest font-medium">
               No trails match those filters.
             </p>
-            <p className="text-ink/70 mt-1 text-sm">Try widening your search.</p>
+            <p className="text-ink/70 mt-1 text-sm">
+              Try widening your search.
+            </p>
             <Link
               href="/trails"
               className={cn(

@@ -19,7 +19,10 @@ async function setTheme(page: Page, theme: "light" | "dark") {
 test("by day the hero shows the sun and hides the moon", async ({ page }) => {
   await setTheme(page, "light");
   await page.goto("/");
-  await expect(page.locator('[data-celestial="sun"]')).toHaveCSS("opacity", "1");
+  await expect(page.locator('[data-celestial="sun"]')).toHaveCSS(
+    "opacity",
+    "1",
+  );
   await expect(page.locator('[data-celestial="moon"]')).toHaveCSS(
     "opacity",
     "0",
@@ -33,7 +36,10 @@ test("at night the hero shows the moon and fully hides the sun", async ({
   await page.goto("/");
   await expect(page.locator("html.dark")).toHaveCount(1);
   // The sun must be fully transparent at night, even though it animates.
-  await expect(page.locator('[data-celestial="sun"]')).toHaveCSS("opacity", "0");
+  await expect(page.locator('[data-celestial="sun"]')).toHaveCSS(
+    "opacity",
+    "0",
+  );
   await expect(page.locator('[data-celestial="moon"]')).toHaveCSS(
     "opacity",
     "1",

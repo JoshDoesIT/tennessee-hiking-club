@@ -40,7 +40,9 @@ describe("PasskeyButton", () => {
   it("authenticates by default, passing an explicit action", async () => {
     enableWebAuthn();
     const user = userEvent.setup();
-    render(<PasskeyButton label="Sign in with a passkey" callbackUrl="/hikes" />);
+    render(
+      <PasskeyButton label="Sign in with a passkey" callbackUrl="/hikes" />,
+    );
     await user.click(await screen.findByRole("button", { name: /passkey/i }));
     await waitFor(() =>
       expect(signInMock).toHaveBeenCalledWith("passkey", {

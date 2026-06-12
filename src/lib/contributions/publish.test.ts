@@ -10,9 +10,13 @@ const mocks = vi.hoisted(() => ({
     getFile: vi.fn(async () => ({ content: "", sha: "filesha" })),
     putFile: vi.fn(async () => undefined),
     putBinaryFile: vi.fn(async () => undefined),
-    openPullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
+    openPullRequest: vi.fn(async () => ({
+      url: "https://github.com/o/r/pull/9",
+    })),
   },
-  openFilePullRequest: vi.fn(async () => ({ url: "https://github.com/o/r/pull/9" })),
+  openFilePullRequest: vi.fn(async () => ({
+    url: "https://github.com/o/r/pull/9",
+  })),
   updateSet: vi.fn(() => ({ where: async () => undefined })),
   blobGet: vi.fn(async () => ({
     stream: new Blob(["img-bytes"]).stream(),
@@ -130,7 +134,11 @@ describe("publishOnApproval", () => {
     mocks.config = { token: "t", owner: "o", repo: "r", baseBranch: "main" };
     mocks.selectCalls = 0;
     mocks.firstRow = null;
-    mocks.profileRow = { userId: "u1", githubLogin: "trail-ann", displayName: null };
+    mocks.profileRow = {
+      userId: "u1",
+      githubLogin: "trail-ann",
+      displayName: null,
+    };
     mocks.trails = [];
     mocks.api.getFile = vi.fn(async () => ({
       content: "---\nslug: virgin-falls\nname: Virgin Falls\n---\n\nBody.",
@@ -140,7 +148,9 @@ describe("publishOnApproval", () => {
 
   it("returns null when no token is configured", async () => {
     mocks.config = null;
-    expect(await publishOnApproval({ type: "trail", id: "trail123-abc" })).toBeNull();
+    expect(
+      await publishOnApproval({ type: "trail", id: "trail123-abc" }),
+    ).toBeNull();
     expect(mocks.openFilePullRequest).not.toHaveBeenCalled();
   });
 
@@ -168,7 +178,10 @@ describe("publishOnApproval", () => {
 
   it("opens a PR for an approved condition report, updating the file", async () => {
     mocks.firstRow = conditionRow;
-    const res = await publishOnApproval({ type: "condition", id: "cond456-xyz" });
+    const res = await publishOnApproval({
+      type: "condition",
+      id: "cond456-xyz",
+    });
     expect(res).toEqual({ url: "https://github.com/o/r/pull/9" });
     expect(mocks.api.getFile).toHaveBeenCalled();
     const calls = mocks.openFilePullRequest.mock.calls as unknown as Array<
@@ -183,7 +196,8 @@ describe("publishOnApproval", () => {
   it("opens a PR for an approved photo, committing the image and the entry", async () => {
     mocks.firstRow = photoRow;
     mocks.api.getFile = vi.fn(async () => ({
-      content: "---\nslug: virgin-falls\nname: Virgin Falls\nphotos: []\n---\n\nBody.",
+      content:
+        "---\nslug: virgin-falls\nname: Virgin Falls\nphotos: []\n---\n\nBody.",
       sha: "contentsha",
     }));
     const res = await publishOnApproval({ type: "photo", id: "photo78-qrs" });

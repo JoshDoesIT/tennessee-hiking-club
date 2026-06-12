@@ -31,7 +31,7 @@ export function TrailParking({
         <p className="text-ink/80 mt-1 text-sm">{parking.note}</p>
       ) : null}
       {parking.seasonal ? (
-        <p className="text-amber-700 mt-1 text-sm">{parking.seasonal}</p>
+        <p className="mt-1 text-sm text-amber-700">{parking.seasonal}</p>
       ) : null}
       <a
         href={googleMapsDirectionsUrl(parking)}

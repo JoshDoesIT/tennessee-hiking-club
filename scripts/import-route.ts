@@ -35,7 +35,9 @@ import { getTrailBySlug } from "../src/lib/trails";
 
 type Candidate = { name: string; segments: LatLng[][] };
 
-const UA = { "User-Agent": "TennesseeHikingClub-route-importer (contact: tnhiking.club)" };
+const UA = {
+  "User-Agent": "TennesseeHikingClub-route-importer (contact: tnhiking.club)",
+};
 
 function arg(flag: string): string | undefined {
   const i = process.argv.indexOf(flag);
@@ -56,7 +58,13 @@ function haversineMi(a: LatLng, b: LatLng): number {
 /** Token-overlap score between a trail's display name and a source trail name. */
 function nameScore(appName: string, srcName: string): number {
   const norm = (s: string) =>
-    new Set(s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter(Boolean));
+    new Set(
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, " ")
+        .split(/\s+/)
+        .filter(Boolean),
+    );
   const a = norm(appName),
     b = norm(srcName);
   let shared = 0;
@@ -85,10 +93,20 @@ async function fetchEsri(
     `&spatialRel=esriSpatialRelIntersects&outFields=${nameField}&returnGeometry=true&outSR=4326&f=geojson`;
   // Some state servers (TDEC) 403 a non-browser UA, so present a browser one.
   const fc = (await safeJson(
-    await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (TennesseeHikingClub route importer)" } }),
-  )) as { features?: Array<{ properties?: Record<string, string>; geometry?: { type: string; coordinates: number[][] | number[][][] } }> };
+    await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (TennesseeHikingClub route importer)",
+      },
+    }),
+  )) as {
+    features?: Array<{
+      properties?: Record<string, string>;
+      geometry?: { type: string; coordinates: number[][] | number[][][] };
+    }>;
+  };
   const byName = new Map<string, LatLng[][]>();
-  const toSeg = (line: number[][]) => line.map(([lo, la]) => ({ lat: la, lng: lo }));
+  const toSeg = (line: number[][]) =>
+    line.map(([lo, la]) => ({ lat: la, lng: lo }));
   for (const f of fc.features ?? []) {
     const name = f.properties?.[nameField] ?? "(unnamed)";
     const g = f.geometry;
@@ -108,7 +126,10 @@ const TDEC_TRAILS =
   "https://tdeconline.tn.gov/arcgis/rest/services/TDEC_Trails/FeatureServer/0";
 
 type OsmGeom = {
-  elements?: Array<{ type?: string; geometry?: Array<{ lat: number; lon: number }> }>;
+  elements?: Array<{
+    type?: string;
+    geometry?: Array<{ lat: number; lon: number }>;
+  }>;
 };
 
 /** Raw `out geom` for every path-like way near the trailhead (for graph routing). */
@@ -117,7 +138,11 @@ async function fetchOsmPaths(th: LatLng, radius: number): Promise<OsmGeom> {
     `[out:json][timeout:90];way[highway~"^(path|footway|track|steps|bridleway|cycleway)$"]` +
     `(around:${radius},${th.lat},${th.lng});out geom;`;
   return (await safeJson(
-    await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: ql, headers: UA }),
+    await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: ql,
+      headers: UA,
+    }),
   )) as OsmGeom;
 }
 
@@ -143,14 +168,31 @@ async function fetchOsmTraces(bbox: string, maxPages = 10): Promise<LatLng[]> {
 async function fetchOsm(th: LatLng, radius = 2500): Promise<Candidate[]> {
   const ql = `[out:json][timeout:60];way[highway~"^(path|footway|track|steps)$"][name](around:${radius},${th.lat},${th.lng});out geom;`;
   const json = (await safeJson(
-    await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: ql, headers: UA }),
-  )) as { elements?: Array<{ type: string; tags?: Record<string, string>; geometry?: Array<{ lat: number; lon: number }> }> };
+    await fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: ql,
+      headers: UA,
+    }),
+  )) as {
+    elements?: Array<{
+      type: string;
+      tags?: Record<string, string>;
+      geometry?: Array<{ lat: number; lon: number }>;
+    }>;
+  };
   const byName = new Map<string, LatLng[][]>();
   for (const el of json.elements ?? []) {
     if (el.type === "way" && el.geometry?.length) {
       const name = el.tags?.name ?? "(unnamed)";
       if (!byName.has(name)) byName.set(name, []);
-      byName.get(name)!.push(el.geometry.map((p: { lat: number; lon: number }) => ({ lat: p.lat, lng: p.lon })));
+      byName
+        .get(name)!
+        .push(
+          el.geometry.map((p: { lat: number; lon: number }) => ({
+            lat: p.lat,
+            lng: p.lon,
+          })),
+        );
     }
   }
   return [...byName].map(([name, segments]) => ({ name, segments }));
@@ -159,7 +201,8 @@ async function fetchOsm(th: LatLng, radius = 2500): Promise<Candidate[]> {
 /** Closest approach (mi) of a candidate's points to the trailhead. */
 function distToTrailhead(c: Candidate, th: LatLng): number {
   let min = Infinity;
-  for (const seg of c.segments) for (const p of seg) min = Math.min(min, haversineMi(p, th));
+  for (const seg of c.segments)
+    for (const p of seg) min = Math.min(min, haversineMi(p, th));
   return min;
 }
 
@@ -202,7 +245,9 @@ async function main() {
   const clipTo: LatLng | undefined = toArg
     ? (() => {
         const [lat, lng] = toArg.split(",").map((s) => Number(s.trim()));
-        return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : undefined;
+        return Number.isFinite(lat) && Number.isFinite(lng)
+          ? { lat, lng }
+          : undefined;
       })()
     : undefined;
 
@@ -245,14 +290,24 @@ async function main() {
     }
     const sampled = downsampleRoute(line, maxPoints);
     const elevations = await sampleElevationFt(sampled);
-    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const route = sampled.map((p, i) => ({
+      lat: p.lat,
+      lng: p.lng,
+      elevationFt: elevations[i],
+    }));
     const profile = buildElevationProfile(route);
     console.error(`\nSource: OSM public GPS traces (routed to ${toArg})`);
     console.error(`Points: ${route.length} (from ${line.length} trace points)`);
-    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
-    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(
+      `Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`,
+    );
+    console.error(
+      `Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`,
+    );
     console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
-    console.error(`Attribution: OpenStreetMap contributors' GPS traces (ODbL)\n`);
+    console.error(
+      `Attribution: OpenStreetMap contributors' GPS traces (ODbL)\n`,
+    );
     console.log(routeFrontmatterYaml(route));
     return;
   }
@@ -287,12 +342,24 @@ async function main() {
     }
     const sampled = downsampleRoute(line, maxPoints);
     const elevations = await sampleElevationFt(sampled);
-    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const route = sampled.map((p, i) => ({
+      lat: p.lat,
+      lng: p.lng,
+      elevationFt: elevations[i],
+    }));
     const profile = buildElevationProfile(route);
-    console.error(`\nSource: OSM path network (${isLoop ? "looped via" : "routed to"} ${toArg})`);
-    console.error(`Points: ${route.length} (from ${line.length} network points)`);
-    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
-    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(
+      `\nSource: OSM path network (${isLoop ? "looped via" : "routed to"} ${toArg})`,
+    );
+    console.error(
+      `Points: ${route.length} (from ${line.length} network points)`,
+    );
+    console.error(
+      `Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`,
+    );
+    console.error(
+      `Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`,
+    );
     console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
     console.error(`Attribution: © OpenStreetMap contributors (ODbL)\n`);
     console.log(routeFrontmatterYaml(route));
@@ -312,7 +379,9 @@ async function main() {
     }
     const segments = combineNamedSegments(osm, wantedWays);
     if (segments.length === 0) {
-      console.error(`No OSM ways near the trailhead matched --ways "${wantedWays.join(", ")}".`);
+      console.error(
+        `No OSM ways near the trailhead matched --ways "${wantedWays.join(", ")}".`,
+      );
       console.error("Named ways within range:");
       [...new Set(osm.map((c) => c.name))]
         .sort()
@@ -325,14 +394,24 @@ async function main() {
       : orientFromStart(stitched, th);
     const sampled = downsampleRoute(line, maxPoints);
     const elevations = await sampleElevationFt(sampled);
-    const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+    const route = sampled.map((p, i) => ({
+      lat: p.lat,
+      lng: p.lng,
+      elevationFt: elevations[i],
+    }));
     const profile = buildElevationProfile(route);
     console.error(
       `\nSource: OSM — ways: ${wantedWays.join(", ")}${clipTo ? ` (clipped to ${toArg})` : ""}`,
     );
-    console.error(`Points: ${route.length} (from ${line.length} geometry points)`);
-    console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
-    console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+    console.error(
+      `Points: ${route.length} (from ${line.length} geometry points)`,
+    );
+    console.error(
+      `Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`,
+    );
+    console.error(
+      `Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`,
+    );
     console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
     console.error(`Attribution: © OpenStreetMap contributors (ODbL)\n`);
     console.log(routeFrontmatterYaml(route));
@@ -355,7 +434,9 @@ async function main() {
   // token with the trail, so we never silently pick the wrong nearby trail.
   const viable = tagged.filter((c) => distToTrailhead(c, th) < 0.075);
   const matches = forcedName
-    ? viable.filter((c) => c.name.toLowerCase().includes(forcedName.toLowerCase()))
+    ? viable.filter((c) =>
+        c.name.toLowerCase().includes(forcedName.toLowerCase()),
+      )
     : viable.filter((c) => nameScore(trail.name, c.name) > 0);
 
   if (matches.length === 0) {
@@ -364,28 +445,37 @@ async function main() {
         ? `No trail near the trailhead matched --name "${forcedName}".`
         : `No source trail near the trailhead matched "${trail.name}" by name.`,
     );
-    console.error("Trails that pass near the trailhead (re-run with --source/--name):");
+    console.error(
+      "Trails that pass near the trailhead (re-run with --source/--name):",
+    );
     viable
       .sort((a, b) => distToTrailhead(a, th) - distToTrailhead(b, th))
       .slice(0, 10)
       .forEach((c) =>
-        console.error(`  - [${c.source}] ${c.name} (${(distToTrailhead(c, th) * 5280).toFixed(0)} ft away)`),
+        console.error(
+          `  - [${c.source}] ${c.name} (${(distToTrailhead(c, th) * 5280).toFixed(0)} ft away)`,
+        ),
       );
     process.exit(1);
   }
 
   const rank: Record<string, number> = { nps: 0, tdec: 1, osm: 2 };
-  const chosen = matches.sort((a, b) =>
-    nameScore(trail.name, b.name) - nameScore(trail.name, a.name) ||
-    (rank[a.source] ?? 9) - (rank[b.source] ?? 9) ||
-    distToTrailhead(a, th) - distToTrailhead(b, th),
+  const chosen = matches.sort(
+    (a, b) =>
+      nameScore(trail.name, b.name) - nameScore(trail.name, a.name) ||
+      (rank[a.source] ?? 9) - (rank[b.source] ?? 9) ||
+      distToTrailhead(a, th) - distToTrailhead(b, th),
   )[0];
   const source = chosen.source;
 
   const line = orientFromStart(stitchSegments(chosen.segments), th);
   const sampled = downsampleRoute(line, maxPoints);
   const elevations = await sampleElevationFt(sampled);
-  const route = sampled.map((p, i) => ({ lat: p.lat, lng: p.lng, elevationFt: elevations[i] }));
+  const route = sampled.map((p, i) => ({
+    lat: p.lat,
+    lng: p.lng,
+    elevationFt: elevations[i],
+  }));
   const profile = buildElevationProfile(route);
 
   // A match far shorter than the stated length is almost always the wrong
@@ -400,9 +490,15 @@ async function main() {
   }
 
   console.error(`\nSource: ${source.toUpperCase()} — "${chosen.name}"`);
-  console.error(`Points: ${route.length} (from ${line.length} geometry points)`);
-  console.error(`Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`);
-  console.error(`Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`);
+  console.error(
+    `Points: ${route.length} (from ${line.length} geometry points)`,
+  );
+  console.error(
+    `Length: ${profile.totalMiles.toFixed(2)} mi  (trail says ${trail.lengthMiles ?? "?"} mi)`,
+  );
+  console.error(
+    `Gain:   ${profile.gainFt} ft  (trail says ${trail.elevationGainFt ?? "?"} ft)`,
+  );
   console.error(`Low/High: ${profile.lowFt}/${profile.highFt} ft`);
   const ATTRIB: Record<string, string> = {
     nps: "National Park Service (public domain)",

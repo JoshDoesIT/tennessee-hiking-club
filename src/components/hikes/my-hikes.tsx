@@ -86,7 +86,11 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
 
   // Each logged hike, newest first; same-day hikes keep their logged order.
   const rows = log
-    .map((entry, index) => ({ entry, index, trail: bySlug.get(entry.trailSlug) }))
+    .map((entry, index) => ({
+      entry,
+      index,
+      trail: bySlug.get(entry.trailSlug),
+    }))
     .filter((r): r is { entry: HikeLogEntry; index: number; trail: Trail } =>
       Boolean(r.trail),
     )
@@ -154,7 +158,10 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
             ) : null}
 
             {entry.track && entry.track.points.length > 1 ? (
-              <RecordedTrackSummary track={entry.track} trailName={trail.name} />
+              <RecordedTrackSummary
+                track={entry.track}
+                trailName={trail.name}
+              />
             ) : null}
 
             <div className="mt-3">

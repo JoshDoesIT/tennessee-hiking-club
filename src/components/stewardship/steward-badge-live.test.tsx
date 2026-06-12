@@ -5,7 +5,10 @@ import { StewardBadgeLive } from "./steward-badge-live";
 function mockCount(count: number) {
   vi.stubGlobal(
     "fetch",
-    vi.fn(async () => ({ ok: true, json: async () => ({ count }) }) as unknown as Response),
+    vi.fn(
+      async () =>
+        ({ ok: true, json: async () => ({ count }) }) as unknown as Response,
+    ),
   );
 }
 

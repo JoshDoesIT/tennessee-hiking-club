@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  aggregateContributions,
-  contributionCountFor,
-} from "./contributions";
+import { aggregateContributions, contributionCountFor } from "./contributions";
 import type { Trail } from "./schema";
 
 const make = (over: Partial<Trail>): Trail => ({
@@ -30,7 +27,9 @@ describe("aggregateContributions", () => {
       make({
         slug: "a",
         contributors: ["Octocat"],
-        conditionReports: [{ date: "2026-05-01", status: "Open", by: "octocat" }],
+        conditionReports: [
+          { date: "2026-05-01", status: "Open", by: "octocat" },
+        ],
         photos: [{ src: "/p.jpg", alt: "x", by: "OCTOCAT" }],
       }),
     ];

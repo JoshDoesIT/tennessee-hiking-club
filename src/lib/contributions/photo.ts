@@ -43,7 +43,8 @@ export function generatePhotoEntry(photo: PhotoEntry): {
     `  - src: ${yamlScalar(photo.src)}`,
     `    alt: ${yamlScalar(photo.alt)}`,
   ];
-  if (photo.credit?.trim()) lines.push(`    credit: ${yamlScalar(photo.credit.trim())}`);
+  if (photo.credit?.trim())
+    lines.push(`    credit: ${yamlScalar(photo.credit.trim())}`);
   if (photo.by?.trim()) lines.push(`    by: ${yamlScalar(photo.by.trim())}`);
 
   const parsed = photoItemSchema.safeParse({

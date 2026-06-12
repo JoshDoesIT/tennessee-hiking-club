@@ -3,12 +3,10 @@ import type { RoutePoint } from "@/lib/trails/elevation";
 
 let onPoint: ((p: RoutePoint) => void) | null = null;
 const stop = vi.fn();
-const startLocationWatch = vi.fn(
-  async (op: (p: RoutePoint) => void) => {
-    onPoint = op;
-    return stop;
-  },
-);
+const startLocationWatch = vi.fn(async (op: (p: RoutePoint) => void) => {
+  onPoint = op;
+  return stop;
+});
 vi.mock("@/lib/hikes/geo-watcher", () => ({
   startLocationWatch: (...a: unknown[]) =>
     (startLocationWatch as (...a: unknown[]) => unknown)(...a),

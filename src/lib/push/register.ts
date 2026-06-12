@@ -16,7 +16,11 @@ export type RegisterResult = {
   token?: string;
 };
 
-type PermissionState = "prompt" | "prompt-with-rationale" | "granted" | "denied";
+type PermissionState =
+  | "prompt"
+  | "prompt-with-rationale"
+  | "granted"
+  | "denied";
 type RegistrationEvent = "registration" | "registrationError";
 
 // Minimal shape of @capacitor/push-notifications, declared locally so the web

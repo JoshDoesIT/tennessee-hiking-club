@@ -6,7 +6,11 @@
 export type RoutePoint = { lat: number; lng: number; elevationFt: number };
 
 /** A route point that may not yet have its elevation filled (#137). */
-export type RoutePointMaybe = { lat: number; lng: number; elevationFt?: number };
+export type RoutePointMaybe = {
+  lat: number;
+  lng: number;
+  elevationFt?: number;
+};
 
 /**
  * True only when every point carries an elevation, narrowing the route to

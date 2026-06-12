@@ -106,7 +106,10 @@ export function SubmissionReviewList({
             <p className="text-ink/80 mt-2 text-sm leading-relaxed">
               {s.description}
             </p>
-            {(s.lengthMiles || s.elevationGainFt || s.difficulty || s.routeType) && (
+            {(s.lengthMiles ||
+              s.elevationGainFt ||
+              s.difficulty ||
+              s.routeType) && (
               <p className="text-ink/70 mt-2 text-xs">
                 {[
                   s.lengthMiles ? `${s.lengthMiles} mi` : null,
@@ -189,12 +192,12 @@ export function SubmissionReviewList({
                         </Button>
                       </div>
                       {!s.generated.valid && (
-                        <p className="text-amber-700 mt-2 text-xs" role="note">
+                        <p className="mt-2 text-xs text-amber-700" role="note">
                           Fill in before committing:{" "}
                           {s.generated.missing.join(", ")}
                         </p>
                       )}
-                      <pre className="border-forest/10 text-ink/80 mt-3 overflow-x-auto rounded-lg border bg-cream-50 p-3 text-xs">
+                      <pre className="border-forest/10 text-ink/80 bg-cream-50 mt-3 overflow-x-auto rounded-lg border p-3 text-xs">
                         {s.generated.markdown}
                       </pre>
                     </div>

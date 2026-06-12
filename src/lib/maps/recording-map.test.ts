@@ -50,11 +50,7 @@ describe("travelHeading", () => {
 
   it("takes the heading from the most recent real movement", () => {
     // Walking east; the last fix is jitter near the prior one.
-    const points = [
-      pt(35.6, -83.4),
-      pt(35.6, -83.39),
-      pt(35.600002, -83.39),
-    ];
+    const points = [pt(35.6, -83.4), pt(35.6, -83.39), pt(35.600002, -83.39)];
     const h = travelHeading(points);
     expect(h).not.toBeNull();
     expect(h as number).toBeCloseTo(90, 0);

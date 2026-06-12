@@ -40,9 +40,7 @@ export function lngLatToTile(
   const latRad = (latC * Math.PI) / 180;
 
   const x = Math.floor(((lon + 180) / 360) * n);
-  const y = Math.floor(
-    ((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n,
-  );
+  const y = Math.floor(((1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2) * n);
   return { x: clamp(x, 0, n - 1), y: clamp(y, 0, n - 1) };
 }
 

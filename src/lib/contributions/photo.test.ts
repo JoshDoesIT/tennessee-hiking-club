@@ -13,7 +13,8 @@ describe("validatePhotoSubmission", () => {
   it("accepts a slug and alt text, with optional credit", () => {
     expect(validatePhotoSubmission(valid).success).toBe(true);
     expect(
-      validatePhotoSubmission({ ...valid, credit: "Photo by Trail Ann" }).success,
+      validatePhotoSubmission({ ...valid, credit: "Photo by Trail Ann" })
+        .success,
     ).toBe(true);
   });
 
@@ -21,7 +22,9 @@ describe("validatePhotoSubmission", () => {
     expect(validatePhotoSubmission({ trailSlug: "virgin-falls" }).success).toBe(
       false,
     );
-    expect(validatePhotoSubmission({ ...valid, alt: "  " }).success).toBe(false);
+    expect(validatePhotoSubmission({ ...valid, alt: "  " }).success).toBe(
+      false,
+    );
   });
 
   it("requires a trail slug", () => {

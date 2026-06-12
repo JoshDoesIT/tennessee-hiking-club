@@ -94,7 +94,10 @@ describe("createPushSender", () => {
     const ok = await send({ token: "devtoken", platform: "ios" }, NOTE);
     expect(ok).toBe(true);
     expect(h.apnsPost).toHaveBeenCalledWith(
-      expect.objectContaining({ deviceToken: "devtoken", topic: "club.tnhiking.app" }),
+      expect.objectContaining({
+        deviceToken: "devtoken",
+        topic: "club.tnhiking.app",
+      }),
     );
   });
 
@@ -109,9 +112,17 @@ describe("createPushSender", () => {
     const send = createPushSender({ fcm: FCM } as PushConfig, deps(h));
     const ok = await send({ token: "devtoken", platform: "android" }, NOTE);
     expect(ok).toBe(true);
-    const calls = (h.fetch as ReturnType<typeof vi.fn>).mock.calls.map((c) => String(c[0]));
-    expect(calls.some((u) => u.includes("oauth2.googleapis.com/token"))).toBe(true);
-    expect(calls.some((u) => u.includes("fcm.googleapis.com/v1/projects/proj/messages:send"))).toBe(true);
+    const calls = (h.fetch as ReturnType<typeof vi.fn>).mock.calls.map((c) =>
+      String(c[0]),
+    );
+    expect(calls.some((u) => u.includes("oauth2.googleapis.com/token"))).toBe(
+      true,
+    );
+    expect(
+      calls.some((u) =>
+        u.includes("fcm.googleapis.com/v1/projects/proj/messages:send"),
+      ),
+    ).toBe(true);
   });
 
   it("no-ops (returns false) when the platform's provider is unconfigured", async () => {
@@ -126,8 +137,8 @@ describe("createPushSender", () => {
     const send = createPushSender({ fcm: FCM } as PushConfig, deps(h));
     await send({ token: "a", platform: "android" }, NOTE);
     await send({ token: "b", platform: "android" }, NOTE);
-    const tokenCalls = (h.fetch as ReturnType<typeof vi.fn>).mock.calls.filter((c) =>
-      String(c[0]).includes("oauth2"),
+    const tokenCalls = (h.fetch as ReturnType<typeof vi.fn>).mock.calls.filter(
+      (c) => String(c[0]).includes("oauth2"),
     );
     expect(tokenCalls).toHaveLength(1);
   });

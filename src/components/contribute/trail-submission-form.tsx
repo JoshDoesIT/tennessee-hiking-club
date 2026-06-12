@@ -15,8 +15,7 @@ import { REGIONS, DIFFICULTIES, ROUTE_TYPES } from "@/lib/trails/schema";
  */
 const fieldClass =
   "border-forest/20 text-ink w-full rounded-lg border bg-cream-50 px-3 py-2 text-sm";
-const labelClass =
-  "text-olive text-xs font-semibold tracking-wider uppercase";
+const labelClass = "text-olive text-xs font-semibold tracking-wider uppercase";
 
 export function TrailSubmissionForm() {
   const [state, setState] = useState<"loading" | "anon" | "ready">("loading");
@@ -44,9 +43,9 @@ export function TrailSubmissionForm() {
     return (
       <div className="border-forest/15 bg-cream-50 mt-4 rounded-2xl border p-6">
         <p className="text-ink/75 text-sm leading-relaxed">
-          Sign in to suggest a trail right here, no git required. Your suggestion
-          is reviewed before it goes on the map, and you are credited once it is
-          approved.
+          Sign in to suggest a trail right here, no git required. Your
+          suggestion is reviewed before it goes on the map, and you are credited
+          once it is approved.
         </p>
         <div className="mt-4 max-w-xs">
           <SignInOptions />

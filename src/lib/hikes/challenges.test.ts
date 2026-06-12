@@ -129,9 +129,10 @@ describe("CHALLENGES seed against the real catalog", () => {
     for (const c of CHALLENGES) {
       if (c.criterion.kind !== "trails") continue;
       for (const slug of c.criterion.slugs) {
-        expect(known, `"${c.slug}" references unknown trail "${slug}"`).toContain(
-          slug,
-        );
+        expect(
+          known,
+          `"${c.slug}" references unknown trail "${slug}"`,
+        ).toContain(slug);
       }
     }
   });

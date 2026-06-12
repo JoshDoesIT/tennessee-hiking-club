@@ -35,7 +35,10 @@ export async function POST(req: Request, { params }: Context) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
   const { action, type = "trail" } = body;
   if (action !== "approve" && action !== "reject") {

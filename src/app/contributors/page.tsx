@@ -31,7 +31,7 @@ export default function ContributorsPage() {
           No contributions are credited yet. Add a trail to be the first.
         </p>
       ) : (
-        <ul className="mt-8 divide-y divide-forest/10">
+        <ul className="divide-forest/10 mt-8 divide-y">
           {rows.map((r) => (
             <li
               key={r.handle}
@@ -39,8 +39,12 @@ export default function ContributorsPage() {
             >
               <span className="text-pine font-medium">@{r.handle}</span>
               <span className="text-ink/70 text-sm">
-                {r.trailsContributed > 0 ? `${r.trailsContributed} trails` : null}
-                {r.trailsContributed > 0 && r.conditionsReported > 0 ? " · " : ""}
+                {r.trailsContributed > 0
+                  ? `${r.trailsContributed} trails`
+                  : null}
+                {r.trailsContributed > 0 && r.conditionsReported > 0
+                  ? " · "
+                  : ""}
                 {r.conditionsReported > 0
                   ? `${r.conditionsReported} reports`
                   : null}

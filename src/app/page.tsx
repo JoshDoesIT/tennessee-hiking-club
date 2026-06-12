@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import { PeakPinMark } from "@/components/logo";
+import { Reveal } from "@/components/reveal";
 import { Ridgeline } from "@/components/ridgeline";
 import { SkyBackdrop } from "@/components/sky-backdrop";
 import { Container } from "@/components/ui/container";
@@ -24,14 +25,19 @@ export default function Home() {
         <Ridgeline className="absolute inset-x-0 bottom-0 -z-10 h-80 w-full sm:h-96" />
 
         <Container className="flex max-w-4xl flex-col items-center pt-16 pb-48 text-center sm:pt-24">
-          <Image
-            src="/logo.png"
-            alt=""
-            width={132}
-            height={132}
-            priority
-            className="animate-rise drop-shadow-md"
-          />
+          {/* The brand moment: the pin drops, lands, and pings (spec 0010). */}
+          <div className="animate-pin-drop relative" aria-hidden="true">
+            <PeakPinMark
+              size={120}
+              decorative
+              className="text-forest drop-shadow-md"
+            />
+            <span className="animate-pin-ping border-amber absolute bottom-1 left-1/2 h-5 w-24 -translate-x-1/2 rounded-[100%] border-2" />
+            <span
+              className="animate-pin-ping border-amber absolute bottom-1 left-1/2 h-5 w-24 -translate-x-1/2 rounded-[100%] border"
+              style={{ animationDelay: "1.15s" }}
+            />
+          </div>
           <p
             className="eyebrow animate-rise mt-7 text-amber-700"
             style={{ animationDelay: "80ms" }}
@@ -73,6 +79,7 @@ export default function Home() {
 
       {/* -------------------------- MISSION ----------------------------- */}
       <section className="night-panel bg-forest text-cream">
+        <TaglineMarquee />
         <Container className="grid gap-10 py-16 sm:grid-cols-3 sm:py-20">
           <Value
             title="Explore"
@@ -118,12 +125,12 @@ export default function Home() {
       {/* -------------------------- FEATURES ---------------------------- */}
       <section>
         <Container className="py-20 sm:py-24">
-          <div className="max-w-2xl">
+          <Reveal className="max-w-2xl">
             <p className="eyebrow text-amber-700">What you can do</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               Everything you need to find your next trail
             </h2>
-          </div>
+          </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <FeatureCard
               title="Interactive Tennessee map"
@@ -175,12 +182,12 @@ export default function Home() {
       {/* --------------------------- REGIONS ---------------------------- */}
       <section className="bg-parchment/60 border-forest/10 border-y">
         <Container className="py-20 sm:py-24">
-          <div className="max-w-2xl">
+          <Reveal className="max-w-2xl">
             <p className="eyebrow text-amber-700">Three Tennessees</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               One state, three very different hikes
             </h2>
-          </div>
+          </Reveal>
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             <RegionCard region="East" title="Mountains & mist">
               The Great Smokies and Blue Ridge: high balds, waterfalls, and the
@@ -201,7 +208,7 @@ export default function Home() {
       {/* ----------------------- FEATURED TRAILS ------------------------ */}
       <section>
         <Container className="py-20 sm:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+          <Reveal className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <p className="eyebrow text-amber-700">Featured trails</p>
               <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
@@ -214,11 +221,13 @@ export default function Home() {
             >
               Browse all trails
             </Link>
-          </div>
+          </Reveal>
           <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((trail) => (
+            {featured.map((trail, i) => (
               <li key={trail.slug}>
-                <TrailCard trail={trail} />
+                <Reveal delay={(i % 3) * 110} className="h-full">
+                  <TrailCard trail={trail} />
+                </Reveal>
               </li>
             ))}
           </ul>
@@ -261,6 +270,33 @@ export default function Home() {
 }
 
 /* ------------------------------ helpers ----------------------------- */
+
+/** The tagline as a slow trail-marker marquee (spec 0010). Decorative: the
+ *  moving track is hidden from assistive tech; a static sr-only line carries
+ *  the words. Pauses on hover; freezes entirely under reduced motion. */
+function TaglineMarquee() {
+  const items = Array.from({ length: 4 });
+  return (
+    <div className="marquee border-cream/10 border-b py-3.5">
+      <span className="sr-only">Explore Tennessee together</span>
+      <div className="marquee-track" aria-hidden="true">
+        {[0, 1].map((half) => (
+          <div key={half} className="flex shrink-0 items-center">
+            {items.map((_, i) => (
+              <span
+                key={i}
+                className="text-cream/80 flex items-center gap-10 pr-10 text-xs font-semibold tracking-[0.32em] uppercase"
+              >
+                Explore Tennessee Together
+                <PeakPinMark size={14} decorative className="text-amber" />
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function IconWrap({ children }: { children: React.ReactNode }) {
   return (
@@ -310,7 +346,7 @@ function FeatureCard({
   soon?: boolean;
 }) {
   return (
-    <Card interactive className="relative">
+    <Card interactive className="relative h-full">
       {soon ? <Badge className="absolute top-4 right-4">Soon</Badge> : null}
       <div className="text-pine">{icon}</div>
       <h3 className="display text-forest mt-4 text-xl">{title}</h3>

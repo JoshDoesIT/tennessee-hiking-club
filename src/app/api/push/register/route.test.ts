@@ -35,13 +35,19 @@ describe("POST /api/push/register", () => {
     const res = await POST(req("POST", { token: "tok-1", platform: "ios" }));
     expect(res.status).toBe(200);
     const row = (mocks.values as Mock).mock.calls[0][0];
-    expect(row).toMatchObject({ token: "tok-1", platform: "ios", userId: "u1" });
+    expect(row).toMatchObject({
+      token: "tok-1",
+      platform: "ios",
+      userId: "u1",
+    });
     expect(mocks.onConflictDoUpdate).toHaveBeenCalled();
   });
 
   it("stores an anonymous subscription when signed out (userId null)", async () => {
     mocks.auth.mockResolvedValue(null);
-    const res = await POST(req("POST", { token: "tok-2", platform: "android" }));
+    const res = await POST(
+      req("POST", { token: "tok-2", platform: "android" }),
+    );
     expect(res.status).toBe(200);
     expect((mocks.values as Mock).mock.calls[0][0].userId).toBeNull();
   });

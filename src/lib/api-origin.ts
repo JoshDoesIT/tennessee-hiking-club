@@ -18,8 +18,9 @@ type PatchedFetch = typeof fetch & { __apiOriginPatched?: boolean };
  * local origin is a later phase (#248 phase 4).
  */
 export function installApiOriginRewrite(
-  win: (Window & typeof globalThis) | undefined =
-    typeof window !== "undefined" ? window : undefined,
+  win: (Window & typeof globalThis) | undefined = typeof window !== "undefined"
+    ? window
+    : undefined,
 ): void {
   if (!win || !Capacitor.isNativePlatform()) return;
   if (win.location.origin === API_ORIGIN) return;

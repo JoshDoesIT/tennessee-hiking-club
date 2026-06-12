@@ -21,7 +21,10 @@ export async function POST(req: Request) {
   try {
     raw = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
 
   const parsed = validateConditionSubmission(raw);

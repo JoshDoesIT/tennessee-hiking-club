@@ -86,7 +86,10 @@ export function generateTrailContent(
 
   const markdown = matter.stringify(`\n${submission.description}\n`, data);
 
-  const parsed = trailSchema.safeParse({ ...data, body: submission.description });
+  const parsed = trailSchema.safeParse({
+    ...data,
+    body: submission.description,
+  });
   const missing = parsed.success
     ? []
     : [
@@ -97,5 +100,11 @@ export function generateTrailContent(
         ),
       ];
 
-  return { slug, fileName: `${slug}.md`, markdown, valid: parsed.success, missing };
+  return {
+    slug,
+    fileName: `${slug}.md`,
+    markdown,
+    valid: parsed.success,
+    missing,
+  };
 }

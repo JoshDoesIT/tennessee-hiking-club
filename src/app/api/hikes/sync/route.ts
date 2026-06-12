@@ -46,7 +46,10 @@ export async function POST(req: Request) {
   try {
     local = bodySchema.parse(await req.json()).hikes;
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
 
   const db = getDb();
@@ -54,7 +57,9 @@ export async function POST(req: Request) {
   const { toInsert, toUpdate, merged } = planSync(local, rows.map(rowToEntry));
 
   if (toInsert.length > 0) {
-    await db.insert(hikes).values(toInsert.map((e) => entryToInsert(userId, e)));
+    await db
+      .insert(hikes)
+      .values(toInsert.map((e) => entryToInsert(userId, e)));
   }
 
   // Backfill photo URLs onto existing hikes that don't have one yet. Guarded so
@@ -98,12 +103,18 @@ export async function DELETE(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
   const trailSlug = typeof body.trailSlug === "string" ? body.trailSlug : "";
   const hikedOn = typeof body.hikedOn === "string" ? body.hikedOn : "";
   if (!trailSlug || !hikedOn) {
-    return NextResponse.json({ error: "Missing trail or date" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing trail or date" },
+      { status: 400 },
+    );
   }
 
   const db = getDb();

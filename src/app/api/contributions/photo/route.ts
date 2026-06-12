@@ -4,7 +4,10 @@ import { auth } from "@/auth";
 import { getDb } from "@/lib/db";
 import { photoSubmissions } from "@/lib/db/schema";
 import { getTrailBySlug } from "@/lib/trails";
-import { validatePhotoSubmission, isAcceptableImage } from "@/lib/contributions/photo";
+import {
+  validatePhotoSubmission,
+  isAcceptableImage,
+} from "@/lib/contributions/photo";
 
 /**
  * Submit an in-app photo (#149) for an existing trail. Any signed-in member may
@@ -23,7 +26,10 @@ export async function POST(req: Request) {
   try {
     form = await req.formData();
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
 
   const parsed = validatePhotoSubmission({
@@ -54,10 +60,14 @@ export async function POST(req: Request) {
 
   const ext = file.type.split("/")[1]?.replace("jpeg", "jpg") || "jpg";
   const key = crypto.randomUUID();
-  const { url } = await put(`contributions/photos/${userId}/${key}.${ext}`, file, {
-    access: "private",
-    contentType: file.type,
-  });
+  const { url } = await put(
+    `contributions/photos/${userId}/${key}.${ext}`,
+    file,
+    {
+      access: "private",
+      contentType: file.type,
+    },
+  );
 
   const db = getDb();
   const [row] = await db

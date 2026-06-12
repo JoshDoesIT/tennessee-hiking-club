@@ -108,7 +108,9 @@ export function MarkHiked({ slug }: { slug: string }) {
           aria-controls={showDetails ? detailsId : undefined}
           className="text-olive hover:text-forest text-sm font-medium underline-offset-4 hover:underline"
         >
-          {showDetails ? "Hide details" : "Add a date, note, conditions, or photo"}
+          {showDetails
+            ? "Hide details"
+            : "Add a date, note, conditions, or photo"}
         </button>
         <span role="status" aria-live="polite" className="text-pine text-sm">
           {status}
@@ -146,7 +148,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               value={date}
               max={today()}
               onChange={(e) => setDate(e.target.value)}
-              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
+              className="border-forest/20 text-ink bg-cream-50 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -160,7 +162,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               id={`${detailsId}-cond`}
               value={conditions}
               onChange={(e) => setConditions(e.target.value)}
-              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
+              className="border-forest/20 text-ink bg-cream-50 rounded-lg border px-3 py-2 text-sm"
             >
               <option value="">Not noted</option>
               {HIKE_CONDITIONS.map((c) => (
@@ -183,7 +185,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. busy lot, bring bug spray"
-              className="border-forest/20 text-ink rounded-lg border bg-cream-50 px-3 py-2 text-sm"
+              className="border-forest/20 text-ink bg-cream-50 rounded-lg border px-3 py-2 text-sm"
             />
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">
@@ -198,7 +200,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               type="file"
               accept="image/*"
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
+              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:px-3 file:py-2 file:text-sm file:font-medium"
             />
             <p className="text-ink/50 text-xs">
               Stays on this device until you sign in.
@@ -216,7 +218,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               type="file"
               accept=".gpx,application/gpx+xml,application/xml,text/xml"
               onChange={(e) => setTrackFile(e.target.files?.[0] ?? null)}
-              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
+              className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:px-3 file:py-2 file:text-sm file:font-medium"
             />
             <p className="text-ink/50 text-xs">
               Exported from a watch or app, to map this hike and chart its

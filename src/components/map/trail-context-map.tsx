@@ -15,7 +15,12 @@ import {
   installOfflineTileProtocol,
 } from "@/lib/maps/offline-tiles";
 
-type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
+type MapWaypoint = {
+  lat: number;
+  lng: number;
+  name: string;
+  type: WaypointType;
+};
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 

@@ -16,14 +16,17 @@ vi.mock("@/auth", () => ({ auth: mocks.auth }));
 vi.mock("@/lib/auth/admin-server", () => ({ isAdminUser: mocks.isAdminUser }));
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
-    select: () => ({ from: () => ({ where: () => ({ limit: async () => mocks.rows }) }) }),
+    select: () => ({
+      from: () => ({ where: () => ({ limit: async () => mocks.rows }) }),
+    }),
   }),
 }));
 
 import { GET } from "./route";
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const req = () => new Request("http://localhost/api/contributions/photo/p1/view");
+const req = () =>
+  new Request("http://localhost/api/contributions/photo/p1/view");
 const BLOB = "https://store.private.blob.vercel-storage.com";
 
 beforeEach(() => {

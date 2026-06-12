@@ -108,9 +108,9 @@ describe("MarkHiked", () => {
     await user.click(screen.getByRole("button", { name: /mark as hiked/i }));
     await user.click(screen.getByRole("button", { name: /log another hike/i }));
 
-    expect(
-      readLog().filter((e) => e.trailSlug === "radnor-lake"),
-    ).toHaveLength(1);
+    expect(readLog().filter((e) => e.trailSlug === "radnor-lake")).toHaveLength(
+      1,
+    );
     expect(screen.getByRole("status")).toHaveTextContent(/already logged/i);
   });
 

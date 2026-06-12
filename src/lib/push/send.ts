@@ -41,7 +41,10 @@ export async function notifyTrailAlert(opts: {
   let failed = 0;
   for (const sub of subscribers) {
     try {
-      const ok = await send({ token: sub.token, platform: sub.platform }, notification);
+      const ok = await send(
+        { token: sub.token, platform: sub.platform },
+        notification,
+      );
       if (ok) sent++;
       else failed++;
     } catch {

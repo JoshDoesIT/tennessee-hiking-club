@@ -28,16 +28,25 @@ function setupFetch(
     }
     if (path.includes("/api/profile")) {
       if (method === "POST") {
-        return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
+        return {
+          ok: true,
+          json: async () => ({ ok: true }),
+        } as unknown as Response;
       }
       return { ok: true, json: async () => profile } as unknown as Response;
     }
     if (path.includes("/respond") || /\/api\/friends\/[^/]+$/.test(path)) {
-      return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
+      return {
+        ok: true,
+        json: async () => ({ ok: true }),
+      } as unknown as Response;
     }
     if (path.endsWith("/api/friends")) {
       if (method === "POST") {
-        return { ok: true, json: async () => ({ ok: true }) } as unknown as Response;
+        return {
+          ok: true,
+          json: async () => ({ ok: true }),
+        } as unknown as Response;
       }
       return { ok: true, json: async () => data } as unknown as Response;
     }

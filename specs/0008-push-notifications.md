@@ -65,8 +65,8 @@ Set these in the deployment env (no-op until present). The private keys are PEM;
 
 1. A device registers and an opt-in is stored. (scaffolded + tested)
 2. A test alert delivers to a registered device on iOS and Android. (transport
-   + trigger implemented and unit-tested; on-device delivery pending the
-   registration plugin + credentials)
+   - trigger implemented and unit-tested; on-device delivery pending the
+     registration plugin + credentials)
 3. Opt-out works and stops delivery. (delete endpoint + opt-in toggle tested;
    transport only sends to stored subscriptions, so opt-out stops it; end-to-end
    verified on device)

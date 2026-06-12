@@ -13,7 +13,9 @@ describe("generateFriendCode", () => {
   });
 
   it("is effectively unique across many calls", () => {
-    const codes = new Set(Array.from({ length: 200 }, () => generateFriendCode()));
+    const codes = new Set(
+      Array.from({ length: 200 }, () => generateFriendCode()),
+    );
     expect(codes.size).toBe(200);
   });
 });
@@ -43,7 +45,10 @@ describe("friendUserIds", () => {
 
 describe("canSendRequest", () => {
   it("rejects friending yourself", () => {
-    expect(canSendRequest("me", "me", [])).toEqual({ ok: false, reason: "self" });
+    expect(canSendRequest("me", "me", [])).toEqual({
+      ok: false,
+      reason: "self",
+    });
   });
 
   it("allows a fresh request", () => {

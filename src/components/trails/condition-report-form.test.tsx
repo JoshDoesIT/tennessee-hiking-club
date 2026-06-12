@@ -29,7 +29,9 @@ afterEach(() => vi.unstubAllGlobals());
 describe("ConditionReportForm", () => {
   it("does not render the form when signed out", async () => {
     const { f } = setupFetch({});
-    render(<ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
+    render(
+      <ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
     await waitFor(() =>
       expect(
         f.mock.calls.some((c) => String(c[0]).includes("/api/auth/session")),
@@ -41,7 +43,9 @@ describe("ConditionReportForm", () => {
   it("submits a condition report for the trail when signed in", async () => {
     const user = userEvent.setup();
     const { getPostBody } = setupFetch({ user: { id: "u1" } });
-    render(<ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
+    render(
+      <ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
 
     await user.type(
       await screen.findByLabelText(/^condition$/i),
@@ -63,7 +67,9 @@ describe("ConditionReportForm", () => {
   it("shows an error when the report is rejected", async () => {
     const user = userEvent.setup();
     setupFetch({ user: { id: "u1" } }, { ok: false });
-    render(<ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
+    render(
+      <ConditionReportForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
 
     await user.type(await screen.findByLabelText(/^condition$/i), "Open");
     await user.click(screen.getByRole("button", { name: /report/i }));

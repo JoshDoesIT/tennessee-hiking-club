@@ -41,7 +41,9 @@ describe("selectNearestParking", () => {
   });
 
   it("returns null when nothing is within range", () => {
-    const far = [{ type: "node", lat: 36.5, lon: -86, tags: { amenity: "parking" } }];
+    const far = [
+      { type: "node", lat: 36.5, lon: -86, tags: { amenity: "parking" } },
+    ];
     expect(selectNearestParking(far, trailhead, 2)).toBeNull();
   });
 

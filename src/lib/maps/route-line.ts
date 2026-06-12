@@ -37,7 +37,8 @@ export function routeLinesCollection(
   const features: RouteLineFeature[] = [];
   for (const trail of trails) {
     const feature = routeLineFeature(trail.route);
-    if (feature) features.push({ ...feature, properties: { slug: trail.slug ?? "" } });
+    if (feature)
+      features.push({ ...feature, properties: { slug: trail.slug ?? "" } });
   }
   return { type: "FeatureCollection", features };
 }

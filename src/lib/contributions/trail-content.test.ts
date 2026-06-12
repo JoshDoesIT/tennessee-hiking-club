@@ -1,10 +1,6 @@
 import { describe, it, expect } from "vitest";
 import matter from "gray-matter";
-import {
-  slugify,
-  uniqueSlug,
-  generateTrailContent,
-} from "./trail-content";
+import { slugify, uniqueSlug, generateTrailContent } from "./trail-content";
 import { trailSchema } from "@/lib/trails/schema";
 
 const complete = {

@@ -36,10 +36,7 @@ const headingOrder = () =>
   screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
 
 function mockGeolocation(
-  impl: (
-    success: PositionCallback,
-    error?: PositionErrorCallback,
-  ) => void,
+  impl: (success: PositionCallback, error?: PositionErrorCallback) => void,
 ) {
   Object.defineProperty(navigator, "geolocation", {
     value: { getCurrentPosition: impl },
@@ -57,7 +54,9 @@ describe("TrailResults", () => {
     expect(
       screen.getByRole("button", { name: /sort by distance from me/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/stays on (your|this) device/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/stays on (your|this) device/i),
+    ).toBeInTheDocument();
     expect(headingOrder()).toEqual(["Far Trail", "Near Trail", "Mid Trail"]);
   });
 

@@ -15,7 +15,12 @@ describe("mergeHikes", () => {
   it("dedupes the same trail and date, filling in details", () => {
     const a: HikeLogEntry[] = [{ trailSlug: "x", hikedOn: "2026-01-01" }];
     const b: HikeLogEntry[] = [
-      { trailSlug: "x", hikedOn: "2026-01-01", note: "great", conditions: "Dry" },
+      {
+        trailSlug: "x",
+        hikedOn: "2026-01-01",
+        note: "great",
+        conditions: "Dry",
+      },
     ];
     const merged = mergeHikes(a, b);
     expect(merged).toHaveLength(1);
@@ -99,8 +104,20 @@ describe("mergeHikes photo fields", () => {
     expect(filled[0].photoUrl).toBe("https://b/p.jpg");
 
     const kept = mergeHikes(
-      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/keep.jpg" }],
-      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/other.jpg" }],
+      [
+        {
+          trailSlug: "x",
+          hikedOn: "2026-01-01",
+          photoUrl: "https://b/keep.jpg",
+        },
+      ],
+      [
+        {
+          trailSlug: "x",
+          hikedOn: "2026-01-01",
+          photoUrl: "https://b/other.jpg",
+        },
+      ],
     );
     expect(kept[0].photoUrl).toBe("https://b/keep.jpg");
   });
@@ -110,7 +127,10 @@ describe("mergeHikes photo fields", () => {
       [{ trailSlug: "x", hikedOn: "2026-01-01", photoId: "ph-1" }],
       [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrl: "https://b/p.jpg" }],
     );
-    expect(merged[0]).toMatchObject({ photoId: "ph-1", photoUrl: "https://b/p.jpg" });
+    expect(merged[0]).toMatchObject({
+      photoId: "ph-1",
+      photoUrl: "https://b/p.jpg",
+    });
   });
 });
 
@@ -144,18 +164,18 @@ describe("row mappers", () => {
   });
 
   it("entryToInsert sets the user id and nulls absent fields", () => {
-    expect(entryToInsert("u1", { trailSlug: "a", hikedOn: "2026-01-01" })).toEqual(
-      {
-        userId: "u1",
-        trailSlug: "a",
-        hikedOn: "2026-01-01",
-        note: null,
-        conditions: null,
-        photoUrl: null,
-        route: null,
-        trackDurationMin: null,
-      },
-    );
+    expect(
+      entryToInsert("u1", { trailSlug: "a", hikedOn: "2026-01-01" }),
+    ).toEqual({
+      userId: "u1",
+      trailSlug: "a",
+      hikedOn: "2026-01-01",
+      note: null,
+      conditions: null,
+      photoUrl: null,
+      route: null,
+      trackDurationMin: null,
+    });
   });
 
   it("entryToInsert carries a photoUrl when present", () => {
@@ -229,7 +249,13 @@ describe("mergeHikes track field", () => {
 
   it("keeps an existing track over the other side's", () => {
     const merged = mergeHikes(
-      [{ trailSlug: "a", hikedOn: "2026-01-01", track: { points, durationMin: 90 } }],
+      [
+        {
+          trailSlug: "a",
+          hikedOn: "2026-01-01",
+          track: { points, durationMin: 90 },
+        },
+      ],
       [{ trailSlug: "a", hikedOn: "2026-01-01", track: { points: [] } }],
     );
     expect(merged[0].track?.durationMin).toBe(90);

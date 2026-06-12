@@ -13,7 +13,10 @@ describe("postSubscription", () => {
     const fetchImpl = vi.fn(async () => ({ ok: true }) as Response);
     const ok = await postSubscription("tok-1", "ios", fetchImpl);
     expect(ok).toBe(true);
-    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
     expect(url).toBe("/api/push/register");
     expect(init.method).toBe("POST");
     expect(JSON.parse(init.body as string)).toEqual({
@@ -33,7 +36,10 @@ describe("unsubscribeDevice", () => {
     const fetchImpl = vi.fn(async () => ({ ok: true }) as Response);
     const ok = await unsubscribeDevice("tok-1", fetchImpl);
     expect(ok).toBe(true);
-    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [
+      string,
+      RequestInit,
+    ];
     expect(url).toBe("/api/push/register");
     expect(init.method).toBe("DELETE");
     expect(JSON.parse(init.body as string)).toEqual({ token: "tok-1" });
