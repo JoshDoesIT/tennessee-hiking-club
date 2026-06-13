@@ -8,7 +8,7 @@ import { TENNESSEE_BOUNDS } from "@/lib/maps";
 import { ALERT_LABEL } from "@/lib/trails/conditions";
 import type { TrailAlert } from "@/lib/trails/schema";
 import { routeLinesCollection } from "@/lib/maps/route-line";
-import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
+import { recordLocationOptIn, resolveUserDot } from "@/lib/maps/location-pref";
 import { Capacitor } from "@capacitor/core";
 import {
   offlineTilesActive,
@@ -116,9 +116,28 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
-          // Remember the location choice and auto-activate it if the member has
-          // shared before, so they don't re-tap on every map (#285).
-          rememberAndApplyLocation(geolocate);
+          // Record the location opt-in for the passive dot below; never
+          // auto-trigger, which would zoom the state map to the member (#285).
+          recordLocationOptIn(geolocate);
+
+          // Passive "you are here" dot if they have shared before, the whole
+          // state stays framed; we never zoom to the member's location (#285).
+          void resolveUserDot({}).then((dot) => {
+            if (!dot || cancelled || !map) return;
+            const uEl = document.createElement("div");
+            uEl.setAttribute("aria-hidden", "true");
+            Object.assign(uEl.style, {
+              width: "16px",
+              height: "16px",
+              borderRadius: "9999px",
+              background: "#1d6fe0",
+              border: "3px solid #ffffff",
+              boxShadow: "0 1px 4px rgba(0,0,0,.4)",
+            });
+            new maplibregl.Marker({ element: uEl })
+              .setLngLat([dot.lng, dot.lat])
+              .addTo(map);
+          });
 
           // Draw every trail's shape as a faint amber line beneath the pins, so
           // the state map conveys the routes, not only their locations (#270).

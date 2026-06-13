@@ -7,7 +7,7 @@ import { buildTennesseeStyle, type MapStyle } from "./build-style";
 import type { WaypointType } from "@/lib/trails/schema";
 import { createWaypointMarkerEl } from "@/components/trails/waypoint-style";
 import { routeLineFeature } from "@/lib/maps/route-line";
-import { rememberAndApplyLocation } from "@/lib/maps/location-pref";
+import { recordLocationOptIn, resolveUserDot } from "@/lib/maps/location-pref";
 import { Capacitor } from "@capacitor/core";
 import {
   offlineTilesActive,
@@ -131,9 +131,9 @@ export function TrailContextMap({
         map.on("load", () => {
           if (!map || cancelled) return;
           map.resize();
-          // Remember the location choice and auto-activate it if the member has
-          // shared before, so they don't re-tap on every map (#285).
-          rememberAndApplyLocation(geolocate);
+          // Record the location opt-in for the passive dot below; never
+          // auto-trigger, which would zoom the map to the member (#285).
+          recordLocationOptIn(geolocate);
 
           // The trail's actual route, drawn as an amber line with a dark casing
           // for contrast over the basemap (#270).
@@ -219,6 +219,31 @@ export function TrailContextMap({
           if (hasExtra) {
             map.fitBounds(bounds, { padding: 64, maxZoom: 14, duration: 0 });
           }
+
+          // Passive "you are here" dot: shown only when the member is actually
+          // near this trail, and never moving the camera off the trail's
+          // framing (#285). Far-away members get no stray marker.
+          void resolveUserDot({
+            near: { lat: coordinates.lat, lng: coordinates.lng },
+            maxMiles: 25,
+          }).then(
+            (dot) => {
+              if (!dot || cancelled || !map) return;
+              const uEl = document.createElement("div");
+              uEl.setAttribute("aria-hidden", "true");
+              Object.assign(uEl.style, {
+                width: "16px",
+                height: "16px",
+                borderRadius: "9999px",
+                background: "#1d6fe0",
+                border: "3px solid #ffffff",
+                boxShadow: "0 1px 4px rgba(0,0,0,.4)",
+              });
+              new maplibregl.Marker({ element: uEl })
+                .setLngLat([dot.lng, dot.lat])
+                .addTo(map);
+            },
+          );
         });
       } catch {
         if (!cancelled) setFailed(true);
