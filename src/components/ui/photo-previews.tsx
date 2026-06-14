@@ -8,6 +8,9 @@ import { useEffect, useMemo } from "react";
  * useful preview (on iOS it can show a black square for HEIC), so this renders
  * the chosen images directly via object URLs, which the WebView decodes fine.
  * URLs are revoked when the selection changes or the component unmounts.
+ *
+ * Pass a stable `files` array (from state or a memo) so the object URLs are not
+ * rebuilt on every parent render.
  */
 export function PhotoPreviews({
   files,
@@ -16,19 +19,13 @@ export function PhotoPreviews({
   files: File[];
   className?: string;
 }) {
-  const images = files.filter((f) => f.type.startsWith("image/"));
-
-  // Re-create object URLs only when the actual selection changes, not on every
-  // parent render (callers often pass a fresh array each time).
-  const signature = images
-    .map((f) => `${f.name}:${f.size}:${f.lastModified}`)
-    .join("|");
-
+  // Re-create object URLs only when the selection array itself changes.
   const urls = useMemo(
-    () => images.map((f) => URL.createObjectURL(f)),
-    // `signature` captures the meaningful contents of `images`.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [signature],
+    () =>
+      files
+        .filter((f) => f.type.startsWith("image/"))
+        .map((f) => URL.createObjectURL(f)),
+    [files],
   );
 
   // Free each batch of URLs when the selection changes or the component leaves.
