@@ -21,7 +21,7 @@ summary: A 2.2-mile round trip on the Appalachian Trail from Dennis Cove into th
 parking:
   lat: 36.26500
   lng: -82.12347
-  note: Small gravel AT trailhead pull-off where the Appalachian Trail crosses Dennis Cove Road (FS 50) above Hampton; the lot holds only a handful of cars and the paved-then-gravel road up from US 321 is steep and winding.
+  note: Small gravel AT trailhead pull-off where the Appalachian Trail crosses Dennis Cove Road (FS 50) above Hampton; the lot holds only a handful of cars and the paved road up from US 321 is steep and winding.
 route:
   - lat: 36.2649954
     lng: -82.1234712
