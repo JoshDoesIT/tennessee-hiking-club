@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, useSyncExternalStore } from "react";
+import { useId, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import { putPhoto } from "@/lib/hikes/photo-store";
 import { uploadPhoto } from "@/lib/hikes/photo-upload";
 import { gpxTrackSummary } from "@/lib/hikes/track";
 import { HIKE_CONDITIONS, type RecordedTrack } from "@/lib/hikes/types";
+import { PhotoPreviews } from "@/components/ui/photo-previews";
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -43,6 +44,8 @@ export function MarkHiked({ slug }: { slug: string }) {
   const [trackFile, setTrackFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const detailsId = useId();
+  // Stable array so the photo preview's object URL is not rebuilt each render.
+  const photoFiles = useMemo(() => (photo ? [photo] : []), [photo]);
 
   async function logHike() {
     const when = date || today();
@@ -200,6 +203,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
               className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
             />
+            <PhotoPreviews files={photoFiles} />
             <p className="text-ink/50 text-xs">
               Stays on this device until you sign in.
             </p>
