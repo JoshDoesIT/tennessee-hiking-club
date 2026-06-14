@@ -14,6 +14,7 @@ import { deleteRemotePhoto } from "@/lib/hikes/photo-upload";
 import { computeStats } from "@/lib/hikes/stats";
 import { HikePhoto } from "./hike-photo";
 import { RecordedTrackSummary } from "./recorded-track-summary";
+import { ContributeRecordedRoute } from "./contribute-recorded-route";
 import type { HikeLogEntry } from "@/lib/hikes/types";
 import type { Trail } from "@/lib/trails/schema";
 
@@ -154,7 +155,17 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
             ) : null}
 
             {entry.track && entry.track.points.length > 1 ? (
-              <RecordedTrackSummary track={entry.track} trailName={trail.name} />
+              <>
+                <RecordedTrackSummary
+                  track={entry.track}
+                  trailName={trail.name}
+                />
+                <ContributeRecordedRoute
+                  trailSlug={entry.trailSlug}
+                  trailName={trail.name}
+                  points={entry.track.points}
+                />
+              </>
             ) : null}
 
             <div className="mt-3">
