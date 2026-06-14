@@ -203,6 +203,11 @@ route:
   - lat: 36.272368
     lng: -82.1344854
     elevationFt: 2099
+conditionReports:
+  - date: "2026-06-14"
+    status: "Muddy"
+    note: "Slightly muddy from morning rains"
+    by: "JoshDoesIT"
 ---
 
 Laurel Fork Falls — locally just Laurel Falls, not to be confused with the paved Smokies walk of the same name — is the centerpiece of the Laurel Fork Gorge in the Pond Mountain Wilderness, and the Appalachian Trail delivers you to it from the Dennis Cove trailhead in barely over a mile. The white-blazed route follows an old railroad grade along the rushing creek, crosses it on footbridges between mossy cliff walls, then breaks right to descend a steep, blasted rock staircase to the base, where the falls pound 55 feet into a broad pool. That staircase is the crux: the stone steps are uneven and stay wet, and the pool below has taken lives — swimmers have been pulled under by the recirculating current at the base, so wade the tail-out, not the plunge pool. At high water the riverside route past the falls floods, which is why a blue-blazed high-water bypass climbs over the ridge; day hikers to the falls can simply turn back the way they came. Expect company on warm weekends, both from Hampton-side hikers coming up the blue-blazed blueline trail and from AT thru-hikers in spring, and leave the tiny Dennis Cove lot early.
