@@ -46,6 +46,27 @@ describe("MobileTabBar", () => {
     expect(trails).toHaveAttribute("aria-current", "page");
   });
 
+  // The Capacitor static export sets `trailingSlash: true`, so in the app
+  // usePathname() returns e.g. "/explore/". Every tab must still light up, not
+  // just Trails (whose startsWith matcher happened to tolerate the slash).
+  it.each([
+    ["/hikes/", "My Hikes"],
+    ["/explore/", "Map"],
+    ["/record/", "Record"],
+    ["/more/", "More"],
+    ["/trails/", "Trails"],
+    ["/trails/mount-leconte/", "Trails"],
+  ])("marks %s as the %s tab with a trailing slash", async (path, label) => {
+    isNativePlatform.mockReturnValue(true);
+    pathname.mockReturnValue(path);
+    render(<MobileTabBar />);
+
+    const active = await screen.findByRole("link", {
+      name: new RegExp(label, "i"),
+    });
+    expect(active).toHaveAttribute("aria-current", "page");
+  });
+
   it("renders nothing on the web", async () => {
     isNativePlatform.mockReturnValue(false);
     const { container } = render(<MobileTabBar />);

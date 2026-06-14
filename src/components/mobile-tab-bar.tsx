@@ -147,7 +147,13 @@ const TABS: Tab[] = [
  */
 export function MobileTabBar() {
   const native = useIsNative();
-  const pathname = usePathname();
+  // The Capacitor static export sets `trailingSlash: true`, so in the app
+  // usePathname() returns e.g. "/explore/". Strip the trailing slash so the
+  // exact-match tabs light up too, not just Trails (whose startsWith matcher
+  // happened to tolerate it) — this is why only Trails highlighted in the app.
+  const rawPathname = usePathname();
+  const pathname =
+    rawPathname.length > 1 ? rawPathname.replace(/\/+$/, "") : rawPathname;
 
   useEffect(() => {
     if (!native) return;
