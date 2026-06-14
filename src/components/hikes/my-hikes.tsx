@@ -160,7 +160,11 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
                       key={p.id ?? p.url ?? i}
                       photoId={p.id}
                       photoUrl={p.url}
-                      alt={`Photo ${i + 1} from your hike of ${trail.name}`}
+                      alt={
+                        photos.length === 1
+                          ? `Photo from your hike of ${trail.name}`
+                          : `Photo ${i + 1} from your hike of ${trail.name}`
+                      }
                       className="border-forest/10 h-28 w-full rounded-lg border object-cover"
                     />
                   ))}
