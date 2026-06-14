@@ -26,26 +26,30 @@ function imageFile(name: string) {
 }
 
 describe("PhotoPreviews", () => {
-  it("renders nothing when there are no files", () => {
+  it("renders nothing when there are no files", async () => {
     const { container } = render(<PhotoPreviews files={[]} />);
+    await new Promise((r) => setTimeout(r));
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows a thumbnail per selected image so the right photo is verifiable", () => {
+  it("shows a thumbnail per selected image so the right photo is verifiable", async () => {
     render(<PhotoPreviews files={[imageFile("a.jpg"), imageFile("b.jpg")]} />);
-    const imgs = screen.getAllByRole("img");
+    const imgs = await screen.findAllByRole("img");
     expect(imgs).toHaveLength(2);
     expect(imgs[0]).toHaveAttribute("src", expect.stringContaining("blob:"));
   });
 
-  it("ignores non-image files", () => {
-    const gpx = new File(["<gpx/>"], "track.gpx", { type: "application/gpx+xml" });
+  it("ignores non-image files", async () => {
+    const gpx = new File(["<gpx/>"], "track.gpx", {
+      type: "application/gpx+xml",
+    });
     render(<PhotoPreviews files={[imageFile("a.jpg"), gpx]} />);
-    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(await screen.findAllByRole("img")).toHaveLength(1);
   });
 
-  it("revokes the object URLs it created on unmount", () => {
+  it("revokes the object URLs it created on unmount", async () => {
     const { unmount } = render(<PhotoPreviews files={[imageFile("a.jpg")]} />);
+    await screen.findByRole("img");
     expect(created).toHaveLength(1);
     unmount();
     expect(revoked).toEqual(created);

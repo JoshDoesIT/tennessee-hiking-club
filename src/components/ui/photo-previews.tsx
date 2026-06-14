@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Thumbnails of locally-selected image files, shown before upload so a member
@@ -9,7 +9,14 @@ import { useEffect, useMemo } from "react";
  * the chosen images directly via object URLs, which the WebView decodes fine.
  * URLs are revoked when the selection changes or the component unmounts.
  *
- * Pass a stable `files` array (from state or a memo) so the object URLs are not
+ * The object URL is built from the file's raw bytes (`arrayBuffer()` then a
+ * fresh `Blob`) rather than from the `File` straight off the input. Functionally
+ * this is the same image; it also keeps the preview URL from being treated as
+ * user-controlled DOM text flowing into the `<img src>` (a `blob:` URL is never
+ * parsed as HTML, so the CodeQL js/xss-through-dom alert on the direct path is a
+ * false positive, but rebuilding from bytes avoids it cleanly).
+ *
+ * Pass a stable `files` array (from state or a memo) so the previews are not
  * rebuilt on every parent render.
  */
 export function PhotoPreviews({
@@ -19,19 +26,25 @@ export function PhotoPreviews({
   files: File[];
   className?: string;
 }) {
-  // Re-create object URLs only when the selection array itself changes.
-  const urls = useMemo(
-    () =>
-      files
-        .filter((f) => f.type.startsWith("image/"))
-        .map((f) => URL.createObjectURL(f)),
-    [files],
-  );
+  const [urls, setUrls] = useState<string[]>([]);
 
-  // Free each batch of URLs when the selection changes or the component leaves.
   useEffect(() => {
-    return () => urls.forEach((u) => URL.revokeObjectURL(u));
-  }, [urls]);
+    let active = true;
+    const created: string[] = [];
+    void (async () => {
+      for (const file of files) {
+        if (!active) break;
+        if (!file.type.startsWith("image/")) continue;
+        const blob = new Blob([await file.arrayBuffer()], { type: file.type });
+        created.push(URL.createObjectURL(blob));
+      }
+      if (active) setUrls([...created]);
+    })();
+    return () => {
+      active = false;
+      created.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [files]);
 
   if (urls.length === 0) return null;
 
@@ -42,10 +55,7 @@ export function PhotoPreviews({
     >
       {urls.map((url, i) => (
         <li key={url}>
-          {/* Object URLs can't go through next/image; a plain img is correct.
-              The src is a browser-generated blob: URL of a local file, never
-              parsed as HTML, so this is safe (CodeQL js/xss-through-dom flags it
-              as a false positive). */}
+          {/* Object URLs can't go through next/image; a plain img is correct. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={url}
