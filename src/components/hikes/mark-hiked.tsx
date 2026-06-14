@@ -15,6 +15,7 @@ import { putPhoto } from "@/lib/hikes/photo-store";
 import { uploadPhoto } from "@/lib/hikes/photo-upload";
 import { gpxTrackSummary } from "@/lib/hikes/track";
 import { HIKE_CONDITIONS, type RecordedTrack } from "@/lib/hikes/types";
+import { PhotoPreviews } from "@/components/ui/photo-previews";
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -200,6 +201,7 @@ export function MarkHiked({ slug }: { slug: string }) {
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
               className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
             />
+            <PhotoPreviews files={photo ? [photo] : []} />
             <p className="text-ink/50 text-xs">
               Stays on this device until you sign in.
             </p>

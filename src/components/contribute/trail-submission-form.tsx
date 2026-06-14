@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SignInOptions } from "@/components/auth/sign-in-options";
 import { PasskeyButton } from "@/components/auth/passkey-button";
 import { REGIONS, DIFFICULTIES, ROUTE_TYPES } from "@/lib/trails/schema";
+import { PhotoPreviews } from "@/components/ui/photo-previews";
 
 /**
  * In-app new-trail submission (#146). Any signed-in member can propose a trail
@@ -22,6 +23,7 @@ export function TrailSubmissionForm() {
   const [state, setState] = useState<"loading" | "anon" | "ready">("loading");
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -77,6 +79,7 @@ export function TrailSubmissionForm() {
       if (res.ok) {
         setStatus("Thank you. Your trail is in the queue for review.");
         form.reset();
+        setPhotos([]);
       } else {
         setStatus("Could not submit. Check the required fields and try again.");
       }
@@ -181,8 +184,12 @@ export function TrailSubmissionForm() {
           type="file"
           accept="image/*"
           multiple
+          onChange={(e) =>
+            setPhotos(e.target.files ? Array.from(e.target.files) : [])
+          }
           className="text-ink file:border-forest/20 file:bg-cream-50 file:text-pine hover:file:bg-parchment text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:px-3 file:py-2 file:text-sm file:font-medium"
         />
+        <PhotoPreviews files={photos} />
         <p className="text-ink/60 text-xs">
           Up to 5 images, shared with reviewers. Only add photos that are yours
           to share.

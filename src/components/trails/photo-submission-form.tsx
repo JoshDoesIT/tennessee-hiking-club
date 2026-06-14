@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
+import { PhotoPreviews } from "@/components/ui/photo-previews";
 
 /**
  * In-app photo submission (#149) for an existing trail. A signed-in member adds
@@ -25,6 +26,7 @@ export function PhotoSubmissionForm({
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -60,6 +62,7 @@ export function PhotoSubmissionForm({
         setStatus("Thanks. Your photo is in the queue for review.");
         form.reset();
         setConsent(false);
+        setFiles([]);
       } else if (res.status === 503) {
         setStatus("Photo uploads are not available right now.");
       } else {
@@ -90,8 +93,12 @@ export function PhotoSubmissionForm({
           type="file"
           accept="image/*"
           required
+          onChange={(e) =>
+            setFiles(e.target.files ? Array.from(e.target.files) : [])
+          }
           className={fieldClass}
         />
+        <PhotoPreviews files={files} />
       </div>
       <div className="grid gap-1">
         <label htmlFor="photo-alt" className={labelClass}>
