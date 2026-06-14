@@ -1,5 +1,6 @@
 import type { HikeLogEntry, RecordedTrack } from "./types";
 import { deletePhoto } from "./photo-store";
+import { entryPhotoIds } from "./entry-photos";
 
 /**
  * The hike log, stored in the browser. Local-first: it never leaves the device
@@ -57,6 +58,7 @@ export function addHike(
     note?: string;
     conditions?: string;
     photoId?: string;
+    photoIds?: string[];
     track?: RecordedTrack;
   },
   storage?: Storage,
@@ -66,6 +68,7 @@ export function addHike(
   if (note) entry.note = note;
   if (details?.conditions) entry.conditions = details.conditions;
   if (details?.photoId) entry.photoId = details.photoId;
+  if (details?.photoIds?.length) entry.photoIds = details.photoIds;
   if (details?.track) entry.track = details.track;
 
   const next = [...readLog(storage), entry];
@@ -88,6 +91,26 @@ export function setEntryPhotoUrl(
   return next;
 }
 
+/** Set the remote photo URLs (aligned with `photoIds`) on the entry matching
+ *  `slug`+`date`, after a multi-photo hike's photos upload. Returns the log. */
+export function setEntryPhotoUrls(
+  slug: string,
+  date: string,
+  urls: string[],
+  storage?: Storage,
+): HikeLogEntry[] {
+  // Mirror the first uploaded URL onto the legacy `photoUrl` so cross-device
+  // sync (which only carries a single URL) keeps working for the first photo.
+  const first = urls.find((u) => u);
+  const next = readLog(storage).map((e) =>
+    e.trailSlug === slug && e.hikedOn === date
+      ? { ...e, photoUrls: urls, ...(first ? { photoUrl: first } : {}) }
+      : e,
+  );
+  writeLog(next, storage);
+  return next;
+}
+
 /** Remove every logged entry for a trail. Returns the new log. Local photos
  *  for the removed entries are garbage-collected (best-effort). */
 export function removeTrail(slug: string, storage?: Storage): HikeLogEntry[] {
@@ -95,7 +118,9 @@ export function removeTrail(slug: string, storage?: Storage): HikeLogEntry[] {
   const next = current.filter((e) => e.trailSlug !== slug);
   writeLog(next, storage);
   for (const e of current) {
-    if (e.trailSlug === slug && e.photoId) void deletePhoto(e.photoId);
+    if (e.trailSlug === slug) {
+      for (const id of entryPhotoIds(e)) void deletePhoto(id);
+    }
   }
   return next;
 }
@@ -113,8 +138,8 @@ export function removeHike(
   );
   writeLog(next, storage);
   for (const e of current) {
-    if (e.trailSlug === slug && e.hikedOn === hikedOn && e.photoId) {
-      void deletePhoto(e.photoId);
+    if (e.trailSlug === slug && e.hikedOn === hikedOn) {
+      for (const id of entryPhotoIds(e)) void deletePhoto(id);
     }
   }
   return next;

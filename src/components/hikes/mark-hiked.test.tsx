@@ -126,12 +126,29 @@ describe("MarkHiked", () => {
     expect(compressImage).toHaveBeenCalledWith(file);
     expect(putPhoto).toHaveBeenCalledTimes(1);
     const [storedId] = vi.mocked(putPhoto).mock.calls[0];
-    expect(readLog().find((e) => e.trailSlug === "radnor-lake")?.photoId).toBe(
-      storedId,
-    );
+    expect(
+      readLog().find((e) => e.trailSlug === "radnor-lake")?.photoIds,
+    ).toEqual([storedId]);
   });
 
-  it("uploads the photo and records its URL when signed in", async () => {
+  it("stores several chosen photos on one hike", async () => {
+    const user = userEvent.setup();
+    render(<MarkHiked slug="radnor-lake" />);
+
+    await user.click(screen.getByRole("button", { name: /add a date/i }));
+    await user.upload(screen.getByLabelText(/photo/i), [
+      new File(["a"], "a.jpg", { type: "image/jpeg" }),
+      new File(["b"], "b.jpg", { type: "image/jpeg" }),
+    ]);
+    await user.click(screen.getByRole("button", { name: /mark as hiked/i }));
+
+    expect(putPhoto).toHaveBeenCalledTimes(2);
+    expect(
+      readLog().find((e) => e.trailSlug === "radnor-lake")?.photoIds,
+    ).toHaveLength(2);
+  });
+
+  it("uploads each photo and records its URL when signed in", async () => {
     vi.mocked(uploadPhoto).mockResolvedValue("https://b/p.jpg");
     const user = userEvent.setup();
     render(<MarkHiked slug="radnor-lake" />);
@@ -146,8 +163,8 @@ describe("MarkHiked", () => {
     expect(uploadPhoto).toHaveBeenCalledTimes(1);
     await vi.waitFor(() => {
       expect(
-        readLog().find((e) => e.trailSlug === "radnor-lake")?.photoUrl,
-      ).toBe("https://b/p.jpg");
+        readLog().find((e) => e.trailSlug === "radnor-lake")?.photoUrls,
+      ).toEqual(["https://b/p.jpg"]);
     });
   });
 

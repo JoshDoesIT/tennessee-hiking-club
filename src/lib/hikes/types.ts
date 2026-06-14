@@ -26,10 +26,16 @@ export type HikeLogEntry = {
   hikedOn: string;
   note?: string;
   conditions?: string;
-  /** Local handle for the photo blob in IndexedDB (see `photo-store`). */
+  /** Local handle for a single photo blob (legacy, pre-multi-photo). New hikes
+   *  use `photoIds`; this is still read as a fallback so older logs keep their
+   *  photo. See `entry-photos`. */
   photoId?: string;
-  /** Remote photo URL once uploaded when signed in (account-backed sync). */
+  /** Remote URL for the legacy single photo once uploaded (account sync). */
   photoUrl?: string;
+  /** Local handles for this hike's photo blobs in IndexedDB (see `photo-store`). */
+  photoIds?: string[];
+  /** Remote URLs for the photos once uploaded, aligned with `photoIds` by index. */
+  photoUrls?: string[];
   /** A recorded GPS track uploaded for this hike, if any. */
   track?: RecordedTrack;
 };
