@@ -4,14 +4,14 @@ import userEvent from "@testing-library/user-event";
 import { PhotoSubmissionForm } from "./photo-submission-form";
 
 function setupFetch(session: unknown, { ok = true } = {}) {
-  let body: FormData | null = null;
+  const bodies: FormData[] = [];
   const f = vi.fn(async (url: string, init?: RequestInit) => {
     const path = String(url);
     if (path.includes("/api/auth/session")) {
       return { ok: true, json: async () => session } as unknown as Response;
     }
     if (path.includes("/api/contributions/photo")) {
-      body = init?.body as FormData;
+      bodies.push(init?.body as FormData);
       return {
         ok,
         status: ok ? 201 : 400,
@@ -21,58 +21,83 @@ function setupFetch(session: unknown, { ok = true } = {}) {
     return { ok: false, json: async () => ({}) } as unknown as Response;
   });
   vi.stubGlobal("fetch", f as unknown as typeof fetch);
-  return { f, getBody: () => body };
+  return { f, getBodies: () => bodies };
 }
 
-const file = () =>
-  new File(["jpeg-bytes"], "falls.jpg", { type: "image/jpeg" });
+const file = (name = "falls.jpg") =>
+  new File(["jpeg-bytes"], name, { type: "image/jpeg" });
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("PhotoSubmissionForm", () => {
   it("does not render the form when signed out", async () => {
     const { f } = setupFetch({});
-    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
+    render(
+      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
     await waitFor(() =>
       expect(
         f.mock.calls.some((c) => String(c[0]).includes("/api/auth/session")),
       ).toBe(true),
     );
-    expect(screen.queryByLabelText(/describe the photo/i)).toBeNull();
+    expect(screen.queryByLabelText(/choose photos/i)).toBeNull();
   });
 
-  it("submits a photo with alt text and trail slug when signed in", async () => {
+  it("submits each selected photo with its own alt text and the trail slug", async () => {
     const user = userEvent.setup();
-    const { getBody } = setupFetch({ user: { id: "u1" } });
-    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
-
-    await user.upload(await screen.findByLabelText(/choose a photo/i), file());
-    await user.type(
-      screen.getByLabelText(/describe the photo/i),
-      "The falls in spring flow",
+    const { getBodies } = setupFetch({ user: { id: "u1" } });
+    render(
+      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
     );
+
+    await user.upload(await screen.findByLabelText(/choose photos/i), [
+      file("a.jpg"),
+      file("b.jpg"),
+    ]);
+    await user.type(screen.getByLabelText(/describe photo 1/i), "First view");
+    await user.type(screen.getByLabelText(/describe photo 2/i), "Second view");
     await user.click(screen.getByLabelText(/right to share/i));
     await user.click(screen.getByRole("button", { name: /add photo/i }));
 
-    await waitFor(() => expect(getBody()).not.toBeNull());
-    const body = getBody()!;
-    expect(body.get("trailSlug")).toBe("virgin-falls");
-    expect(body.get("alt")).toBe("The falls in spring flow");
-    expect(body.get("file")).toBeInstanceOf(File);
+    await waitFor(() => expect(getBodies()).toHaveLength(2));
+    const bodies = getBodies();
+    expect(bodies[0].get("trailSlug")).toBe("virgin-falls");
+    expect(bodies[0].get("alt")).toBe("First view");
+    expect(bodies[0].get("file")).toBeInstanceOf(File);
+    expect(bodies[1].get("alt")).toBe("Second view");
     expect(await screen.findByRole("status")).toHaveTextContent(/review/i);
+  });
+
+  it("does not submit until every photo has alt text", async () => {
+    const user = userEvent.setup();
+    const { getBodies } = setupFetch({ user: { id: "u1" } });
+    render(
+      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
+
+    await user.upload(await screen.findByLabelText(/choose photos/i), [
+      file("a.jpg"),
+      file("b.jpg"),
+    ]);
+    await user.type(screen.getByLabelText(/describe photo 1/i), "Only one");
+    await user.click(screen.getByLabelText(/right to share/i));
+    await user.click(screen.getByRole("button", { name: /add photo/i }));
+
+    expect(getBodies()).toHaveLength(0);
+    expect(await screen.findByRole("status")).toHaveTextContent(/description/i);
   });
 
   it("does not submit until the rights box is checked", async () => {
     const user = userEvent.setup();
-    const { f } = setupFetch({ user: { id: "u1" } });
-    render(<PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />);
+    const { getBodies } = setupFetch({ user: { id: "u1" } });
+    render(
+      <PhotoSubmissionForm trailSlug="virgin-falls" trailName="Virgin Falls" />,
+    );
 
-    await user.upload(await screen.findByLabelText(/choose a photo/i), file());
-    await user.type(screen.getByLabelText(/describe the photo/i), "Alt");
+    await user.upload(await screen.findByLabelText(/choose photos/i), file());
+    await user.type(screen.getByLabelText(/describe photo 1/i), "Alt");
     await user.click(screen.getByRole("button", { name: /add photo/i }));
 
-    expect(
-      f.mock.calls.some((c) => String(c[0]).includes("/api/contributions/photo")),
-    ).toBe(false);
+    expect(getBodies()).toHaveLength(0);
   });
 });
