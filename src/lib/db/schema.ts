@@ -48,7 +48,10 @@ export const hikes = pgTable(
     hikedOn: date("hiked_on").notNull(),
     note: text("note"),
     conditions: text("conditions"),
+    /** The first photo's URL; kept for single-photo back-compat (#361). */
     photoUrl: text("photo_url"),
+    /** All photo URLs for the hike, when it has several (#361). */
+    photoUrls: text("photo_urls").array(),
     /** A recorded GPS track for this hike (#201), as JSON route points. */
     route: text("route"),
     /** Elapsed minutes for the recorded track, when the GPX had timestamps. */

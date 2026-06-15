@@ -112,6 +112,65 @@ describe("mergeHikes photo fields", () => {
     );
     expect(merged[0]).toMatchObject({ photoId: "ph-1", photoUrl: "https://b/p.jpg" });
   });
+
+  it("fills missing photoUrls without overwriting an existing array (#361)", () => {
+    const filled = mergeHikes(
+      [{ trailSlug: "x", hikedOn: "2026-01-01" }],
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrls: ["u1", "u2"] }],
+    );
+    expect(filled[0].photoUrls).toEqual(["u1", "u2"]);
+
+    const kept = mergeHikes(
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrls: ["keep"] }],
+      [{ trailSlug: "x", hikedOn: "2026-01-01", photoUrls: ["other"] }],
+    );
+    expect(kept[0].photoUrls).toEqual(["keep"]);
+  });
+});
+
+describe("multi-photo sync (#361)", () => {
+  it("rowToEntry maps a photoUrls array from the row", () => {
+    expect(
+      rowToEntry({
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        note: null,
+        conditions: null,
+        photoUrl: null,
+        photoUrls: ["u1", "u2"],
+      }).photoUrls,
+    ).toEqual(["u1", "u2"]);
+  });
+
+  it("entryToInsert includes photoUrls", () => {
+    expect(
+      entryToInsert("user-1", {
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        photoUrls: ["u1", "u2"],
+      }),
+    ).toMatchObject({ photoUrls: ["u1", "u2"] });
+  });
+
+  it("planSync backfills the photoUrls array for a remote hike missing photos", () => {
+    const local = [
+      {
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        photoUrl: "u1",
+        photoUrls: ["u1", "u2"],
+      },
+    ];
+    const remote = [{ trailSlug: "a", hikedOn: "2026-01-01" }];
+    expect(planSync(local, remote).toUpdate).toEqual([
+      {
+        trailSlug: "a",
+        hikedOn: "2026-01-01",
+        photoUrl: "u1",
+        photoUrls: ["u1", "u2"],
+      },
+    ]);
+  });
 });
 
 describe("row mappers", () => {
@@ -152,6 +211,7 @@ describe("row mappers", () => {
         note: null,
         conditions: null,
         photoUrl: null,
+        photoUrls: null,
         route: null,
         trackDurationMin: null,
       },

@@ -31,6 +31,8 @@ export function mergeHikes(
       conditions: existing.conditions ?? entry.conditions,
       photoId: existing.photoId ?? entry.photoId,
       photoUrl: existing.photoUrl ?? entry.photoUrl,
+      photoIds: existing.photoIds ?? entry.photoIds,
+      photoUrls: existing.photoUrls ?? entry.photoUrls,
       track: existing.track ?? entry.track,
     });
   }
@@ -43,11 +45,14 @@ export function mergeHikes(
  * account (to insert) and the full merged log to hand back to the client. Only
  * additions are made, so sync never deletes a hike.
  */
-/** A photo URL to backfill onto an existing remote hike that lacks one. */
+/** Photo URL(s) to backfill onto an existing remote hike that lacks them. The
+ *  legacy single `photoUrl` (first photo) keeps pre-multi-photo accounts in
+ *  sync; `photoUrls` carries the full set (#361). */
 export type PhotoBackfill = {
   trailSlug: string;
   hikedOn: string;
   photoUrl: string;
+  photoUrls?: string[];
 };
 
 export function planSync(
@@ -72,6 +77,7 @@ export function planSync(
         trailSlug: entry.trailSlug,
         hikedOn: entry.hikedOn,
         photoUrl: entry.photoUrl,
+        ...(entry.photoUrls ? { photoUrls: entry.photoUrls } : {}),
       });
     }
   }
@@ -85,6 +91,8 @@ type HikeRowLike = {
   note: string | null;
   conditions: string | null;
   photoUrl: string | null;
+  /** All photo URLs for the hike; optional so a pre-migration row still maps. */
+  photoUrls?: string[] | null;
   /** JSON-encoded recorded track points; optional so a pre-migration row maps. */
   route?: string | null;
   trackDurationMin?: number | null;
@@ -100,6 +108,7 @@ export function rowToEntry(row: HikeRowLike): HikeLogEntry {
   if (row.note) entry.note = row.note;
   if (row.conditions) entry.conditions = row.conditions;
   if (row.photoUrl) entry.photoUrl = row.photoUrl;
+  if (row.photoUrls?.length) entry.photoUrls = row.photoUrls;
   if (row.route) {
     try {
       const points = JSON.parse(row.route) as RoutePoint[];
@@ -125,6 +134,7 @@ export function entryToInsert(userId: string, entry: HikeLogEntry) {
     note: entry.note ?? null,
     conditions: entry.conditions ?? null,
     photoUrl: entry.photoUrl ?? null,
+    photoUrls: entry.photoUrls ?? null,
     route: entry.track ? JSON.stringify(entry.track.points) : null,
     trackDurationMin: entry.track?.durationMin ?? null,
   };

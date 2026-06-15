@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { readLog, replaceLog, setEntryPhotoUrl } from "@/lib/hikes/local-log";
+import { readLog, replaceLog, setEntryPhotoUrls } from "@/lib/hikes/local-log";
+import { entryPhotoIds } from "@/lib/hikes/entry-photos";
 import { mergeHikes } from "@/lib/hikes/sync";
 import { getPhoto } from "@/lib/hikes/photo-store";
 import { uploadPhoto } from "@/lib/hikes/photo-upload";
@@ -16,20 +17,34 @@ async function postHikeSync() {
 }
 
 /**
- * Upload any photos that exist only on this device (a local `photoId` but no
- * synced `photoUrl`) and record their URLs, then re-sync so the account picks
- * them up. Best-effort: a failed upload leaves the local copy in place.
+ * Upload every photo that exists only on this device (local blob ids without a
+ * synced URL yet) and record the URLs aligned by index, then re-sync so the
+ * account picks them up (#361). Best-effort: a failed upload leaves the local
+ * copy in place to retry next time. Handles both legacy single-photo hikes and
+ * multi-photo hikes, and resumes a partially-uploaded set.
  */
 async function backfillPhotos(): Promise<void> {
-  const pending = readLog().filter((e) => e.photoId && !e.photoUrl);
   let uploadedAny = false;
-  for (const entry of pending) {
-    const blob = await getPhoto(entry.photoId!);
-    if (!blob) continue;
-    const url = await uploadPhoto(blob);
-    if (url) {
-      setEntryPhotoUrl(entry.trailSlug, entry.hikedOn, url);
-      uploadedAny = true;
+  for (const entry of readLog()) {
+    const ids = entryPhotoIds(entry);
+    if (ids.length === 0) continue;
+    const existing =
+      entry.photoUrls ?? (entry.photoUrl ? [entry.photoUrl] : []);
+    if (existing.length >= ids.length && existing.every(Boolean)) continue;
+
+    const urls: string[] = [];
+    for (let i = 0; i < ids.length; i++) {
+      if (existing[i]) {
+        urls.push(existing[i]);
+        continue;
+      }
+      const blob = await getPhoto(ids[i]);
+      const url = blob ? await uploadPhoto(blob) : null;
+      urls.push(url ?? "");
+      if (url) uploadedAny = true;
+    }
+    if (urls.some(Boolean)) {
+      setEntryPhotoUrls(entry.trailSlug, entry.hikedOn, urls);
     }
   }
   if (uploadedAny) await postHikeSync();

@@ -133,6 +133,30 @@ describe("SyncOnSignIn", () => {
     );
   });
 
+  it("uploads every photo of a multi-photo hike and records all URLs (#361)", async () => {
+    addHike("a", "2026-01-01", { photoIds: ["ph-1", "ph-2"] });
+    vi.mocked(getPhoto).mockResolvedValue(
+      new Blob(["x"], { type: "image/jpeg" }),
+    );
+    vi.mocked(uploadPhoto)
+      .mockResolvedValueOnce("https://b/p1.jpg")
+      .mockResolvedValueOnce("https://b/p2.jpg");
+    setupFetch(
+      { user: { id: "u1" } },
+      { hikes: [{ trailSlug: "a", hikedOn: "2026-01-01" }] },
+    );
+
+    render(<SyncOnSignIn />);
+
+    await waitFor(() =>
+      expect(readLog().find((e) => e.trailSlug === "a")?.photoUrls).toEqual([
+        "https://b/p1.jpg",
+        "https://b/p2.jpg",
+      ]),
+    );
+    expect(uploadPhoto).toHaveBeenCalledTimes(2);
+  });
+
   it("does not sync when signed out", async () => {
     addHike("a", "2026-01-01");
     const { fetchMock } = setupFetch({}, { hikes: [] });
