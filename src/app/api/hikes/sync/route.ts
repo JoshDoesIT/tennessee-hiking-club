@@ -20,6 +20,7 @@ const bodySchema = z.object({
       note: z.string().optional(),
       conditions: z.string().optional(),
       photoUrl: z.string().optional(),
+      photoUrls: z.array(z.string()).optional(),
       track: z
         .object({
           points: z.array(routePointSchema),
@@ -64,7 +65,10 @@ export async function POST(req: Request) {
       for (const u of toUpdate) {
         await db
           .update(hikes)
-          .set({ photoUrl: u.photoUrl })
+          .set({
+            photoUrl: u.photoUrl,
+            ...(u.photoUrls ? { photoUrls: u.photoUrls } : {}),
+          })
           .where(
             and(
               eq(hikes.userId, userId),
