@@ -11,6 +11,7 @@ import {
   removeHike,
 } from "@/lib/hikes/local-log";
 import { deleteRemotePhoto } from "@/lib/hikes/photo-upload";
+import { entryPhotos, entryPhotoUrls } from "@/lib/hikes/entry-photos";
 import { computeStats } from "@/lib/hikes/stats";
 import { HikePhoto } from "./hike-photo";
 import { RecordedTrackSummary } from "./recorded-track-summary";
@@ -44,7 +45,7 @@ function formatHikeDate(iso: string): string {
  *  photo), the account when signed in, and any remote photo. */
 function deleteHike(entry: HikeLogEntry) {
   removeHike(entry.trailSlug, entry.hikedOn);
-  if (entry.photoUrl) void deleteRemotePhoto(entry.photoUrl);
+  for (const url of entryPhotoUrls(entry)) void deleteRemotePhoto(url);
   void fetch("/api/hikes/sync", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
@@ -145,14 +146,31 @@ export function MyHikes({ trails }: { trails: Trail[] }) {
               </p>
             ) : null}
 
-            {entry.photoId || entry.photoUrl ? (
-              <HikePhoto
-                photoId={entry.photoId}
-                photoUrl={entry.photoUrl}
-                alt={`Photo from your hike of ${trail.name}`}
-                className="border-forest/10 mt-2 h-28 w-full rounded-lg border object-cover"
-              />
-            ) : null}
+            {(() => {
+              const photos = entryPhotos(entry);
+              if (photos.length === 0) return null;
+              return (
+                <div
+                  className={`mt-2 grid gap-2 ${
+                    photos.length > 1 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1"
+                  }`}
+                >
+                  {photos.map((p, i) => (
+                    <HikePhoto
+                      key={p.id ?? p.url ?? i}
+                      photoId={p.id}
+                      photoUrl={p.url}
+                      alt={
+                        photos.length === 1
+                          ? `Photo from your hike of ${trail.name}`
+                          : `Photo ${i + 1} from your hike of ${trail.name}`
+                      }
+                      className="border-forest/10 h-28 w-full rounded-lg border object-cover"
+                    />
+                  ))}
+                </div>
+              );
+            })()}
 
             {entry.track && entry.track.points.length > 1 ? (
               <>

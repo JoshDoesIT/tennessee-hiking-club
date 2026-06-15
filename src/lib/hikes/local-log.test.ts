@@ -6,6 +6,7 @@ import {
   removeHike,
   isHiked,
   setEntryPhotoUrl,
+  setEntryPhotoUrls,
 } from "./local-log";
 import { deletePhoto } from "./photo-store";
 
@@ -146,5 +147,46 @@ describe("local hike log", () => {
       "https://blob/p.jpg",
     );
     expect(log.find((e) => e.hikedOn === "2026-01-01")?.photoUrl).toBeUndefined();
+  });
+
+  it("stores photoIds for a multi-photo hike", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoIds: ["p1", "p2"] }, s);
+    addHike("b", "2026-01-02", undefined, s);
+    expect(readLog(s)[0].photoIds).toEqual(["p1", "p2"]);
+    expect(readLog(s)[1].photoIds).toBeUndefined();
+  });
+
+  it("garbage-collects every local photo (array and legacy) on remove", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoIds: ["p1", "p2"] }, s);
+    addHike("a", "2026-02-01", { photoId: "legacy" }, s);
+    addHike("b", "2026-03-01", { photoIds: ["keep"] }, s);
+    vi.mocked(deletePhoto).mockClear();
+
+    removeHike("a", "2026-01-01", s);
+    removeHike("a", "2026-02-01", s);
+
+    expect(deletePhoto).toHaveBeenCalledWith("p1");
+    expect(deletePhoto).toHaveBeenCalledWith("p2");
+    expect(deletePhoto).toHaveBeenCalledWith("legacy");
+    expect(deletePhoto).not.toHaveBeenCalledWith("keep");
+  });
+
+  it("sets multiple photo URLs on the matching entry", () => {
+    const s = memStorage();
+    addHike("a", "2026-01-01", { photoIds: ["p1", "p2"] }, s);
+    addHike("a", "2026-02-01", { photoIds: ["p3"] }, s);
+
+    setEntryPhotoUrls("a", "2026-01-01", ["u1", "u2"], s);
+
+    const log = readLog(s);
+    const entry = log.find((e) => e.hikedOn === "2026-01-01");
+    expect(entry?.photoUrls).toEqual(["u1", "u2"]);
+    // The first URL also mirrors to the legacy field so single-URL sync works.
+    expect(entry?.photoUrl).toBe("u1");
+    expect(
+      log.find((e) => e.hikedOn === "2026-02-01")?.photoUrls,
+    ).toBeUndefined();
   });
 });

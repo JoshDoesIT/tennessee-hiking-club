@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, useSyncExternalStore } from "react";
+import { useId, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,7 +8,7 @@ import {
   getLogSnapshot,
   getServerLogSnapshot,
   addHike,
-  setEntryPhotoUrl,
+  setEntryPhotoUrls,
 } from "@/lib/hikes/local-log";
 import { compressImage } from "@/lib/hikes/image";
 import { putPhoto } from "@/lib/hikes/photo-store";
@@ -40,12 +40,10 @@ export function MarkHiked({ slug }: { slug: string }) {
   const [date, setDate] = useState<string>(today);
   const [note, setNote] = useState("");
   const [conditions, setConditions] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [photos, setPhotos] = useState<File[]>([]);
   const [trackFile, setTrackFile] = useState<File | null>(null);
   const [status, setStatus] = useState("");
   const detailsId = useId();
-  // Stable array so the photo preview's object URL is not rebuilt each render.
-  const photoFiles = useMemo(() => (photo ? [photo] : []), [photo]);
 
   async function logHike() {
     const when = date || today();
@@ -54,12 +52,16 @@ export function MarkHiked({ slug }: { slug: string }) {
       return;
     }
 
-    let photoId: string | undefined;
-    let blob: Blob | undefined;
-    if (photo) {
-      blob = await compressImage(photo);
-      photoId = crypto.randomUUID();
-      await putPhoto(photoId, blob);
+    // Compress and store each selected photo locally; keep the blobs to upload
+    // when signed in. Aligned with `photoIds` by index.
+    const photoIds: string[] = [];
+    const blobs: Blob[] = [];
+    for (const file of photos) {
+      const blob = await compressImage(file);
+      const id = crypto.randomUUID();
+      await putPhoto(id, blob);
+      photoIds.push(id);
+      blobs.push(blob);
     }
 
     // Parse an optional recorded GPX track on the device; a malformed file is
@@ -81,20 +83,35 @@ export function MarkHiked({ slug }: { slug: string }) {
       }
     }
 
-    addHike(slug, when, { note, conditions, photoId, track });
+    addHike(slug, when, {
+      note,
+      conditions,
+      // Also set the legacy single `photoId` (the first photo) so the existing
+      // sign-in upload and cross-device sync keep working unchanged; the full
+      // `photoIds` array drives local display. Multi-photo sync is a follow-up.
+      ...(photoIds.length ? { photoId: photoIds[0], photoIds } : {}),
+      track,
+    });
     setStatus("Logged.");
     setNote("");
     setConditions("");
-    setPhoto(null);
+    setPhotos([]);
     setTrackFile(null);
     setDate(today());
     setShowDetails(false);
 
-    // Best-effort: when signed in, upload to the account and record the URL so
-    // the photo syncs across devices. Stays local-only if signed out/offline.
-    if (blob) {
-      const url = await uploadPhoto(blob);
-      if (url) setEntryPhotoUrl(slug, when, url);
+    // Best-effort: when signed in, upload each photo to the account and record
+    // the URLs (aligned by index) so they sync across devices. Stays local-only
+    // if signed out/offline.
+    if (blobs.length) {
+      const urls = await Promise.all(blobs.map((b) => uploadPhoto(b)));
+      if (urls.some((u) => u)) {
+        setEntryPhotoUrls(
+          slug,
+          when,
+          urls.map((u) => u ?? ""),
+        );
+      }
     }
   }
 
@@ -194,18 +211,21 @@ export function MarkHiked({ slug }: { slug: string }) {
               htmlFor={`${detailsId}-photo`}
               className="text-olive text-xs font-semibold tracking-wider uppercase"
             >
-              Photo
+              Photos
             </label>
             <input
               id={`${detailsId}-photo`}
               type="file"
               accept="image/*"
-              onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+              multiple
+              onChange={(e) =>
+                setPhotos(e.target.files ? Array.from(e.target.files) : [])
+              }
               className="text-ink file:border-forest/20 file:text-pine hover:file:bg-cream-50 text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:bg-cream-50 file:px-3 file:py-2 file:text-sm file:font-medium"
             />
-            <PhotoPreviews files={photoFiles} />
+            <PhotoPreviews files={photos} />
             <p className="text-ink/50 text-xs">
-              Stays on this device until you sign in.
+              Add one or more. Stays on this device until you sign in.
             </p>
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">
