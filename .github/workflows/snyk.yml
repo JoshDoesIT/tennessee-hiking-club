@@ -18,7 +18,7 @@ jobs:
     name: Snyk
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Secrets are not exposed to fork PRs, so this gate also makes the job a
       # no-op (still green) on forks - keeping it safe to mark as required
