@@ -35,7 +35,7 @@ jobs:
 
       - name: Install pnpm
         if: steps.token.outputs.present == 'true'
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.9
 
       - name: Set up Node
         if: steps.token.outputs.present == 'true'
