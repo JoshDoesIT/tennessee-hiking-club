@@ -45,6 +45,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# captured `snyk test` output (see .github/workflows/snyk.yml)
+snyk-*.log
+
 # env files (can opt-in for committing if needed)
 .env*
 # ...but the committed template documents what each variable does.

@@ -14,6 +14,9 @@ export default defineConfig({
       // own vanilla JS; test it where it lives so the tested file is the one
       // that ships.
       "mobile/**/*.{test,spec}.{ts,tsx}",
+      // CI helper scripts (e.g. the Snyk no-silent-pass guard) live next to
+      // the workflows that call them, not under src/.
+      "scripts/**/*.{test,spec}.{ts,tsx}",
     ],
     exclude: ["e2e/**", "node_modules/**", ".next/**"],
     css: true,
