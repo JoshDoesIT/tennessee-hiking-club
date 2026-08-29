@@ -52,7 +52,15 @@ jobs:
         if: steps.token.outputs.present == 'true'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        # npx, not `pnpm dlx`: the snyk package is a thin wrapper whose
+        # postinstall downloads the real CLI binary. Once setup-node's
+        # `cache: pnpm` restores a warm cache, pnpm resolves snyk from it and
+        # skips that postinstall, so bin/snyk finds no binary, falls back to
+        # its JS wrapper, and dies on `Cannot find module
+        # 'global-agent/bootstrap'`. npm's npx cache is separate, so the
+        # postinstall runs every time. npx also means no pnpm store write,
+        # which is what poisoned the cache for later runs.
         # --all-projects: pnpm-workspace.yaml is present (declares
         # ignoredBuiltDependencies) and Snyk requires the flag when it sees
         # both a lockfile and a workspace file in the repo root.
-        run: pnpm dlx snyk@latest test --severity-threshold=high --all-projects
+        run: npx --yes snyk@latest test --severity-threshold=high --all-projects
