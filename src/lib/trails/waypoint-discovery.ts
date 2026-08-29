@@ -149,8 +149,7 @@ export function npsPoiWaypoints(fc: GeoJsonPointFC): WaypointCandidate[] {
   for (const f of fc.features ?? []) {
     const props = f.properties ?? {};
     const name = (props.POINAME ?? props.NAME ?? props.MAPLABEL) as
-      | string
-      | undefined;
+      string | undefined;
     const poiType = (props.POITYPE ?? "") as string;
     const coords = f.geometry?.coordinates;
     if (!name || !coords || coords.length < 2) continue;
@@ -297,7 +296,9 @@ export function attributionFor(candidates: WaypointCandidate[]): string[] {
 const num = (n: number) => (Object.is(n, -0) ? "0" : String(n));
 
 /** Render candidates as a `waypoints:` front-matter block for review. */
-export function candidateWaypointsYaml(candidates: WaypointCandidate[]): string {
+export function candidateWaypointsYaml(
+  candidates: WaypointCandidate[],
+): string {
   const lines = ["waypoints:"];
   for (const c of candidates) {
     lines.push(`  - lat: ${num(c.lat)}`);

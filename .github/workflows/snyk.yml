@@ -18,7 +18,7 @@ jobs:
     name: Snyk
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       # Secrets are not exposed to fork PRs, so this gate also makes the job a
       # no-op (still green) on forks - keeping it safe to mark as required
@@ -35,11 +35,11 @@ jobs:
 
       - name: Install pnpm
         if: steps.token.outputs.present == 'true'
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.0.9
 
       - name: Set up Node
         if: steps.token.outputs.present == 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm

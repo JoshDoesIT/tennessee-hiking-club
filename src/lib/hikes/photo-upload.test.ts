@@ -24,18 +24,26 @@ describe("uploadPhoto", () => {
 
   it("returns null when the server has no Blob store (url: null)", async () => {
     vi.stubGlobal("fetch", ok({ url: null }));
-    expect(await uploadPhoto(new Blob(["x"], { type: "image/jpeg" }))).toBeNull();
+    expect(
+      await uploadPhoto(new Blob(["x"], { type: "image/jpeg" })),
+    ).toBeNull();
   });
 
   it("returns null on a non-ok response", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => new Response("nope", { status: 401 })));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("nope", { status: 401 })),
+    );
     expect(await uploadPhoto(new Blob(["x"]))).toBeNull();
   });
 
   it("returns null when the request throws", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => {
-      throw new Error("offline");
-    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new Error("offline");
+      }),
+    );
     expect(await uploadPhoto(new Blob(["x"]))).toBeNull();
   });
 });
@@ -54,9 +62,12 @@ describe("deleteRemotePhoto", () => {
   });
 
   it("swallows network errors", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => {
-      throw new Error("offline");
-    }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => {
+        throw new Error("offline");
+      }),
+    );
     await expect(deleteRemotePhoto("https://b/p.jpg")).resolves.toBeUndefined();
   });
 });

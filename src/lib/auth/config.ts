@@ -76,7 +76,11 @@ export function buildAuthConfig(): NextAuthConfig {
     error(error: unknown) {
       const chain: string[] = [];
       let current: unknown = error;
-      for (let depth = 0; depth < 8 && current && typeof current === "object"; depth++) {
+      for (
+        let depth = 0;
+        depth < 8 && current && typeof current === "object";
+        depth++
+      ) {
         const e = current as {
           name?: string;
           code?: string;

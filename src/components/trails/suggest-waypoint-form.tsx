@@ -101,7 +101,13 @@ export function SuggestWaypointForm({
         <label htmlFor="wp-type" className={labelClass}>
           Landmark type
         </label>
-        <select id="wp-type" name="type" required defaultValue="" className={fieldClass}>
+        <select
+          id="wp-type"
+          name="type"
+          required
+          defaultValue=""
+          className={fieldClass}
+        >
           <option value="" disabled>
             Choose a type
           </option>

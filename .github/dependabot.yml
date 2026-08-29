@@ -16,6 +16,12 @@ updates:
       # removed context.getFilename(). See #36. (TypeScript 6 is adopted.)
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
+      # TypeScript 7 is blocked until typescript-eslint widens its peer range
+      # past <6.1.0. On TS 7, typescript-estree throws at load
+      # ("Cannot read properties of undefined (reading 'Cjs')") and `pnpm lint`
+      # dies before linting a single file. Only 8.68.1-alpha.* has support.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

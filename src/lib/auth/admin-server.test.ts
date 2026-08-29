@@ -1,7 +1,9 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mocks = vi.hoisted(() => ({ rows: [] as Array<{ githubLogin: string | null }> }));
+const mocks = vi.hoisted(() => ({
+  rows: [] as Array<{ githubLogin: string | null }>,
+}));
 vi.mock("@/lib/db", () => ({
   getDb: () => ({
     select: () => ({

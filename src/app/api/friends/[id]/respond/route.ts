@@ -16,7 +16,10 @@ export async function POST(req: Request, { params }: Context) {
   try {
     action = (await req.json())?.action;
   } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
   }
   if (action !== "accept" && action !== "decline") {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

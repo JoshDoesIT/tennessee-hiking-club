@@ -11,7 +11,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * caching strategy per request type. This is the first test coverage for the
  * worker, added with the offline navigation fix (#244).
  */
-const SW_PATH = fileURLToPath(new URL("../../../public/sw.js", import.meta.url));
+const SW_PATH = fileURLToPath(
+  new URL("../../../public/sw.js", import.meta.url),
+);
 const ORIGIN = "https://www.tnhiking.club";
 
 type Behavior = "ok" | "offline" | "hang";
@@ -88,9 +90,13 @@ function loadSw(state: { behavior: Behavior; tag: string }) {
           );
           return; // otherwise never settles
         }
-        resolve({ ok: true, _tag: state.tag, clone() {
-          return this;
-        } });
+        resolve({
+          ok: true,
+          _tag: state.tag,
+          clone() {
+            return this;
+          },
+        });
       }),
   );
   const Response = {
@@ -176,8 +182,7 @@ describe("service worker offline navigation (#244)", () => {
   it("caches optimized images so trail photos load offline", async () => {
     const { handlers } = loadSw(state);
     const url = `${ORIGIN}/_next/image?url=%2Ftrails%2Fgrassy-ridge-bald.jpg&w=640&q=75`;
-    const req = () =>
-      makeRequest(url, { accept: "image/avif,image/webp,*/*" });
+    const req = () => makeRequest(url, { accept: "image/avif,image/webp,*/*" });
 
     state.tag = "image";
     const online = await dispatchFetch(handlers, req());

@@ -54,7 +54,9 @@ describe("POST /api/contributions/photo", () => {
   });
 
   it("returns 400 when alt text is missing", async () => {
-    const res = await POST(photoReq(jpeg(), { trailSlug: "virgin-falls", alt: "  " }));
+    const res = await POST(
+      photoReq(jpeg(), { trailSlug: "virgin-falls", alt: "  " }),
+    );
     expect(res.status).toBe(400);
     expect(mocks.put).not.toHaveBeenCalled();
   });
@@ -86,7 +88,10 @@ describe("POST /api/contributions/photo", () => {
 
     const [path, , opts] = (mocks.put as Mock).mock.calls[0];
     expect(path).toMatch(/^contributions\/photos\/u1\//);
-    expect(opts).toMatchObject({ access: "private", contentType: "image/jpeg" });
+    expect(opts).toMatchObject({
+      access: "private",
+      contentType: "image/jpeg",
+    });
 
     const row = (mocks.values as Mock).mock.calls[0][0];
     expect(row).toMatchObject({

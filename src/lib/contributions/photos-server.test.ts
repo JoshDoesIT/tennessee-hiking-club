@@ -11,10 +11,7 @@ vi.mock("@/lib/db", () => ({
   }),
 }));
 
-import {
-  getApprovedPhotoCount,
-  getApprovedPhotoCounts,
-} from "./photos-server";
+import { getApprovedPhotoCount, getApprovedPhotoCounts } from "./photos-server";
 
 beforeEach(() => {
   vi.clearAllMocks();

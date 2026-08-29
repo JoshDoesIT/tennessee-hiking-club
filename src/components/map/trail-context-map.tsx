@@ -15,7 +15,12 @@ import {
   installOfflineTileProtocol,
 } from "@/lib/maps/offline-tiles";
 
-type MapWaypoint = { lat: number; lng: number; name: string; type: WaypointType };
+type MapWaypoint = {
+  lat: number;
+  lng: number;
+  name: string;
+  type: WaypointType;
+};
 
 const OPENFREEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
@@ -226,24 +231,22 @@ export function TrailContextMap({
           void resolveUserDot({
             near: { lat: coordinates.lat, lng: coordinates.lng },
             maxMiles: 25,
-          }).then(
-            (dot) => {
-              if (!dot || cancelled || !map) return;
-              const uEl = document.createElement("div");
-              uEl.setAttribute("aria-hidden", "true");
-              Object.assign(uEl.style, {
-                width: "16px",
-                height: "16px",
-                borderRadius: "9999px",
-                background: "#1d6fe0",
-                border: "3px solid #ffffff",
-                boxShadow: "0 1px 4px rgba(0,0,0,.4)",
-              });
-              new maplibregl.Marker({ element: uEl })
-                .setLngLat([dot.lng, dot.lat])
-                .addTo(map);
-            },
-          );
+          }).then((dot) => {
+            if (!dot || cancelled || !map) return;
+            const uEl = document.createElement("div");
+            uEl.setAttribute("aria-hidden", "true");
+            Object.assign(uEl.style, {
+              width: "16px",
+              height: "16px",
+              borderRadius: "9999px",
+              background: "#1d6fe0",
+              border: "3px solid #ffffff",
+              boxShadow: "0 1px 4px rgba(0,0,0,.4)",
+            });
+            new maplibregl.Marker({ element: uEl })
+              .setLngLat([dot.lng, dot.lat])
+              .addTo(map);
+          });
         });
       } catch {
         if (!cancelled) setFailed(true);

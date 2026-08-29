@@ -17,9 +17,10 @@ test("privacy and accessibility pages render and are linked from the footer", as
 
   await page.goto("/");
   const footer = page.getByRole("contentinfo");
-  await expect(
-    footer.getByRole("link", { name: /^privacy/i }),
-  ).toHaveAttribute("href", "/privacy");
+  await expect(footer.getByRole("link", { name: /^privacy/i })).toHaveAttribute(
+    "href",
+    "/privacy",
+  );
   await expect(
     footer.getByRole("link", { name: /^accessibility/i }),
   ).toHaveAttribute("href", "/accessibility");

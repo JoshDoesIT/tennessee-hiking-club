@@ -22,7 +22,9 @@ describe("YourTennesseeMap", () => {
       .getAllByRole("link")
       .filter((l) => l.getAttribute("href")?.startsWith("/trails/"));
     expect(pins).toHaveLength(2);
-    expect(screen.getByRole("figure")).toHaveTextContent(/0 of 2\s+trails hiked/i);
+    expect(screen.getByRole("figure")).toHaveTextContent(
+      /0 of 2\s+trails hiked/i,
+    );
   });
 
   it("lights up hiked trails and conveys it in the accessible name", () => {
@@ -36,6 +38,8 @@ describe("YourTennesseeMap", () => {
     const notHiked = screen.getByRole("link", { name: /trail b/i });
     expect(notHiked).toHaveAttribute("data-hiked", "false");
 
-    expect(screen.getByRole("figure")).toHaveTextContent(/1 of 2\s+trails hiked/i);
+    expect(screen.getByRole("figure")).toHaveTextContent(
+      /1 of 2\s+trails hiked/i,
+    );
   });
 });

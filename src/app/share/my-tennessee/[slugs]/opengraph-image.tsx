@@ -35,94 +35,92 @@ export default async function OgImage({
   } hiked across ${regions.size} of 3 Grand Divisions`;
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        // Generous padding keeps every line inside the safe-zone that
+        // platforms like Teams crop into when previewing a 1200x630 card.
+        padding: "80px 96px",
+        background: "#fbf6e9",
+        color: "#2a3623",
+      }}
+    >
       <div
         style={{
-          height: "100%",
-          width: "100%",
           display: "flex",
-          flexDirection: "column",
-          // Generous padding keeps every line inside the safe-zone that
-          // platforms like Teams crop into when previewing a 1200x630 card.
-          padding: "80px 96px",
-          background: "#fbf6e9",
-          color: "#2a3623",
+          fontSize: 22,
+          letterSpacing: 4,
+          fontWeight: 600,
+          color: "#e0a24c",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            fontSize: 22,
-            letterSpacing: 4,
-            fontWeight: 600,
-            color: "#e0a24c",
-          }}
-        >
-          TENNESSEE HIKING CLUB
-        </div>
-        <div
-          style={{
-            display: "flex",
-            fontSize: 64,
-            fontWeight: 800,
-            marginTop: 4,
-          }}
-        >
-          My Tennessee
-        </div>
-        <div
-          style={{
-            display: "flex",
-            fontSize: 26,
-            color: "#475036",
-            marginTop: 6,
-          }}
-        >
-          {subtitle}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            marginTop: 24,
-            justifyContent: "center",
-          }}
-        >
-          <svg
-            width={mapPxWidth}
-            height={mapPxHeight}
-            viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d={mapData.outline}
-              fill="#c6c680"
-              fillOpacity={0.4}
-              stroke="#2a3623"
-              strokeWidth={1.5}
-              strokeLinejoin="round"
-            />
-            {mapData.pins.map((pin) => {
-              const isHiked = hikedSet.has(pin.slug);
-              const cx = (pin.xPct / 100) * MAP_WIDTH;
-              const cy = (pin.yPct / 100) * MAP_HEIGHT;
-              return (
-                <circle
-                  key={pin.slug}
-                  cx={cx}
-                  cy={cy}
-                  r={isHiked ? 7 : 3.5}
-                  fill={isHiked ? "#e0a24c" : "#2a3623"}
-                  fillOpacity={isHiked ? 1 : 0.18}
-                  stroke="#2a3623"
-                  strokeWidth={isHiked ? 1.8 : 0.5}
-                />
-              );
-            })}
-          </svg>
-        </div>
+        TENNESSEE HIKING CLUB
       </div>
-    ),
+      <div
+        style={{
+          display: "flex",
+          fontSize: 64,
+          fontWeight: 800,
+          marginTop: 4,
+        }}
+      >
+        My Tennessee
+      </div>
+      <div
+        style={{
+          display: "flex",
+          fontSize: 26,
+          color: "#475036",
+          marginTop: 6,
+        }}
+      >
+        {subtitle}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          marginTop: 24,
+          justifyContent: "center",
+        }}
+      >
+        <svg
+          width={mapPxWidth}
+          height={mapPxHeight}
+          viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d={mapData.outline}
+            fill="#c6c680"
+            fillOpacity={0.4}
+            stroke="#2a3623"
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+          />
+          {mapData.pins.map((pin) => {
+            const isHiked = hikedSet.has(pin.slug);
+            const cx = (pin.xPct / 100) * MAP_WIDTH;
+            const cy = (pin.yPct / 100) * MAP_HEIGHT;
+            return (
+              <circle
+                key={pin.slug}
+                cx={cx}
+                cy={cy}
+                r={isHiked ? 7 : 3.5}
+                fill={isHiked ? "#e0a24c" : "#2a3623"}
+                fillOpacity={isHiked ? 1 : 0.18}
+                stroke="#2a3623"
+                strokeWidth={isHiked ? 1.8 : 0.5}
+              />
+            );
+          })}
+        </svg>
+      </div>
+    </div>,
     { ...size },
   );
 }

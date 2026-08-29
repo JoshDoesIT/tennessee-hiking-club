@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { routeShapePath } from "./route-shape";
 
-const pts = (arr: [number, number][]) => arr.map(([lat, lng]) => ({ lat, lng }));
+const pts = (arr: [number, number][]) =>
+  arr.map(([lat, lng]) => ({ lat, lng }));
 
 describe("routeShapePath", () => {
   it("returns an empty string for fewer than two points", () => {

@@ -51,7 +51,9 @@ describe("AdminNavLink", () => {
     mockStatus({ isAdmin: true });
     render(<AdminNavLink />);
 
-    const control = await screen.findByRole("button", { name: /review queue/i });
+    const control = await screen.findByRole("button", {
+      name: /review queue/i,
+    });
     expect(screen.queryByRole("link", { name: /review queue/i })).toBeNull();
 
     fireEvent.click(control);
@@ -68,7 +70,9 @@ describe("AdminNavLink", () => {
     const onNavigate = vi.fn();
     render(<AdminNavLink onNavigate={onNavigate} />);
 
-    const control = await screen.findByRole("button", { name: /review queue/i });
+    const control = await screen.findByRole("button", {
+      name: /review queue/i,
+    });
     fireEvent.click(control);
     expect(onNavigate).toHaveBeenCalledTimes(1);
   });

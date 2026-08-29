@@ -42,7 +42,9 @@ export function PushOptIn() {
       const result = await registerForPushNotifications();
       if (result.status === "registered" && result.token) {
         setPushPref({ optedIn: true, token: result.token });
-        setMessage("You’ll get a push when a trail near you has a closure or alert.");
+        setMessage(
+          "You’ll get a push when a trail near you has a closure or alert.",
+        );
       } else if (!result.supported) {
         setMessage(
           "Push alerts need the Tennessee Hiking Club app on your phone. Open it there to turn them on.",
@@ -81,7 +83,7 @@ export function PushOptIn() {
           } disabled:opacity-60`}
         >
           <span
-            className={`inline-block h-5 w-5 transform rounded-full bg-cream shadow transition-transform ${
+            className={`bg-cream inline-block h-5 w-5 transform rounded-full shadow transition-transform ${
               pref.optedIn ? "translate-x-5" : "translate-x-0.5"
             }`}
           />

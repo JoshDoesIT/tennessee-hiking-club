@@ -50,7 +50,9 @@ describe("mobile offline fallback (#248, hosted mode)", () => {
 
   it("explains the app is offline rather than showing a blank screen", async () => {
     const config = await hostedConfig();
-    expect(fallbackHtml(config)).toMatch(/offline|no signal|connect|reconnect/i);
+    expect(fallbackHtml(config)).toMatch(
+      /offline|no signal|connect|reconnect/i,
+    );
   });
 
   it("offers a way back into the hosted app once a connection returns", async () => {

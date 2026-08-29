@@ -12,7 +12,9 @@ const parking = {
 describe("TrailParking", () => {
   it("shows the parking note", () => {
     render(<TrailParking parking={parking} />);
-    expect(screen.getByText(/gravel lot, about 20 spaces/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/gravel lot, about 20 spaces/i),
+    ).toBeInTheDocument();
   });
 
   it("shows the seasonal / accessibility note", () => {

@@ -83,9 +83,7 @@ describe("exportLogJson / parseLogJson", () => {
   });
 
   it("rejects entries missing required fields", () => {
-    expect(() =>
-      parseLogJson(JSON.stringify([{ trailSlug: "a" }])),
-    ).toThrow();
+    expect(() => parseLogJson(JSON.stringify([{ trailSlug: "a" }]))).toThrow();
   });
 });
 
@@ -157,7 +155,10 @@ describe("photo round-trip", () => {
 });
 
 describe("exportLogGpx", () => {
-  const trails = [make("a", { name: "Trail A" }), make("b", { name: "Trail B" })];
+  const trails = [
+    make("a", { name: "Trail A" }),
+    make("b", { name: "Trail B" }),
+  ];
 
   it("emits a GPX waypoint per distinct hiked trail", () => {
     const gpx = exportLogGpx(log, trails);
