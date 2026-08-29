@@ -24,7 +24,7 @@ jobs:
     name: TruffleHog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Full history so PR diff scans and main-branch range scans both
           # have the commits TruffleHog needs to walk.
