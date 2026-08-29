@@ -24,7 +24,11 @@ function routeReq(gpx: string | null = GPX, trailSlug = "grotto-falls") {
   const form = new FormData();
   form.set("trailSlug", trailSlug);
   if (gpx !== null) {
-    form.set("gpx", new Blob([gpx], { type: "application/gpx+xml" }), "hike.gpx");
+    form.set(
+      "gpx",
+      new Blob([gpx], { type: "application/gpx+xml" }),
+      "hike.gpx",
+    );
   }
   return new Request("http://localhost/api/contributions/route", {
     method: "POST",

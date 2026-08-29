@@ -77,7 +77,9 @@ describe("filterTrails", () => {
       "burgess",
       "cummins",
     ]);
-    expect(slugs(filterTrails(named, { query: "MOUNTAIN" }))).toEqual(["house"]);
+    expect(slugs(filterTrails(named, { query: "MOUNTAIN" }))).toEqual([
+      "house",
+    ]);
     expect(filterTrails(named, { query: "" })).toHaveLength(3);
   });
 

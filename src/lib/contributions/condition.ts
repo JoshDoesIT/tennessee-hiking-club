@@ -13,7 +13,9 @@ export const conditionSubmissionSchema = z.object({
   note: z.string().trim().max(280).optional(),
 });
 
-export type ConditionSubmissionInput = z.infer<typeof conditionSubmissionSchema>;
+export type ConditionSubmissionInput = z.infer<
+  typeof conditionSubmissionSchema
+>;
 
 export function validateConditionSubmission(input: unknown) {
   return conditionSubmissionSchema.safeParse(input);
@@ -39,7 +41,8 @@ export function generateConditionEntry(report: ConditionEntry): {
     `  - date: ${yamlScalar(report.date)}`,
     `    status: ${yamlScalar(report.status)}`,
   ];
-  if (report.note?.trim()) lines.push(`    note: ${yamlScalar(report.note.trim())}`);
+  if (report.note?.trim())
+    lines.push(`    note: ${yamlScalar(report.note.trim())}`);
   if (report.by?.trim()) lines.push(`    by: ${yamlScalar(report.by.trim())}`);
 
   const parsed = conditionReportSchema.safeParse({

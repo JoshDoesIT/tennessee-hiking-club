@@ -43,7 +43,9 @@ export function LogTransfer({ trails }: { trails: Trail[] }) {
     try {
       const next = await importLogJson(await file.text(), "merge");
       const n = next.length;
-      setStatus(`Imported. You now have ${n} hike${n === 1 ? "" : "s"} logged.`);
+      setStatus(
+        `Imported. You now have ${n} hike${n === 1 ? "" : "s"} logged.`,
+      );
     } catch {
       setStatus(
         "Could not read that file. Export a JSON file from this page to see the expected format.",

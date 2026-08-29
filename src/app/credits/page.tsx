@@ -61,9 +61,8 @@ export default function CreditsPage() {
         </p>
         <p className="text-ink/70 mt-3 text-sm leading-relaxed">
           Are you a photographer who would like a photo added, updated, or taken
-          down? Open an issue on{" "}
-          <ExtLink href={ISSUES_URL}>GitHub</ExtLink> and we will take care of
-          it.
+          down? Open an issue on <ExtLink href={ISSUES_URL}>GitHub</ExtLink> and
+          we will take care of it.
         </p>
       </section>
 

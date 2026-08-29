@@ -36,7 +36,10 @@ describe("DELETE /api/friends/[id]", () => {
   });
 
   it("returns 400 when not allowed", async () => {
-    mocks.removeFriendship.mockResolvedValue({ ok: false, reason: "not-allowed" });
+    mocks.removeFriendship.mockResolvedValue({
+      ok: false,
+      reason: "not-allowed",
+    });
     expect((await DELETE(req(), ctx("f1"))).status).toBe(400);
   });
 });

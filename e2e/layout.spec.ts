@@ -8,7 +8,8 @@ import { test, expect, type Page } from "@playwright/test";
 async function horizontalOverflow(page: Page): Promise<number> {
   return page.evaluate(
     () =>
-      document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
   );
 }
 

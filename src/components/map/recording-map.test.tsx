@@ -44,7 +44,15 @@ const mocks = vi.hoisted(() => {
       remove: vi.fn(),
     };
   });
-  return { Map, Marker, markerSetLngLat, addSource, easeTo, fitBounds, setData };
+  return {
+    Map,
+    Marker,
+    markerSetLngLat,
+    addSource,
+    easeTo,
+    fitBounds,
+    setData,
+  };
 });
 
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
@@ -183,7 +191,10 @@ describe("RecordingMap", () => {
 
     // Move due east: the map should rotate to a ~90 deg bearing.
     rerender(
-      <RecordingMap center={center} points={[pt(35.6, -83.4), pt(35.6, -83.3)]} />,
+      <RecordingMap
+        center={center}
+        points={[pt(35.6, -83.4), pt(35.6, -83.3)]}
+      />,
     );
 
     await waitFor(() => {

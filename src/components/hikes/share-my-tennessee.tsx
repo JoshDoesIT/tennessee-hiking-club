@@ -49,8 +49,8 @@ export function ShareMyTennessee({ origin }: { origin: string }) {
         Share your Tennessee
       </h3>
       <p className="text-ink/70 mt-1 text-sm leading-relaxed">
-        Generate a public link to your map with this trail list. Anyone with
-        the link can see it; nothing is shared until you copy and send it.
+        Generate a public link to your map with this trail list. Anyone with the
+        link can see it; nothing is shared until you copy and send it.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" size="sm" onClick={copy}>

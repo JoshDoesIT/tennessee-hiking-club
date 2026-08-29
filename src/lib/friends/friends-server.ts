@@ -95,9 +95,7 @@ export async function getFriendsData(userId: string): Promise<FriendsData> {
   };
 }
 
-export type FriendActionResult =
-  | { ok: true }
-  | { ok: false; reason: string };
+export type FriendActionResult = { ok: true } | { ok: false; reason: string };
 
 export async function sendFriendRequest(
   userId: string,
@@ -131,9 +129,11 @@ export async function sendFriendRequest(
   const check = canSendRequest(userId, target.userId, existing);
   if (!check.ok) return { ok: false, reason: check.reason };
 
-  await db
-    .insert(friendships)
-    .values({ requesterId: userId, addresseeId: target.userId, status: "pending" });
+  await db.insert(friendships).values({
+    requesterId: userId,
+    addresseeId: target.userId,
+    status: "pending",
+  });
   return { ok: true };
 }
 

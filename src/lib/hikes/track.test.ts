@@ -42,7 +42,8 @@ describe("gpxTrackSummary", () => {
   it("downsamples a long track to the point cap", () => {
     const many = Array.from(
       { length: 400 },
-      (_, i) => `<trkpt lat="${35.6 + i * 0.0001}" lon="-83.45"><ele>${1000 + i}</ele></trkpt>`,
+      (_, i) =>
+        `<trkpt lat="${35.6 + i * 0.0001}" lon="-83.45"><ele>${1000 + i}</ele></trkpt>`,
     ).join("");
     const t = gpxTrackSummary(gpx(many), 70);
     expect(t!.points.length).toBeLessThanOrEqual(70);
@@ -51,7 +52,9 @@ describe("gpxTrackSummary", () => {
   it("returns null for a GPX with fewer than two usable points", () => {
     expect(gpxTrackSummary("<gpx></gpx>")).toBeNull();
     expect(
-      gpxTrackSummary(gpx(`<trkpt lat="35.6" lon="-83.45"><ele>1000</ele></trkpt>`)),
+      gpxTrackSummary(
+        gpx(`<trkpt lat="35.6" lon="-83.45"><ele>1000</ele></trkpt>`),
+      ),
     ).toBeNull();
   });
 });

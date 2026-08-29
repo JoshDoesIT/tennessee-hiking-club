@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  readPushPref,
-  setPushPref,
-  clearPushPref,
-  subscribe,
-} from "./pref";
+import { readPushPref, setPushPref, clearPushPref, subscribe } from "./pref";
 
 function memoryStorage(): Storage {
   let map = new Map<string, string>();

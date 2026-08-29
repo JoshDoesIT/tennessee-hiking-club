@@ -21,7 +21,10 @@ vi.mock("next/link", () => ({
 
 import { LeaderboardBoard } from "./leaderboard-board";
 
-const entry = (user: string, over: Partial<LeaderboardEntry>): LeaderboardEntry => ({
+const entry = (
+  user: string,
+  over: Partial<LeaderboardEntry>,
+): LeaderboardEntry => ({
   user,
   regions: 0,
   trails: 0,
@@ -36,7 +39,9 @@ const entry = (user: string, over: Partial<LeaderboardEntry>): LeaderboardEntry 
 function mockApi(data: unknown) {
   vi.stubGlobal(
     "fetch",
-    vi.fn(async () => ({ ok: true, json: async () => data }) as unknown as Response),
+    vi.fn(
+      async () => ({ ok: true, json: async () => data }) as unknown as Response,
+    ),
   );
 }
 
@@ -73,7 +78,9 @@ describe("LeaderboardBoard", () => {
     mockApi({ entries: [] });
     render(<LeaderboardBoard />);
     await waitFor(() =>
-      expect(screen.getByText(/no hikers on the board yet/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/no hikers on the board yet/i),
+      ).toBeInTheDocument(),
     );
   });
 

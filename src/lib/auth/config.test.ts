@@ -81,8 +81,7 @@ describe("buildAuthConfig", () => {
     const fb = (cfg.providers ?? [])
       .map((p) => (typeof p === "function" ? p({}) : p))
       .find((p) => (p as { id: string }).id === "facebook") as
-      | { options?: { allowDangerousEmailAccountLinking?: boolean } }
-      | undefined;
+      { options?: { allowDangerousEmailAccountLinking?: boolean } } | undefined;
     expect(fb?.options?.allowDangerousEmailAccountLinking).not.toBe(true);
   });
 

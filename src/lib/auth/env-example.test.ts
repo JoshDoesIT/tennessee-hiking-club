@@ -15,10 +15,15 @@ const config = readFileSync(
 
 describe(".env.example", () => {
   it("documents every AUTH_*_ID provider key the auth config branches on", () => {
-    const keys = [...new Set([...config.matchAll(/AUTH_[A-Z]+_ID/g)].map((m) => m[0]))];
+    const keys = [
+      ...new Set([...config.matchAll(/AUTH_[A-Z]+_ID/g)].map((m) => m[0])),
+    ];
     expect(keys.length).toBeGreaterThan(0);
     for (const key of keys) {
-      expect(example, `${key} is referenced in config.ts but missing from .env.example`).toContain(key);
+      expect(
+        example,
+        `${key} is referenced in config.ts but missing from .env.example`,
+      ).toContain(key);
     }
   });
 });

@@ -64,7 +64,8 @@ export function RecordHike({
     setMessage("");
   }
 
-  const profile = rec.points.length >= 2 ? buildElevationProfile(rec.points) : null;
+  const profile =
+    rec.points.length >= 2 ? buildElevationProfile(rec.points) : null;
   const miles = profile ? profile.totalMiles.toFixed(2) : "0.00";
   const currentElevation = rec.points.length
     ? rec.points[rec.points.length - 1].elevationFt
@@ -80,8 +81,8 @@ export function RecordHike({
       {activeElsewhere ? (
         <p className="text-ink/75 mt-2 text-sm">
           A hike is already recording on{" "}
-          <span className="font-medium">{rec.trailName}</span>. Finish or discard
-          it before starting a new one.
+          <span className="font-medium">{rec.trailName}</span>. Finish or
+          discard it before starting a new one.
         </p>
       ) : activeHere ? (
         <>
@@ -124,7 +125,9 @@ export function RecordHike({
                   size="sm"
                   onClick={confirm === "discard" ? onDiscard : onFinish}
                 >
-                  {confirm === "discard" ? "Discard recording" : "Finish & save"}
+                  {confirm === "discard"
+                    ? "Discard recording"
+                    : "Finish & save"}
                 </Button>
               </div>
             </div>
@@ -176,7 +179,9 @@ export function RecordHike({
           </p>
           <div className="mt-3">
             <Button type="button" variant="outline" size="sm" onClick={start}>
-              {message.includes("Saved") ? "Record another" : "Record this hike"}
+              {message.includes("Saved")
+                ? "Record another"
+                : "Record this hike"}
             </Button>
           </div>
         </>

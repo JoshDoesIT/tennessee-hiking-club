@@ -111,8 +111,13 @@ describe("loadOsmParkingMap", () => {
   it("reads the cached OSM parking map", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "osm-parking-"));
     const file = path.join(dir, "osm-parking.json");
-    fs.writeFileSync(file, JSON.stringify({ "piney-falls": { lat: 1, lng: 2 } }));
-    expect(loadOsmParkingMap(file)).toEqual({ "piney-falls": { lat: 1, lng: 2 } });
+    fs.writeFileSync(
+      file,
+      JSON.stringify({ "piney-falls": { lat: 1, lng: 2 } }),
+    );
+    expect(loadOsmParkingMap(file)).toEqual({
+      "piney-falls": { lat: 1, lng: 2 },
+    });
     fs.rmSync(dir, { recursive: true, force: true });
   });
 });

@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  entryPhotos,
-  entryPhotoIds,
-  entryPhotoUrls,
-} from "./entry-photos";
+import { entryPhotos, entryPhotoIds, entryPhotoUrls } from "./entry-photos";
 import type { HikeLogEntry } from "./types";
 
 const base: HikeLogEntry = { trailSlug: "virgin-falls", hikedOn: "2026-06-14" };
