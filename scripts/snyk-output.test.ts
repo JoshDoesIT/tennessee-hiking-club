@@ -69,6 +69,21 @@ describe("checkSnykScanned", () => {
     ).toMatch(/failed to get dependencies/);
   });
 
+  it("fails on the iOS SPM manifest Snyk detects but cannot resolve", () => {
+    // Real output from the first run of this workflow: Snyk found
+    // ios/App/CapApp-SPM/Package.swift, could not build a tree from its
+    // local `path:` dependencies, and still exited 0.
+    expect(
+      rejectionReason(`
+/home/runner/work/tennessee-hiking-club/tennessee-hiking-club/ios/App/CapApp-SPM/Package.swift:
+  Unable to generate dependency tree
+✗ 1/2 potential projects failed to get dependencies.
+
+✔ Tested 216 dependencies for known issues, no vulnerable paths found.
+`),
+    ).toMatch(/failed to get dependencies/);
+  });
+
   it("fails when no target file could be detected at all", () => {
     expect(
       rejectionReason(

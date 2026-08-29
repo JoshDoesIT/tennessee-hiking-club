@@ -6,8 +6,8 @@ name: Snyk
 # - `android` - the Gradle tree (androidx, Capacitor Android runtime, the
 #               plugin modules). Needs the Android SDK and a `cap update`, so
 #               it is a separate, slower job.
-# - iOS       - NOT scanned. The iOS app resolves its native packages through
-#               Swift Package Manager, which Snyk has no support for; those
+# - iOS       - NOT scanned. Snyk detects the SPM manifest but cannot build a
+#               dependency tree from it, so it is excluded explicitly; those
 #               pins are reviewed by hand at Capacitor upgrade time.
 #
 # Both jobs guard against a *silent* pass: Snyk exits 0 when a detected
@@ -80,14 +80,18 @@ jobs:
         # ignoredBuiltDependencies) and Snyk requires the flag when it sees
         # both a lockfile and a workspace file in the repo root.
         #
-        # --exclude=android: the Gradle projects are scanned by the `android`
-        # job, which sets up the SDK they need. Without this, Snyk detects
-        # them here, fails to resolve them, and still exits 0.
+        # --exclude=android,ios: Snyk detects both native trees here and can
+        # resolve neither. The Gradle projects need an SDK, so they get their
+        # own job below. `ios/App/CapApp-SPM/Package.swift` it detects but
+        # cannot build a tree for ("Unable to generate dependency tree") -
+        # almost every dependency is a local `path:` reference into the pnpm
+        # store rather than a versioned package. Excluding them keeps this
+        # required check scanning exactly what it claims to.
         run: |
           set -eo pipefail
           npx --yes snyk@latest test \
             --all-projects \
-            --exclude=android \
+            --exclude=android,ios \
             --severity-threshold=high 2>&1 | tee snyk-npm.log
           pnpm exec tsx scripts/assert-snyk-scanned.ts snyk-npm.log
 
@@ -172,12 +176,24 @@ jobs:
         if: steps.token.outputs.present == 'true'
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        # --all-sub-projects covers `:app` and every `:capacitor-*` module, not
-        # just the root project's own configurations.
+        # Scan `:app`'s release runtime classpath: that is the APK's actual
+        # contents, and it transitively covers androidx, the Capacitor runtime
+        # and every `:capacitor-*` module.
+        #
+        # Scanning every configuration of every sub-project instead (the first
+        # attempt here) reported the same 26 issues eleven times over, all of
+        # them in the Android Gradle Plugin's own test-orchestration toolchain
+        # - netty, protobuf and opentelemetry pulled in by
+        # `com.android.tools.utp` and `com.google.testing.platform`. None of
+        # that is declared by this repo and none of it ships in the APK, so it
+        # would have made the check permanently red without saying anything
+        # about the app. Nothing in androidx, Capacitor or cordova-android was
+        # flagged.
         run: |
           set -eo pipefail
           npx --yes snyk@latest test \
             --file=android/build.gradle \
-            --all-sub-projects \
+            --sub-project=app \
+            --configuration-matching='^releaseRuntimeClasspath$' \
             --severity-threshold=high 2>&1 | tee snyk-android.log
           pnpm exec tsx scripts/assert-snyk-scanned.ts snyk-android.log

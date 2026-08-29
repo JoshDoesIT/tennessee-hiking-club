@@ -143,16 +143,27 @@ Store (#219).
 `.github/workflows/snyk.yml` runs two jobs, because the web and native
 dependency trees resolve in completely different ways:
 
-| Job              | Covers                                                                                                     | Required |
-| ---------------- | ---------------------------------------------------------------------------------------------------------- | -------- |
-| `Snyk`           | the JS/TS tree from `pnpm-lock.yaml`                                                                       | yes      |
-| `Snyk (Android)` | the Gradle tree: androidx, the Capacitor Android runtime, `:capacitor-*` plugin modules, `cordova-android` | not yet  |
+| Job              | Covers                                                                                           | Required |
+| ---------------- | ------------------------------------------------------------------------------------------------ | -------- |
+| `Snyk`           | the JS/TS tree from `pnpm-lock.yaml`                                                             | yes      |
+| `Snyk (Android)` | `:app`'s release runtime classpath — androidx, the Capacitor Android runtime, the plugin modules | not yet  |
 
-**iOS is not scanned.** The iOS app resolves its native packages through Swift
-Package Manager (`ios/App/CapApp-SPM/Package.swift`), which Snyk has no support
-for. The remote pins in `Package.resolved` — currently `capacitor-swift-pm`,
-`ion-ios-filesystem`, and `SwiftKeychainWrapper` — are reviewed by hand
-whenever Capacitor or a plugin is upgraded.
+The Android job scans `--sub-project=app` with
+`--configuration-matching='^releaseRuntimeClasspath$'`, i.e. what actually ends
+up in the APK. Scanning every configuration of every sub-project instead
+reports the Android Gradle Plugin's own test-orchestration toolchain
+(`com.android.tools.utp`, `com.google.testing.platform`, and the netty /
+protobuf / opentelemetry they drag in). That code is not declared here and does
+not ship, so including it would keep the check permanently red while saying
+nothing about the app.
+
+**iOS is not scanned.** Snyk detects `ios/App/CapApp-SPM/Package.swift` but
+answers "Unable to generate dependency tree" for it: almost every dependency
+there is a local `path:` reference into the pnpm store rather than a versioned
+package. The workflow therefore excludes `ios` explicitly instead of letting
+that detection fail silently. The remote pins in `Package.resolved` — currently
+`capacitor-swift-pm`, `ion-ios-filesystem`, and `SwiftKeychainWrapper` — are
+reviewed by hand whenever Capacitor or a plugin is upgraded.
 
 ### Why the Android job needs `cap update`
 
@@ -164,16 +175,24 @@ does not exist, so Gradle cannot be evaluated at all. The job therefore runs
 scaffolding against the tiny `mobile/` offline page instead of the full `out/`
 export — the web assets are irrelevant to a dependency scan.
 
-### Keeping `capacitor.settings.gradle` in sync
+### Regenerate the native manifests after every Capacitor bump
 
-`android/capacitor.settings.gradle` is committed but generated, and it
-hard-codes pnpm store paths that contain the resolved version of every plugin
-(`.pnpm/@capacitor+app@8.1.1_@capacitor+core@8.5.0/...`). Those paths change on
-every Capacitor or plugin bump, so landing a bump without re-running
-`cap update` leaves Gradle unable to find a single plugin module. Run
-`pnpm cap:sync` (or `CAP_LOCAL_BUNDLE=0 npx cap update android`) and commit the
-result whenever you change a Capacitor dependency; the `Snyk (Android)` job
-diffs the file and fails if it has drifted.
+Two committed-but-generated files hard-code pnpm store paths that carry the
+resolved version of every plugin
+(`.pnpm/@capacitor+app@8.1.1_@capacitor+core@8.5.0/...`):
+
+- `android/capacitor.settings.gradle`
+- `ios/App/CapApp-SPM/Package.swift` (which also pins `capacitor-swift-pm`)
+
+Those paths change on **every** Capacitor or plugin bump, and the directories
+they used to name simply stop existing — so landing a bump without re-running
+`cap update` leaves both native builds unable to resolve a single plugin. Both
+files were stale in exactly this way after the 8.4.0 → 8.5.0 bump.
+
+Run `pnpm cap:sync` (or `CAP_LOCAL_BUNDLE=0 npx cap update android ios`) and
+commit the result whenever you touch a Capacitor dependency. The
+`Snyk (Android)` job diffs `capacitor.settings.gradle` and fails if it has
+drifted; the iOS manifest has no such guard, because nothing in CI builds it.
 
 ### The no-silent-pass guard
 
