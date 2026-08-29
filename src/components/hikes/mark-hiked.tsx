@@ -138,7 +138,7 @@ export function MarkHiked({ slug }: { slug: string }) {
       </div>
 
       {count > 0 ? (
-        <p className="text-ink/60 mt-1 text-sm">
+        <p className="text-ink/65 mt-1 text-sm">
           Hiked {count} time{count === 1 ? "" : "s"}.{" "}
           <Link
             href="/hikes"

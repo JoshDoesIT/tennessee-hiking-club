@@ -41,24 +41,25 @@ deleted; re-apply the native customizations afterward (see the list below).
 
 ## App icon and splash
 
-The native app icon and launch splash are generated from the TNHC badge
-(`assets/logo.png`, the 1024x1024 source) with `@capacitor/assets` (#299). It is
-run on demand rather than pinned as a dev dependency, the tool bundles an old
-Capacitor CLI 5.x and trapeze toolchain that carried several flagged transitive
-advisories (tar/minimatch/uuid), and the generated resources are committed, so
-there is no need to keep it installed between logo changes. To regenerate after a
-logo change, replace `assets/logo.png` and run (npx fetches it on demand):
+The native app icon and launch splash are generated from the brand-kit
+badge (`assets/logo.png`, the 1024x1024 app-icon source, plus
+`public/logo.png` for splash art) by `scripts/generate-native-assets.mjs`
+(#299). The generated resources are committed, so the script only needs to
+run again after a logo or brand color change:
 
 ```bash
-npx capacitor-assets generate \
-  --iconBackgroundColor '#fbf6e9' --iconBackgroundColorDark '#161a12' \
-  --splashBackgroundColor '#2a3623' --splashBackgroundColorDark '#161a12'
+node scripts/generate-native-assets.mjs
 ```
 
-It writes the icon + splash resources into `ios/` and `android/` (commit those).
-It also emits stray PWA icons at the repo root and a `public/manifest.webmanifest`;
-delete those (the web PWA icons are handled separately). Note: the bundled
-`sharp` needs the `sharp` pnpm override (Node 22 has no `sharp@0.32` prebuilt).
+(The script uses the sharp bundled with Next.js and the brand colors from
+`src/app/globals.css`: Trail Cream `#f9f3d5` light splash, night ground
+`#0e1506` dark splash, Evergreen `#151f0a` icon backgrounds. Pass the path
+to an extracted brand kit as the first argument to regenerate from kit
+masters instead of the committed badge.)
+
+It writes the icon + splash resources into `ios/` and `android/` (commit
+those). The web PWA icons (`public/icons/`, `public/site.webmanifest`) come
+straight from the brand kit and are handled separately.
 
 ## Run
 

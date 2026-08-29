@@ -33,7 +33,7 @@ export default function Home() {
             className="animate-rise drop-shadow-md"
           />
           <p
-            className="eyebrow animate-rise mt-7 text-amber-700"
+            className="eyebrow animate-rise text-moss-700 mt-7"
             style={{ animationDelay: "80ms" }}
           >
             Est. 2026 · The Volunteer State
@@ -42,17 +42,16 @@ export default function Home() {
             className="display text-forest animate-rise mt-4 text-5xl sm:text-7xl"
             style={{ animationDelay: "140ms" }}
           >
-            Tennessee
+            Explore Tennessee.
             <br />
-            Hiking Club
+            Together.
           </h1>
           <p
             className="text-ink/75 animate-rise mt-6 max-w-xl text-lg leading-relaxed sm:text-xl"
             style={{ animationDelay: "220ms" }}
           >
-            Discover the Volunteer State&rsquo;s best trails on an interactive
-            map: photos, coordinates, and one-tap directions straight to the
-            trailhead.
+            A community built around Tennessee trails, mountains, waterfalls,
+            and the people who love exploring them.
           </p>
           <div
             className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3"
@@ -119,7 +118,7 @@ export default function Home() {
       <section>
         <Container className="py-20 sm:py-24">
           <div className="max-w-2xl">
-            <p className="eyebrow text-amber-700">What you can do</p>
+            <p className="eyebrow text-moss-700">What you can do</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               Everything you need to find your next trail
             </h2>
@@ -176,7 +175,7 @@ export default function Home() {
       <section className="bg-parchment/60 border-forest/10 border-y">
         <Container className="py-20 sm:py-24">
           <div className="max-w-2xl">
-            <p className="eyebrow text-amber-700">Three Tennessees</p>
+            <p className="eyebrow text-moss-700">Three Tennessees</p>
             <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
               One state, three very different hikes
             </h2>
@@ -203,7 +202,7 @@ export default function Home() {
         <Container className="py-20 sm:py-24">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="eyebrow text-amber-700">Featured trails</p>
+              <p className="eyebrow text-moss-700">Featured trails</p>
               <h2 className="display text-forest mt-3 text-3xl sm:text-4xl">
                 Start with a few favorites
               </h2>
@@ -291,7 +290,7 @@ function Value({
 }) {
   return (
     <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-      <div className="text-amber mb-4">{icon}</div>
+      <div className="text-moss mb-4">{icon}</div>
       <h3 className="display text-cream text-2xl">{title}</h3>
       <p className="text-cream/70 mt-2 text-sm leading-relaxed">{children}</p>
     </div>

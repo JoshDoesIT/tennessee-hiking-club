@@ -1,161 +1,138 @@
-# Tennessee Hiking Club: Brand Guidelines
+# Tennessee Hiking Club — Brand Guidelines
 
-Our brand is **vintage heritage outdoors**: the look of a hand-screened
-national-park poster or an enamel trail badge. Warm paper, deep forest green,
-layered ridgelines, and a single warm accent. Everything should feel earthy,
-welcoming, and made for the trail.
+The visual identity comes from the official Tennessee Hiking Club brand kit.
+The kit's reference files are versioned alongside this document:
 
----
+- [`color_palette.csv`](./color_palette.csv) — the seven core colors
+- [`logo_usage.md`](./logo_usage.md) — logo rules from the kit
+- [`typography.md`](./typography.md) — type rules from the kit
+- [`brand_voice_and_bios.md`](./brand_voice_and_bios.md) — voice, taglines, bios
 
-## 1. Logo
+**The kit is the source of truth.** When it changes, update the `@theme`
+block in `src/app/globals.css`, the derived values below, and this file
+together.
 
-The mark is a circular **badge** containing:
+## Logo
 
-- **TNHC** monogram (the club initials) set in a bold serif.
-- A layered **mountain range** with an evergreen forest foreground.
-- A warm **setting sun** rising over the ridgeline, our accent color.
-- **TENNESSEE HIKING CLUB** curved along the bottom of the ring.
+A circular raster badge: a hiker silhouetted on a summit above layered
+mountain ridges and evergreens, "TENNESSEE" in distressed cream capitals,
+"HIKING CLUB" in moss green, and the Tennessee tri-star at the base.
 
-### Files
+| File                                                                | Use                                                            |
+| ------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `docs/brand/assets/logo-original.png`                               | Archival master (2048px, from the kit)                         |
+| `public/logo.png`                                                   | In-product badge (1024px, transparent)                         |
+| `src/app/icon.png`, `src/app/favicon.ico`, `src/app/apple-icon.png` | Favicons / touch icon                                          |
+| `public/icons/*`                                                    | PWA + manifest icons (android-chrome, maskable, favicon sizes) |
+| `public/opengraph-image.png`, `public/twitter-image.png`            | Link previews (kit OG art, flattened)                          |
+| `assets/logo.png`                                                   | Native app icon source (kit `app_icon_1024`)                   |
 
-| File                                                | Use                                                                          |
-| --------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `public/logo.png`                                   | Primary badge, 1024×1024, **transparent background**. Use everywhere in-app. |
-| `src/app/icon.png`                                  | Favicon / app icon (512×512), generated from the badge.                      |
-| `src/app/favicon.ico`                               | Legacy multi-size favicon (16/32/48).                                        |
-| `src/app/apple-icon.png`                            | Apple touch icon (180×180, badge on a cream tile).                           |
-| `src/app/opengraph-image.png` / `twitter-image.png` | 1200×630 social share card (auto-used for OG/Twitter).                       |
-| `docs/brand/assets/logo-mono-forest.png`            | Monochrome (forest) treatment for light backgrounds.                         |
-| `docs/brand/assets/logo-mono-cream.png`             | Monochrome (cream) treatment for dark backgrounds.                           |
-| `docs/brand/assets/logo-original.png`               | Original master artwork. Source of truth; do not edit in place.              |
+Usage rules (from the kit's `logo_usage.md`):
 
-The `Logo` React component (`src/components/logo.tsx`) renders the badge with an
-optional wordmark and a `tone="light" | "dark"` for placement on dark or light
-backgrounds.
+- Keep ≥ 8% of the badge diameter as clear space; ≥ 160px wide in normal
+  layouts, the prepared 64–128px exports for small placements.
+- Keep the badge circular and proportional; never stretch, skew, rotate,
+  crop, recolor, re-type the lettering, or add shadows/glows/filters.
+- The artwork is **raster only** — there is no vector master. Use the
+  prepared exports rather than re-saving the archival master.
+- Standard alt text: _"Tennessee Hiking Club circular logo showing a hiker
+  on a mountain summit above layered mountain ridges and pine trees."_
 
-### Usage rules
+The horizontal lockup is the `Logo` component (`src/components/logo.tsx`):
+badge + "Tennessee" in the display face with "HIKING CLUB" in moss beneath.
 
-- **Clear space:** keep at least 25% of the badge diameter clear on all sides.
-- **Minimum size:** 28 px (favicon) / 32 px (in-product). Below this the curved
-  text becomes illegible; use the badge without the wordmark.
-- **Backgrounds:** the badge is transparent and reads well on `cream`, `forest`,
-  and photography. On busy photos, place it on a solid or lightly scrimmed area.
-- **Don't:** recolor it, stretch/skew it, rotate it, add drop shadows beyond the
-  subtle built-in one, crop the circle, or place the dark ring on a dark green
-  background without sufficient contrast.
+## Color
 
-The **horizontal lockup** is the `Logo` component (badge + wordmark). **Monochrome**
-treatments (forest for light, cream for dark) live in `docs/brand/assets/` for
-single-color contexts. Favicons and the social card are generated from the badge
-and auto-wired by Next.js (file-based metadata).
+Utilities come from the `@theme` tokens in `src/app/globals.css` — use
+`bg-forest`, `text-moss-700`, etc., never raw hex in components.
 
----
+### Kit colors → tokens (light)
 
-## 2. Color palette
+| Kit name      | Hex       | Token               | Role                                               |
+| ------------- | --------- | ------------------- | -------------------------------------------------- |
+| Evergreen     | `#151F0A` | `forest`, `ink`     | Primary dark, headings, body text, primary buttons |
+| Trail Cream   | `#F9F3D5` | `cream`             | Page background, text on dark                      |
+| Rock Olive    | `#465139` | `pine`              | Secondary green, hover of primary                  |
+| Mountain Teal | `#375E62` | `teal`              | Info accents, focus ring, water features           |
+| Ridge Sage    | `#66867F` | — (decorative only) | Ridgeline art, summit markers                      |
+| Mist Sage     | `#ACBFA5` | `sage`              | Decorative fills                                   |
+| Moss Accent   | `#A2BD77` | `moss`              | Accent CTAs (always with Evergreen text)           |
 
-Sampled directly from the badge. Defined as Tailwind v4 tokens in
-`src/app/globals.css` (`@theme`); use the utility classes, never raw hex, in app
-code.
+### Derived values (not in the kit — tints/shades added for contrast and surface steps)
 
-| Role               | Hex       | Utility     | Notes                                   |
-| ------------------ | --------- | ----------- | --------------------------------------- |
-| Forest (primary)   | `#2A3623` | `forest`    | Ring, headings, dark sections, footer   |
-| Pine               | `#475036` | `pine`      | Hover/secondary green                   |
-| Olive              | `#6C724A` | `olive`     | Foreground foliage, muted labels        |
-| Sage               | `#959760` | `sage`      | Mid mountains, secondary text on dark   |
-| Light sage         | `#C6C680` | `sage-100`  | Borders, far ridges, fills              |
-| Cream (background) | `#FBF6E9` | `cream`     | Page "paper" background                 |
-| Cream-50           | `#FEFCF5` | `cream-50`  | Cards, raised surfaces                  |
-| Parchment          | `#F1E9D6` | `parchment` | Alternating section bands               |
-| Amber (accent)     | `#E0A24C` | `amber`     | The sun, primary CTAs, highlights       |
-| Amber-600          | `#C8852F` | `amber-600` | Amber hover, eyebrow labels, focus ring |
-| Ink (text)         | `#1E2419` | `ink`       | Body copy                               |
+| Token       | Hex       | Derivation     | Why                                                |
+| ----------- | --------- | -------------- | -------------------------------------------------- |
+| `olive`     | `#526F69` | Ridge Sage 700 | AA text on cream (4.9:1) — raw Ridge Sage is 3.6:1 |
+| `sage-100`  | `#CBD7C6` | Mist Sage 100  | Light borders/fills                                |
+| `cream-50`  | `#FCF9E8` | Trail Cream +L | Raised cards                                       |
+| `parchment` | `#EDE5C0` | Trail Cream −L | Map land, sunken surfaces                          |
+| `moss-600`  | `#8CA65E` | Moss −L        | Hover fills                                        |
+| `moss-700`  | `#556B2F` | Moss dark      | AA moss text on cream (5.3:1)                      |
 
-### Contrast & accessibility (WCAG)
+### Accessibility
 
-- `ink`/`forest` on `cream` → ~11:1. Passes AA & AAA for body text.
-- `cream`/`sage-100` on `forest` → high contrast. Use for footer/dark sections.
-- `amber` on `forest` → ~5:1. AA for normal text; used for CTA fills.
-- **`amber` is an accent, not a text color on light**: it fails contrast as text
-  on `cream`. Use it as a fill (with `forest` text) or a small highlight only.
+- Evergreen on Trail Cream ≈ **15.3:1** (AAA both directions).
+- Moss carries Evergreen text (8.2:1). **Moss is never a text color on
+  light** (1.9:1) — use `moss-700`.
+- Teal on cream = 6.4:1 — the AA link/info accent and the focus ring.
+- `ink` equals `forest` in light mode but they **diverge in dark mode** —
+  don't deduplicate the tokens.
 
----
+### Dark mode
 
-## 3. Typography
+`.dark` re-values the same token names (see `globals.css`): near-black
+Evergreen ground `#0E1506`, dimmed Trail Cream ink `#EFE9CD` (15.3:1),
+lightened moss/teal/sages — every text token ≥ 4.5:1 on both the ground
+and raised cards. `.night-panel` restores the light values inside surfaces
+designed as dark panels (footer, mission bands, map tooltips).
 
-A characterful display serif paired with a warm, modern sans. Loaded via
-`next/font` (self-hosted, no layout shift).
+## Typography
 
-| Role               | Typeface                                | Where                            |
-| ------------------ | --------------------------------------- | -------------------------------- |
-| Display / headings | **Fraunces** (variable, optical sizing) | `h1`–`h3`, hero, section titles  |
-| Body / UI          | **Hanken Grotesk**                      | Paragraphs, nav, buttons, labels |
+- **Display / headings:** Oswald SemiBold via `next/font`
+  (`--font-display`, the `.display` helper: weight 600, letter-spacing
+  0.02em). Fallbacks: Impact, Arial Narrow.
+- **Body / UI:** Inter via `next/font` (`--font-sans`). Fallbacks: Arial,
+  Helvetica. Body 16–18px at 1.5–1.7 line-height; buttons and labels Inter
+  SemiBold 14–16px.
+- Type scale: hero `text-5xl`→`text-7xl`, section `text-3xl`→`4xl`, cards
+  `text-xl`→`2xl`, body `text-base`→`lg`, `.eyebrow` `text-xs` tracked caps.
+- Use all-caps sparingly: the club name and short navigation labels only.
+- The lettering inside the badge is artwork — never re-type it in a font.
 
-Helper classes in `globals.css`:
+## Voice & tone
 
-- `.display`: applies Fraunces, optical sizing, `SOFT 40`, tight tracking. Put
-  it on every display heading.
-- `.eyebrow`: uppercase, `0.24em` tracking, 600 weight, the "trail-sign" label
-  above section titles. Pair with `text-amber-600`.
+The club sounds like an experienced trail friend: welcoming, outdoorsy,
+capable, local, practical.
 
-**Type scale (Tailwind):** hero `text-5xl`→`text-7xl`; section titles
-`text-3xl`→`text-4xl`; card titles `text-xl`→`text-2xl`; body `text-base`→
-`text-lg`; eyebrow `text-xs`.
+- Lead with the trail, place, or experience; keep logistics clear
+  (distance, difficulty, meeting point).
+- Welcome every skill level while being specific about difficulty.
+- Champion Leave No Trace, respect for wildlife and private property.
+- No hype, minimal exclamation points, no gatekeeping.
+- Tagline: **"Explore Tennessee. Together."**
 
-Never substitute generic system fonts (Inter, Arial, Roboto) for the display
-face; the Fraunces character is core to the brand.
+## Imagery
 
----
+Real Tennessee landscape photography — golden-hour, earthy, horizontal,
+≥ 1200px. The layered ridgeline (`src/components/ridgeline.tsx`) is the
+recurring motif; its ladder mirrors the badge art (Mist Sage → Ridge Sage
+→ Mountain Teal → Evergreen).
 
-## 4. Voice & tone
+## UI components
 
-Warm, knowledgeable, and welcoming, a friend who knows the trails, not a
-guidebook. Adventurous but never reckless; we always champion **Leave No Trace**.
+`src/components/ui` cva primitives:
 
-- **Do:** "Discover the Volunteer State's best trails." "Pack it in, pack it out."
-- **Don't:** hype ("EPIC!!!"), gatekeeping, or jargon. No exclamation spam.
-- Use "the Volunteer State" and "Grand Divisions" naturally; it's local pride.
+- Primary button: `bg-forest text-cream rounded-full hover:bg-pine`.
+- Accent button: `bg-moss text-forest hover:bg-moss-600` (Evergreen label
+  in both themes).
+- Outline/ghost: `border-forest/25 text-forest`.
+- Cards: `bg-cream-50 border-forest/10 rounded-2xl` (kit radii: 8 / 16 /
+  pill — `rounded-md` / `rounded-2xl` / `rounded-full`).
+- Map pins: moss fills with Evergreen strokes; waterfalls/water in
+  Mountain Teal; caution keeps functional red. 44px tap targets.
+- Focus: 2px Mountain Teal outline, offset 2.
 
----
+## Motion
 
-## 5. Imagery
-
-- Real Tennessee landscape photography: golden-hour ridgelines, waterfalls,
-  forest trails. Earthy, natural color; avoid heavy saturation or cool filters.
-- Decorative **layered ridgelines** (see `src/components/ridgeline.tsx`) are a
-  recurring motif; reuse them rather than inventing new illustration styles.
-- Trail photos should be horizontal, ≥1200px wide, and compressed (see
-  CONTRIBUTING.md) before commit.
-
----
-
-## 6. UI components
-
-Reusable primitives live in `src/components/ui` (`Button`/`buttonVariants`,
-`Badge`/`badgeVariants`, `Card`, `Container`), cva-based, brand-themed, and
-shadcn-compatible. Prefer these over ad-hoc utility strings.
-
-- **Primary button:** `bg-forest text-cream`, fully rounded (`rounded-full`),
-  hover `bg-pine`. **Accent button:** `bg-amber text-forest`, hover `bg-amber-600`.
-- **Secondary/ghost button:** `border border-forest/25 text-forest`, hover
-  `bg-forest/5`.
-- **Cards:** `bg-cream-50`, `border-forest/10`, `rounded-2xl`, subtle hover lift.
-- **Map pins (M3):** amber fill with forest stroke for default; forest fill for
-  selected. Sized for a comfortable 44px tap target.
-- **Focus:** 2px `amber-600` outline, 2px offset (global in `globals.css`).
-
----
-
-## 7. Motion
-
-Restrained and earthy. One orchestrated entrance beats scattered effects.
-
-- `animate-rise`: staggered fade-up for hero elements (use `animationDelay`).
-- `animate-sun`: slow glow/pulse on the setting sun.
-- All motion respects `prefers-reduced-motion` (handled globally). Keep
-  transitions ≤ 200ms for interactive states.
-
----
-
-_Tokens live in `src/app/globals.css`. When the logo changes, re-sample the
-palette and update both this document and the `@theme` block together._
+`animate-rise` staggered hero fade-up, `animate-sun` glow, ≤ 200ms
+transitions, all guarded by `prefers-reduced-motion`.

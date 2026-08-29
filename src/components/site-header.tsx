@@ -60,7 +60,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <AdminNavLink className="text-sm font-medium text-amber-700 transition-colors hover:text-amber-600" />
+          <AdminNavLink className="text-moss-700 hover:text-moss-600 text-sm font-medium transition-colors" />
           <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
@@ -134,7 +134,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <AdminNavLink
-              className="border-forest/5 border-b py-3 text-base font-medium text-amber-700"
+              className="border-forest/5 text-moss-700 border-b py-3 text-base font-medium"
               onNavigate={() => setOpen(false)}
             />
             <div className="pt-3">

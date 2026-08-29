@@ -82,13 +82,13 @@ export function SkyBackdrop() {
         >
           <defs>
             <radialGradient id="sky-sun" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#f4c074" />
-              <stop offset="45%" stopColor="#e0a24c" />
-              <stop offset="100%" stopColor="#e0a24c" stopOpacity="0" />
+              <stop offset="0%" stopColor="#efe4b4" />
+              <stop offset="45%" stopColor="#e3d28a" />
+              <stop offset="100%" stopColor="#e3d28a" stopOpacity="0" />
             </radialGradient>
           </defs>
           <circle cx="80" cy="80" r="80" fill="url(#sky-sun)" />
-          <circle cx="80" cy="80" r="40" fill="#eab35e" />
+          <circle cx="80" cy="80" r="40" fill="#d5bc5c" />
         </svg>
       </div>
 
@@ -125,7 +125,7 @@ export function SkyBackdrop() {
               <circle cx="68" cy="65" r="44" fill="#f4efdc" />
             </g>
           </g>
-          {/* the crisp crescent, craters on the lit limb, and a warm amber rim */}
+          {/* the crisp crescent, craters on the lit limb, and a warm cream rim */}
           <g mask="url(#sky-moon-mask)">
             <circle cx="68" cy="65" r="44" fill="#ece8d4" />
             <circle cx="90" cy="52" r="3.5" fill="#d6cfb2" opacity="0.6" />
@@ -135,7 +135,7 @@ export function SkyBackdrop() {
           <path
             d="M68 22 A43 43 0 0 1 68 108"
             fill="none"
-            stroke="#e9b870"
+            stroke="#d9d2a8"
             strokeWidth="2"
             strokeLinecap="round"
             opacity="0.4"

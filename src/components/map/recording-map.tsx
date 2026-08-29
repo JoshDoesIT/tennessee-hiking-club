@@ -174,7 +174,7 @@ export function RecordingMap({
               source: "trail-route",
               layout: { "line-cap": "round", "line-join": "round" },
               paint: {
-                "line-color": "#475036",
+                "line-color": "#465139",
                 "line-width": 4,
                 "line-opacity": 0.9,
                 "line-dasharray": [1.5, 1.2],
@@ -193,18 +193,18 @@ export function RecordingMap({
             type: "line",
             source: "recorded-track",
             layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#2a3623", "line-width": 6 },
+            paint: { "line-color": "#151f0a", "line-width": 6 },
           });
           map.addLayer({
             id: "recorded-track-line",
             type: "line",
             source: "recorded-track",
             layout: { "line-cap": "round", "line-join": "round" },
-            paint: { "line-color": "#e0a24c", "line-width": 3.5 },
+            paint: { "line-color": "#8ca65e", "line-width": 3.5 },
           });
 
           // The "you are here" heading puck: a forest dot with a cream ring, a
-          // pulsing accuracy halo, and an amber heading cone. The map is kept
+          // pulsing accuracy halo, and a moss heading cone. The map is kept
           // course-up (rotated to the heading below), so the cone, fixed to the
           // screen, always points the direction of travel.
           const el = document.createElement("div");

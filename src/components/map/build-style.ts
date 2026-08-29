@@ -5,19 +5,20 @@ import { TENNESSEE } from "@/lib/geo/tennessee";
 const TERRARIUM_DEM =
   "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png";
 
-/** Vintage brand palette used to repaint the OpenFreeMap base. */
+/** Brand-kit palette used to repaint the OpenFreeMap base: Trail Cream land,
+ * Mountain Teal water, Moss greenery, Evergreen labels (docs/brand/BRAND.md). */
 const COLOR = {
-  background: "#f1e9d6",
-  land: "#efe6d2",
-  water: "#b6c8c0",
-  green: "#bcc391",
-  boundary: "#b8ad8e",
-  line: "#dccfb2",
-  text: "#2a3623",
-  textHalo: "#fbf6e9",
-  mask: "#fbf6e9",
-  outline: "#2a3623",
-  hillshadeShadow: "#3d3422",
+  background: "#ede5c0",
+  land: "#f2ecc9",
+  water: "#a5c6ca",
+  green: "#b3c893",
+  boundary: "#96a38f",
+  line: "#e0d8ae",
+  text: "#151f0a",
+  textHalo: "#f9f3d5",
+  mask: "#f9f3d5",
+  outline: "#151f0a",
+  hillshadeShadow: "#2a331f",
 } as const;
 
 /**

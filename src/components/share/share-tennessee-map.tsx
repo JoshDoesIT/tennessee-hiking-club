@@ -51,7 +51,7 @@ export function ShareTennesseeMap({
                 className={cn(
                   "block rounded-full transition-transform group-hover:scale-150 group-focus-visible:scale-150 motion-reduce:transition-none",
                   hiked
-                    ? "bg-amber ring-forest h-3.5 w-3.5 ring-2"
+                    ? "bg-moss ring-forest h-3.5 w-3.5 ring-2"
                     : "bg-forest/15 ring-forest/40 h-2.5 w-2.5 ring-1",
                 )}
               />

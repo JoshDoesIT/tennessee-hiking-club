@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- The page background (brand cream). Used as the window background so the
+    <!-- The page background (brand Trail Cream). Used as the window background so the
          area Capacitor paints behind the transparent status/navigation bars on
          the edge-to-edge layout is cream, not the system-default white (#294). -->
-    <color name="appBackground">#fbf6e9</color>
-    <!-- Brand forest, for the Android 12+ system splash background so the launch
-         is a consistent forest splash (matches the @capacitor/splash-screen
+    <color name="appBackground">#f9f3d5</color>
+    <!-- Brand Evergreen, for the Android 12+ system splash background so the launch
+         is a consistent Evergreen splash (matches the @capacitor/splash-screen
          splash) rather than flashing cream first. -->
-    <color name="splashBackground">#2a3623</color>
+    <color name="splashBackground">#151f0a</color>
+    <!-- AppTheme material colors (referenced by styles.xml). -->
+    <color name="colorPrimary">#151f0a</color>
+    <color name="colorPrimaryDark">#0e1506</color>
+    <color name="colorAccent">#a2bd77</color>
 </resources>

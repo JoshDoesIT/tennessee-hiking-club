@@ -11,8 +11,8 @@ vi.mock("@/lib/native/decor-background", () => ({
 
 import { NativeEdgeToEdge } from "./native-edge-to-edge";
 
-const CREAM = "#fbf6e9";
-const NIGHT = "#161a12";
+const CREAM = "#f9f3d5";
+const NIGHT = "#0e1506";
 
 // Reset in beforeEach: the previous test's component is unmounted by RTL cleanup
 // (its MutationObserver disconnected) before this runs, so removing the class

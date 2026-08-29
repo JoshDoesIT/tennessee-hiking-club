@@ -11,7 +11,7 @@ describe("Button", () => {
   it("applies the accent variant", () => {
     render(<Button variant="accent">Buy</Button>);
     expect(screen.getByRole("button", { name: "Buy" }).className).toContain(
-      "bg-amber",
+      "bg-moss",
     );
   });
 

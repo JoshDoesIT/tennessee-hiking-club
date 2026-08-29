@@ -16,7 +16,7 @@ export const metadata = pageMetadata({
 export default function OfflinePage() {
   return (
     <Container className="py-16 text-center sm:py-24">
-      <p className="eyebrow text-amber-700">No signal</p>
+      <p className="eyebrow text-moss-700">No signal</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         You are offline
       </h1>

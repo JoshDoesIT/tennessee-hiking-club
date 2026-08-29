@@ -140,7 +140,7 @@ export function TrailContextMap({
           // auto-trigger, which would zoom the map to the member (#285).
           recordLocationOptIn(geolocate);
 
-          // The trail's actual route, drawn as an amber line with a dark casing
+          // The trail's actual route, drawn as a moss line with a dark casing
           // for contrast over the basemap (#270).
           const routePoints: { lat: number; lng: number }[] =
             JSON.parse(routeKey);
@@ -156,7 +156,7 @@ export function TrailContextMap({
               source: "trail-route",
               layout: { "line-join": "round", "line-cap": "round" },
               paint: {
-                "line-color": "#2a3623",
+                "line-color": "#151f0a",
                 "line-width": 6,
                 "line-opacity": 0.5,
               },
@@ -166,7 +166,7 @@ export function TrailContextMap({
               type: "line",
               source: "trail-route",
               layout: { "line-join": "round", "line-cap": "round" },
-              paint: { "line-color": "#e0a24c", "line-width": 3.5 },
+              paint: { "line-color": "#8ca65e", "line-width": 3.5 },
             });
           }
 
@@ -176,8 +176,8 @@ export function TrailContextMap({
             width: "16px",
             height: "16px",
             borderRadius: "9999px",
-            background: "#e0a24c",
-            border: "2.5px solid #2a3623",
+            background: "#a2bd77",
+            border: "2.5px solid #151f0a",
             boxShadow: "0 1px 4px rgba(0,0,0,.35)",
           });
           new maplibregl.Marker({ element: el }).setLngLat(center).addTo(map);
@@ -198,9 +198,9 @@ export function TrailContextMap({
               width: "20px",
               height: "20px",
               borderRadius: "9999px",
-              background: "#475036",
-              color: "#fbf6e9",
-              border: "2px solid #fbf6e9",
+              background: "#465139",
+              color: "#f9f3d5",
+              border: "2px solid #f9f3d5",
               font: "700 12px/1 sans-serif",
               boxShadow: "0 1px 4px rgba(0,0,0,.35)",
             });

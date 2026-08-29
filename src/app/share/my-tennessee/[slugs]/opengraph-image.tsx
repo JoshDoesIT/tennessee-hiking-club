@@ -44,8 +44,8 @@ export default async function OgImage({
         // Generous padding keeps every line inside the safe-zone that
         // platforms like Teams crop into when previewing a 1200x630 card.
         padding: "80px 96px",
-        background: "#fbf6e9",
-        color: "#2a3623",
+        background: "#f9f3d5",
+        color: "#151f0a",
       }}
     >
       <div
@@ -54,7 +54,7 @@ export default async function OgImage({
           fontSize: 22,
           letterSpacing: 4,
           fontWeight: 600,
-          color: "#e0a24c",
+          color: "#556b2f",
         }}
       >
         TENNESSEE HIKING CLUB
@@ -73,7 +73,7 @@ export default async function OgImage({
         style={{
           display: "flex",
           fontSize: 26,
-          color: "#475036",
+          color: "#465139",
           marginTop: 6,
         }}
       >
@@ -95,9 +95,9 @@ export default async function OgImage({
         >
           <path
             d={mapData.outline}
-            fill="#c6c680"
+            fill="#cbd7c6"
             fillOpacity={0.4}
-            stroke="#2a3623"
+            stroke="#151f0a"
             strokeWidth={1.5}
             strokeLinejoin="round"
           />
@@ -111,9 +111,9 @@ export default async function OgImage({
                 cx={cx}
                 cy={cy}
                 r={isHiked ? 7 : 3.5}
-                fill={isHiked ? "#e0a24c" : "#2a3623"}
+                fill={isHiked ? "#8ca65e" : "#151f0a"}
                 fillOpacity={isHiked ? 1 : 0.18}
-                stroke="#2a3623"
+                stroke="#151f0a"
                 strokeWidth={isHiked ? 1.8 : 0.5}
               />
             );

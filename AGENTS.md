@@ -2,7 +2,9 @@
 
 # This is NOT the Next.js you know
 
-This version has breaking changes: APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
 
@@ -13,7 +15,7 @@ Conventions for humans and AI assistants working in this repo.
 ## Stack
 
 - Next.js (App Router) + React + TypeScript (strict), Tailwind CSS v4, pnpm.
-- Fonts: Fraunces (display) + Hanken Grotesk (body) via `next/font`.
+- Fonts: Oswald (display) + Inter (body) via `next/font`.
 - Map: `d3-geo` (stylized TN map), `react-leaflet` + OpenStreetMap (detail map),
   and Google Maps deep links (`src/lib/maps.ts`) for directions.
 - Content: Markdown + front-matter in `content/trails/`, validated by Zod.
@@ -30,7 +32,7 @@ Conventions for humans and AI assistants working in this repo.
   non-trivial feature.
 - **Test-driven:** write failing tests first, then implement the minimum to pass.
   Do not claim TDD if tests were written after the code.
-- Use **brand tokens** (`bg-forest`, `text-amber`, …) from `src/app/globals.css`,
+- Use **brand tokens** (`bg-forest`, `text-moss`, …) from `src/app/globals.css`,
   never raw hex in components. See `docs/brand/BRAND.md`.
 - Accessibility and responsiveness are required, not optional.
 - Conventional Commits; reference issues; keep PRs focused (see `CONTRIBUTING.md`).

@@ -14,7 +14,7 @@ export default function RecordPage() {
   const trails = getAllTrails();
   return (
     <Container className="py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Record</p>
+      <p className="eyebrow text-moss-700">Record</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Record a hike
       </h1>

@@ -17,7 +17,7 @@ export const metadata = pageMetadata({
 export default function LeaderboardPage() {
   return (
     <Container className="max-w-2xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Community</p>
+      <p className="eyebrow text-moss-700">Community</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Leaderboard
       </h1>

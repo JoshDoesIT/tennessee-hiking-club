@@ -15,7 +15,7 @@ export const metadata = pageMetadata({
 export default function PrivacyPage() {
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <p className="eyebrow text-amber-700">Your data</p>
+      <p className="eyebrow text-moss-700">Your data</p>
       <h1 className="display text-forest mt-3 text-4xl">Privacy</h1>
       <p className="text-ink/75 mt-4 leading-relaxed">
         The Tennessee Hiking Club is local-first. You can browse every trail and

@@ -35,24 +35,24 @@ const byId = (style: MapStyle, id: string) =>
 describe("buildTennesseeStyle", () => {
   it("recolors fills by category (water, green, land)", () => {
     const s = buildTennesseeStyle(base());
-    expect(byId(s, "water")?.paint?.["fill-color"]).toBe("#b6c8c0");
-    expect(byId(s, "landcover-wood")?.paint?.["fill-color"]).toBe("#bcc391");
-    expect(byId(s, "building")?.paint?.["fill-color"]).toBe("#efe6d2");
+    expect(byId(s, "water")?.paint?.["fill-color"]).toBe("#a5c6ca");
+    expect(byId(s, "landcover-wood")?.paint?.["fill-color"]).toBe("#b3c893");
+    expect(byId(s, "building")?.paint?.["fill-color"]).toBe("#f2ecc9");
   });
 
   it("recolors lines by category (water, boundary, other)", () => {
     const s = buildTennesseeStyle(base());
-    expect(byId(s, "waterway")?.paint?.["line-color"]).toBe("#b6c8c0");
-    expect(byId(s, "boundary-admin")?.paint?.["line-color"]).toBe("#b8ad8e");
-    expect(byId(s, "road")?.paint?.["line-color"]).toBe("#dccfb2");
+    expect(byId(s, "waterway")?.paint?.["line-color"]).toBe("#a5c6ca");
+    expect(byId(s, "boundary-admin")?.paint?.["line-color"]).toBe("#96a38f");
+    expect(byId(s, "road")?.paint?.["line-color"]).toBe("#e0d8ae");
   });
 
   it("recolors the background and label text in brand tones", () => {
     const s = buildTennesseeStyle(base());
-    expect(byId(s, "background")?.paint?.["background-color"]).toBe("#f1e9d6");
+    expect(byId(s, "background")?.paint?.["background-color"]).toBe("#ede5c0");
     const label = byId(s, "place-label");
-    expect(label?.paint?.["text-color"]).toBe("#2a3623");
-    expect(label?.paint?.["text-halo-color"]).toBe("#fbf6e9");
+    expect(label?.paint?.["text-color"]).toBe("#151f0a");
+    expect(label?.paint?.["text-halo-color"]).toBe("#f9f3d5");
   });
 
   it("leaves icon-only symbol layers without a text color", () => {

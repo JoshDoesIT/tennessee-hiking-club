@@ -94,7 +94,7 @@ export function LeaderboardBoard() {
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-semibold",
               s.key === scope
-                ? "bg-amber/10 border-amber-600 text-amber-700"
+                ? "bg-moss/10 border-moss-600 text-moss-700"
                 : "border-forest/20 text-forest hover:bg-forest/5",
             )}
           >
@@ -140,7 +140,7 @@ export function LeaderboardBoard() {
       </div>
 
       {loading ? (
-        <p className="text-ink/60 mt-8 text-center text-sm">
+        <p className="text-ink/65 mt-8 text-center text-sm">
           Loading the board…
         </p>
       ) : needsSignIn ? (

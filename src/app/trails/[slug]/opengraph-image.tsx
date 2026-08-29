@@ -36,8 +36,8 @@ export default async function OgImage({
         // Generous padding keeps every line in the safe-zone that platforms
         // like Teams crop into when they preview a 1200x630 card.
         padding: "108px 96px",
-        background: "#2a3623",
-        color: "#fbf6e9",
+        background: "#151f0a",
+        color: "#f9f3d5",
       }}
     >
       <div
@@ -46,7 +46,7 @@ export default async function OgImage({
           fontSize: 26,
           letterSpacing: 4,
           fontWeight: 600,
-          color: "#e0a24c",
+          color: "#a2bd77",
         }}
       >
         TENNESSEE HIKING CLUB
@@ -67,7 +67,7 @@ export default async function OgImage({
             display: "flex",
             fontSize: 34,
             marginTop: 28,
-            color: "#c6c680",
+            color: "#acbfa5",
           }}
         >
           {subtitle}

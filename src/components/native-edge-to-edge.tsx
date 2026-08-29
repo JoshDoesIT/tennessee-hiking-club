@@ -8,8 +8,8 @@ import { DecorBackground } from "@/lib/native/decor-background";
 // globals.css). On Android 15 the app draws edge-to-edge and the area behind the
 // transparent system bars is the window decor background; a static theme value
 // can't follow the app's in-app dark toggle, so we set it at runtime here (#294).
-const CREAM = "#fbf6e9";
-const NIGHT = "#161a12";
+const CREAM = "#f9f3d5";
+const NIGHT = "#0e1506";
 
 /**
  * Keep the Android system-bar background in step with the app's theme, so dark

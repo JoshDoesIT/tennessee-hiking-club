@@ -41,9 +41,9 @@ export function TrailCard({
               <Badge
                 className={
                   alertLevel === "closure"
-                    ? "text-cream bg-amber-700"
+                    ? "text-cream bg-moss-700"
                     : alertLevel === "caution"
-                      ? "bg-amber/25 text-amber-700"
+                      ? "bg-moss/25 text-moss-700"
                       : "border-forest/20 text-olive border"
                 }
               >

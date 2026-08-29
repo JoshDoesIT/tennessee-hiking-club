@@ -32,7 +32,7 @@ export function StewardPledge() {
 
   if (pledge) {
     return (
-      <div className="border-amber/40 bg-amber/10 rounded-2xl border p-5">
+      <div className="border-moss/40 bg-moss/10 rounded-2xl border p-5">
         <p className="text-forest font-semibold">
           You&rsquo;re a Trail Steward.
         </p>

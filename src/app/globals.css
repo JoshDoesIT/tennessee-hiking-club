@@ -7,29 +7,33 @@
 
 /* ------------------------------------------------------------------ *
  *  Tennessee Hiking Club: design tokens
- *  Palette sampled directly from the badge logo.
- *  Full guidelines: docs/brand/BRAND.md
+ *  Palette from the official brand kit (docs/brand/color_palette.csv):
+ *  Evergreen, Trail Cream, Mountain Teal, Ridge Sage, Moss Accent,
+ *  Mist Sage, Rock Olive. Values marked "derived" are tints/shades of
+ *  those seven, added for contrast or surface steps and documented in
+ *  docs/brand/BRAND.md.
  * ------------------------------------------------------------------ */
 @theme {
-  --color-forest: #2a3623; /* primary dark, ring, headings on light */
-  --color-pine: #475036; /* secondary green */
-  --color-olive: #6c724a;
-  --color-sage: #959760;
-  --color-sage-100: #c6c680; /* light sage, borders, fills */
-  --color-cream: #fbf6e9; /* page background (warm paper) */
-  --color-cream-50: #fefcf5;
-  --color-parchment: #f1e9d6;
-  --color-amber: #e0a24c; /* trail-sun accent / CTAs */
-  --color-amber-600: #c8852f; /* amber on dark / hover fills */
-  --color-amber-700: #8a5a1c; /* AA-safe amber for text on light (>=4.5:1) */
-  --color-ink: #1e2419; /* body text */
+  --color-forest: #151f0a; /* Evergreen: primary dark, ring, headings on light */
+  --color-pine: #465139; /* Rock Olive: secondary green */
+  --color-olive: #526f69; /* Ridge Sage 700 (derived): AA text on cream (4.9:1) */
+  --color-sage: #acbfa5; /* Mist Sage: decorative fills */
+  --color-sage-100: #cbd7c6; /* Mist Sage 100 (derived): borders, fills */
+  --color-cream: #f9f3d5; /* Trail Cream: page background (warm paper) */
+  --color-cream-50: #fcf9e8; /* derived lighter cream: raised cards */
+  --color-parchment: #ede5c0; /* derived darker cream: map land, sunken surfaces */
+  --color-moss: #a2bd77; /* Moss Accent: CTAs with Evergreen text */
+  --color-moss-600: #8ca65e; /* derived: hover fills */
+  --color-moss-700: #556b2f; /* derived: AA-safe moss for text on light (>=4.5:1) */
+  --color-teal: #375e62; /* Mountain Teal: info accents, focus ring, water */
+  --color-ink: #151f0a; /* Evergreen: body text (diverges from forest in dark) */
 
   --color-background: var(--color-cream);
   --color-foreground: var(--color-ink);
 
-  --font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, Arial, Helvetica, sans-serif;
+  --font-display: var(--font-oswald), Impact, "Arial Narrow", sans-serif;
 
   --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-sun: sun-glow 7s ease-in-out infinite;
@@ -38,22 +42,24 @@
 
 /* Night palette: the same token names re-valued, so every `bg-cream`,
  * `text-ink`, `text-forest`, etc. across the site shifts to dusk without
- * touching components. Deep warm forest-black ground, moonlit-cream ink,
- * light "forest" for headings/primary, amber accents brightened for contrast. */
+ * touching components. Near-black Evergreen ground, dimmed Trail Cream ink,
+ * light "forest" for headings/primary, moss and teal lightened for contrast
+ * (every text token >=4.5:1 on both the ground and raised cards). */
 .dark {
   color-scheme: dark;
-  --color-cream: #161a12; /* page background: deep forest night */
-  --color-cream-50: #1e2318; /* raised surfaces / cards */
-  --color-parchment: #262c1d;
-  --color-ink: #ebe6d6; /* body text: warm moonlit off-white */
-  --color-forest: #eef1e3; /* headings, primary, rings -> light */
-  --color-pine: #bcc4a0; /* secondary text / links -> light sage-green */
-  --color-olive: #9aa178;
-  --color-sage: #aab07e;
-  --color-sage-100: #39402a; /* subtle borders / fills -> dark */
-  --color-amber: #eab35e; /* accent stays warm, a touch brighter */
-  --color-amber-600: #e0a24c;
-  --color-amber-700: #edb86a; /* amber text readable on the night ground */
+  --color-cream: #0e1506; /* page background: near-black Evergreen night */
+  --color-cream-50: #161f0c; /* raised surfaces / cards */
+  --color-parchment: #1f2b12;
+  --color-ink: #efe9cd; /* body text: dimmed Trail Cream */
+  --color-forest: #eaf0dc; /* headings, primary, rings -> light */
+  --color-pine: #b7c4a2; /* secondary text -> lightened Rock Olive */
+  --color-olive: #9fb8b1; /* lightened Ridge Sage */
+  --color-sage: #acbfa5; /* Mist Sage reads at night as-is */
+  --color-sage-100: #27351d; /* subtle borders / fills -> dark */
+  --color-moss: #acc87e; /* accent brightened a touch */
+  --color-moss-600: #a2bd77; /* base Moss as the hover step */
+  --color-moss-700: #bcd193; /* moss text readable on the night ground */
+  --color-teal: #7fa8ac; /* lightened Mountain Teal (7.2:1) */
 }
 
 /* A "day island": a surface designed as a dark forest panel by day (e.g. the
@@ -61,18 +67,19 @@
  * invert to a bright light panel at night. Restore the full set of light-theme
  * token values within it so it stays as designed instead of inverting. */
 .dark .night-panel {
-  --color-cream: #fbf6e9;
-  --color-cream-50: #fefcf5;
-  --color-parchment: #f1e9d6;
-  --color-ink: #1e2419;
-  --color-forest: #2a3623;
-  --color-pine: #475036;
-  --color-olive: #6c724a;
-  --color-sage: #959760;
-  --color-sage-100: #c6c680;
-  --color-amber: #e0a24c;
-  --color-amber-600: #c8852f;
-  --color-amber-700: #8a5a1c;
+  --color-cream: #f9f3d5;
+  --color-cream-50: #fcf9e8;
+  --color-parchment: #ede5c0;
+  --color-ink: #151f0a;
+  --color-forest: #151f0a;
+  --color-pine: #465139;
+  --color-olive: #526f69;
+  --color-sage: #acbfa5;
+  --color-sage-100: #cbd7c6;
+  --color-moss: #a2bd77;
+  --color-moss-600: #8ca65e;
+  --color-moss-700: #556b2f;
+  --color-teal: #375e62;
 }
 
 @keyframes rise {
@@ -123,13 +130,12 @@ body {
     color 0.5s ease;
 }
 
-/* Fraunces display face: optical sizing + a touch of its "soft" character */
+/* Oswald display face: SemiBold, brand-spec tracking (typography.md) */
 .display {
   font-family: var(--font-display);
-  font-optical-sizing: auto;
-  font-variation-settings: "SOFT" 40;
-  letter-spacing: -0.015em;
-  line-height: 1.02;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -170,12 +176,14 @@ body::after {
 }
 
 ::selection {
-  background-color: var(--color-amber);
+  background-color: var(--color-moss);
   color: var(--color-forest);
 }
 
+/* Mountain Teal ring: 6.4:1 on cream, 7.2:1 on the night ground (moss is
+ * too light against cream to mark focus). */
 :focus-visible {
-  outline: 2px solid var(--color-amber-600);
+  outline: 2px solid var(--color-teal);
   outline-offset: 2px;
 }
 
@@ -191,8 +199,8 @@ body::after {
 }
 
 /* Dark mode: darken the interactive terrain map's tiles (the canvas only, so the
- * amber pins and controls keep their colors). A lightness invert with a hue
- * rotate keeps water blue and land green while turning the bright basemap dark. */
+ * moss pins and controls keep their colors). A lightness invert with a hue
+ * rotate keeps water teal and land green while turning the bright basemap dark. */
 .dark .maplibregl-canvas {
   filter: invert(0.9) hue-rotate(180deg) brightness(1.05);
 }
@@ -217,7 +225,7 @@ body::after {
 }
 
 /* The live "you are here" heading puck on the recording map (#271): a forest dot
- * with a cream ring, a pulsing accuracy halo, and an amber heading cone. The map
+ * with a cream ring, a pulsing accuracy halo, and a moss heading cone. The map
  * is kept course-up, so the screen-fixed cone always points the way you're
  * travelling, like a GPS app. Tokens keep it visible in dark mode (the dot/ring
  * invert) while the puck sits above the tinted canvas. */
@@ -231,7 +239,7 @@ body::after {
   stroke-width: 3;
 }
 .recording-puck-cone {
-  fill: var(--color-amber);
+  fill: var(--color-moss);
   opacity: 0.5;
 }
 .recording-puck-halo {

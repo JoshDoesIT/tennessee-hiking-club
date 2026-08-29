@@ -14,7 +14,7 @@ export const metadata = pageMetadata({
 export default function AccessibilityPage() {
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <p className="eyebrow text-amber-700">For everyone</p>
+      <p className="eyebrow text-moss-700">For everyone</p>
       <h1 className="display text-forest mt-3 text-4xl">Accessibility</h1>
       <p className="text-ink/75 mt-4 leading-relaxed">
         We want everyone to be able to find a trail. We aim to meet{" "}

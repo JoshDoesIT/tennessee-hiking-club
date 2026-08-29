@@ -28,7 +28,7 @@ generic slippy map) where every trail is a pin you can click to open its page.
       accessible name (the trail name).
 - [ ] Hover/focus shows a tooltip with the trail name and region.
 - [ ] The map is responsive (scales to container) and styled to the brand
-      (forest outline, region tints, amber pins).
+      (forest outline, region tints, moss pins).
 - [ ] A projection unit test maps a known lat/lng to expected SVG coordinates
       within tolerance.
 

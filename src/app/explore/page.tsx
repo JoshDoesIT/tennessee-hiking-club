@@ -25,7 +25,7 @@ export default function ExplorePage() {
 
   return (
     <Container className="py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Interactive map</p>
+      <p className="eyebrow text-moss-700">Interactive map</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Explore Tennessee
       </h1>
@@ -59,7 +59,7 @@ export default function ExplorePage() {
                 </Link>
                 <span className="text-ink/70 shrink-0 text-sm">
                   {alertLevel ? (
-                    <span className="font-medium text-amber-700">
+                    <span className="text-moss-700 font-medium">
                       {ALERT_LABEL[alertLevel]} ·{" "}
                     </span>
                   ) : null}

@@ -25,7 +25,7 @@ export default function MorePage() {
       </nav>
 
       <div className="mt-6">
-        <AdminNavLink className="text-sm font-medium text-amber-700" />
+        <AdminNavLink className="text-moss-700 text-sm font-medium" />
       </div>
     </Container>
   );

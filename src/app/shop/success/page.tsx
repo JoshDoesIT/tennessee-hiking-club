@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function CheckoutSuccessPage() {
   return (
     <Container className="max-w-2xl py-20 text-center sm:py-28">
-      <p className="eyebrow text-amber-700">Thank you</p>
+      <p className="eyebrow text-moss-700">Thank you</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Your order is confirmed
       </h1>

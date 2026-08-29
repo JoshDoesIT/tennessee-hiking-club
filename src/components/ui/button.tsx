@@ -8,9 +8,9 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: "bg-forest text-cream shadow-sm hover:bg-pine",
-        // Amber stays a warm light surface in both themes, so its label keeps
-        // the brand dark green even at night (text-forest flips light otherwise).
-        accent: "bg-amber text-forest hover:bg-amber-600 dark:text-[#2a3623]",
+        // Moss stays a light surface in both themes, so its label keeps the
+        // brand Evergreen even at night (text-forest flips light otherwise).
+        accent: "bg-moss text-forest hover:bg-moss-600 dark:text-[#151f0a]",
         outline: "border border-forest/25 text-forest hover:bg-forest/5",
         ghost: "text-forest hover:bg-forest/5",
       },
