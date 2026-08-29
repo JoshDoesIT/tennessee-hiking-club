@@ -4,7 +4,9 @@
 
 # Tennessee Hiking Club
 
-**Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead.**
+**Explore Tennessee. Together.**
+
+Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead.
 
 [![CI](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml)

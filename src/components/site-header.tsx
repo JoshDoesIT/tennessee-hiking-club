@@ -50,7 +50,7 @@ export function SiteHeader() {
           <Logo size={42} priority />
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
           {NAV.map((item) => (
             <Link
               key={item.href}
@@ -60,7 +60,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <AdminNavLink className="text-moss-700 hover:text-moss-600 text-sm font-medium transition-colors" />
+          <AdminNavLink className="text-moss-700 hover:text-forest text-sm font-medium transition-colors" />
           <Link href="/explore" className={buttonVariants({ size: "sm" })}>
             Open the map
           </Link>
@@ -68,7 +68,7 @@ export function SiteHeader() {
           <ThemeToggle />
         </nav>
 
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
           {native ? null : (
             <button
@@ -78,7 +78,7 @@ export function SiteHeader() {
               aria-expanded={open}
               aria-controls="mobile-nav"
               aria-label="Toggle navigation menu"
-              className="border-forest/15 text-forest flex h-10 w-10 items-center justify-center rounded-full border md:hidden"
+              className="border-forest/15 text-forest flex h-10 w-10 items-center justify-center rounded-full border lg:hidden"
             >
               <span className="sr-only">Menu</span>
               <svg
@@ -113,7 +113,7 @@ export function SiteHeader() {
           ref={menuRef}
           id="mobile-nav"
           aria-label="Mobile"
-          className="border-forest/10 bg-cream border-t md:hidden"
+          className="border-forest/10 bg-cream border-t lg:hidden"
         >
           <div className="mx-auto flex max-w-6xl flex-col px-5 py-3">
             <Link
