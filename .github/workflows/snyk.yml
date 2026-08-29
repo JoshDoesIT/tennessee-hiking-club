@@ -1,5 +1,20 @@
 name: Snyk
 
+# Dependency scanning coverage (see docs/mobile.md#dependency-scanning):
+#
+# - `npm`     - the JavaScript/TypeScript tree from pnpm-lock.yaml. Required.
+# - `android` - the Gradle tree (androidx, Capacitor Android runtime, the
+#               plugin modules). Needs the Android SDK and a `cap update`, so
+#               it is a separate, slower job.
+# - iOS       - NOT scanned. The iOS app resolves its native packages through
+#               Swift Package Manager, which Snyk has no support for; those
+#               pins are reviewed by hand at Capacitor upgrade time.
+#
+# Both jobs guard against a *silent* pass: Snyk exits 0 when a detected
+# project fails to resolve, so a required check can otherwise stay green while
+# scanning nothing at all. That is exactly what happened to the Gradle
+# projects before this split.
+
 on:
   push:
     branches: [main]
@@ -14,7 +29,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  security:
+  npm:
     name: Snyk
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +75,109 @@ jobs:
         # 'global-agent/bootstrap'`. npm's npx cache is separate, so the
         # postinstall runs every time. npx also means no pnpm store write,
         # which is what poisoned the cache for later runs.
+        #
         # --all-projects: pnpm-workspace.yaml is present (declares
         # ignoredBuiltDependencies) and Snyk requires the flag when it sees
         # both a lockfile and a workspace file in the repo root.
-        run: npx --yes snyk@latest test --severity-threshold=high --all-projects
+        #
+        # --exclude=android: the Gradle projects are scanned by the `android`
+        # job, which sets up the SDK they need. Without this, Snyk detects
+        # them here, fails to resolve them, and still exits 0.
+        run: |
+          set -eo pipefail
+          npx --yes snyk@latest test \
+            --all-projects \
+            --exclude=android \
+            --severity-threshold=high 2>&1 | tee snyk-npm.log
+          pnpm exec tsx scripts/assert-snyk-scanned.ts snyk-npm.log
+
+  android:
+    name: Snyk (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check for Snyk token
+        id: token
+        run: |
+          if [ -n "${{ secrets.SNYK_TOKEN }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SNYK_TOKEN not configured (or fork PR); skipping native dependency scan."
+          fi
+
+      - name: Install pnpm
+        if: steps.token.outputs.present == 'true'
+        uses: pnpm/action-setup@ff378ebe6b225b0680b81c1ad4498ae0d1d3a5e3 # v6.0.10
+
+      - name: Set up Node
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # AGP 8.13 / Gradle 8.14 need a JDK 17+ toolchain; 21 is the current LTS.
+      - name: Set up Java
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Provides the SDK that `compileSdkVersion 36` (android/variables.gradle)
+      # resolves against, and exports ANDROID_HOME for Gradle.
+      - name: Set up Android SDK
+        if: steps.token.outputs.present == 'true'
+        uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699 # v4.0.1
+
+      - name: Install dependencies
+        if: steps.token.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+
+      # The Capacitor plugin scaffolding is generated, not committed
+      # (android/.gitignore). android/settings.gradle and
+      # android/app/capacitor.build.gradle both reference
+      # `capacitor-cordova-android-plugins/`, so without this step Gradle
+      # cannot even be evaluated on a clean checkout.
+      #
+      # `update` regenerates that scaffolding but also runs `copy`, which
+      # needs a web build. CAP_LOCAL_BUNDLE=0 points webDir at the tiny
+      # `mobile/` offline page instead of the `out/` export, so we get the
+      # Gradle wiring without building the whole site - the web assets are
+      # irrelevant to a dependency scan. The mkdir is required because the
+      # plugin step writes capacitor.plugins.json into an assets directory
+      # that git does not carry (it holds only ignored files).
+      - name: Generate the Capacitor Gradle scaffolding
+        if: steps.token.outputs.present == 'true'
+        run: |
+          mkdir -p android/app/src/main/assets
+          CAP_LOCAL_BUNDLE=0 npx cap update android
+
+      # `capacitor.settings.gradle` hard-codes pnpm store paths, which change
+      # on every Capacitor or plugin bump. It is committed, so it silently goes
+      # stale whenever someone lands a bump without re-running `cap update` -
+      # and then Gradle cannot find a single plugin module. Since this job
+      # regenerates the file anyway, a diff here is free staleness detection.
+      - name: Check the committed Gradle wiring is in sync
+        if: steps.token.outputs.present == 'true'
+        run: |
+          if ! git diff --exit-code android/capacitor.settings.gradle; then
+            echo "::error::android/capacitor.settings.gradle is stale - its pnpm store paths do not match the current lockfile, so the Android build cannot resolve the Capacitor plugin modules. Run \`pnpm cap:sync\` (or \`CAP_LOCAL_BUNDLE=0 npx cap update android\`) and commit the result."
+            exit 1
+          fi
+
+      - name: Snyk Android dependency test (fails on high or critical)
+        if: steps.token.outputs.present == 'true'
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        # --all-sub-projects covers `:app` and every `:capacitor-*` module, not
+        # just the root project's own configurations.
+        run: |
+          set -eo pipefail
+          npx --yes snyk@latest test \
+            --file=android/build.gradle \
+            --all-sub-projects \
+            --severity-threshold=high 2>&1 | tee snyk-android.log
+          pnpm exec tsx scripts/assert-snyk-scanned.ts snyk-android.log
