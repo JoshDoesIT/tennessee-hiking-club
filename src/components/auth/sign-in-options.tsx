@@ -7,7 +7,21 @@ import { ProviderIcon } from "./provider-icons";
 import { useIsNative } from "@/lib/use-is-native";
 import { startNativeSignIn } from "@/lib/auth/native-signin";
 
-type ProviderInfo = { id: string; name: string; type?: string };
+type ProviderInfo = { id: string; name?: string; type?: string };
+
+/**
+ * Keep only real provider entries. Auth.js answers `/api/auth/providers` with
+ * a 500 JSON error object when its config is broken (e.g. a missing
+ * `AUTH_SECRET`), and `Object.values()` of that payload is a bare string; an
+ * unchecked cast once turned it into a nameless "Continue with " button.
+ */
+function isProvider(value: unknown): value is ProviderInfo {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { id?: unknown }).id === "string"
+  );
+}
 
 /**
  * Lists the configured Auth.js OAuth providers (from `/api/auth/providers`) as
@@ -23,9 +37,11 @@ export function SignInOptions() {
   useEffect(() => {
     let active = true;
     fetch("/api/auth/providers")
-      .then((r) => r.json())
-      .then((data) => {
-        if (active) setProviders(Object.values(data ?? {}) as ProviderInfo[]);
+      .then((r) =>
+        r.ok ? r.json() : Promise.reject(new Error(`providers ${r.status}`)),
+      )
+      .then((data: unknown) => {
+        if (active) setProviders(Object.values(data ?? {}).filter(isProvider));
       })
       .catch(() => {
         if (active) setProviders([]);
@@ -68,7 +84,7 @@ export function SignInOptions() {
           }}
         >
           <ProviderIcon provider={provider.id} />
-          Continue with {provider.name}
+          Continue with {provider.name ?? provider.id}
         </Button>
       ))}
     </div>
