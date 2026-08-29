@@ -299,7 +299,7 @@ export default async function AdminSubmissionsPage() {
 
   return (
     <Container className="max-w-3xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Maintainers</p>
+      <p className="eyebrow text-moss-700">Maintainers</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Review submissions
       </h1>

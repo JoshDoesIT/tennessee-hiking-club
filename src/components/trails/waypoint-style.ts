@@ -14,18 +14,20 @@ export const WAYPOINT_LABEL: Record<WaypointType, string> = {
   landmark: "Landmark",
 };
 
-/** Marker / dot color per type. */
+/** Marker / dot color per type, drawn from the brand-kit palette: Mountain
+ * Teal for water features, moss steps for lookouts, Rock Olive/Ridge Sage for
+ * terrain. Caution keeps a functional red (safety semantics beat the palette). */
 export const WAYPOINT_COLOR: Record<WaypointType, string> = {
-  waterfall: "#3b82c4",
-  viewpoint: "#e0a24c",
-  summit: "#6c724a",
-  gap: "#959760",
-  water: "#3b82c4",
-  campsite: "#8a5a1c",
-  arch: "#9a6b3a",
-  parking: "#475036",
+  waterfall: "#375e62",
+  viewpoint: "#8ca65e",
+  summit: "#66867f",
+  gap: "#94a88d",
+  water: "#375e62",
+  campsite: "#556b2f",
+  arch: "#857a50",
+  parking: "#465139",
   caution: "#c0392b",
-  landmark: "#e0a24c",
+  landmark: "#8ca65e",
 };
 
 /**
@@ -49,7 +51,7 @@ export function createWaypointMarkerEl(w: {
     height: "13px",
     borderRadius: "9999px",
     backgroundColor: WAYPOINT_COLOR[w.type],
-    border: "2px solid #fbf6e9",
+    border: "2px solid #f9f3d5",
     boxShadow: "0 1px 4px rgba(0,0,0,.35)",
     cursor: "pointer",
   });

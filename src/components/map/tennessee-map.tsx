@@ -38,7 +38,7 @@ export function TennesseeMap() {
         >
           <span
             aria-hidden="true"
-            className="bg-amber ring-forest block h-3 w-3 rounded-full ring-2 transition-transform group-hover:scale-150 group-focus-visible:scale-150 motion-reduce:transition-none"
+            className="bg-moss ring-forest block h-3 w-3 rounded-full ring-2 transition-transform group-hover:scale-150 group-focus-visible:scale-150 motion-reduce:transition-none"
           />
           <span
             role="tooltip"

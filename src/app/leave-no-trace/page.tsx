@@ -44,7 +44,7 @@ const PRINCIPLES: { title: string; body: string }[] = [
 export default function LeaveNoTracePage() {
   return (
     <Container className="max-w-2xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Stewardship</p>
+      <p className="eyebrow text-moss-700">Stewardship</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Leave No Trace
       </h1>

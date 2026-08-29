@@ -28,7 +28,7 @@ export function RecordingIndicator() {
       <span
         aria-hidden="true"
         className={`h-2.5 w-2.5 shrink-0 rounded-full ${
-          paused ? "bg-amber" : "animate-pulse bg-red-600"
+          paused ? "bg-moss" : "animate-pulse bg-red-600"
         }`}
       />
       <span className="truncate">

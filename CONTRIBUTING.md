@@ -200,7 +200,7 @@ and NPS are public domain; OSM requires an "© OpenStreetMap contributors" credi
 ## Code style
 
 - TypeScript strict; prefer pure, testable functions in `src/lib`.
-- Tailwind utility classes; use brand tokens (`bg-forest`, `text-amber`, …); see
+- Tailwind utility classes; use brand tokens (`bg-forest`, `text-moss`, …); see
   [`docs/brand/BRAND.md`](docs/brand/BRAND.md). Run `pnpm format` before pushing.
 - Accessibility is not optional: semantic HTML, labels, keyboard support,
   sufficient contrast.

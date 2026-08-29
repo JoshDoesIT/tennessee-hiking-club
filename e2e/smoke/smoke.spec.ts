@@ -12,7 +12,9 @@ test("home loads and shows the club name", async ({ page }) => {
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
   await expect(
-    page.getByRole("heading", { name: /tennessee hiking club/i }).first(),
+    page
+      .getByRole("heading", { name: /explore tennessee\. together\./i })
+      .first(),
   ).toBeVisible();
 });
 

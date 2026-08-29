@@ -20,13 +20,15 @@ export function Logo({
   priority = false,
 }: LogoProps) {
   const word = tone === "light" ? "text-cream" : "text-forest";
-  const sub = tone === "light" ? "text-sage-100" : "text-olive";
+  // Moss mirrors the kit lockup's "HIKING CLUB" line: raw moss on dark panels
+  // (8.2:1 on Evergreen), AA-safe moss-700 on light grounds (5.3:1 on cream).
+  const sub = tone === "light" ? "text-moss" : "text-moss-700";
 
   return (
     <span className={`inline-flex items-center gap-3 ${className}`}>
       <Image
         src="/logo.png"
-        alt="Tennessee Hiking Club badge"
+        alt="Tennessee Hiking Club circular logo showing a hiker on a mountain summit above layered mountain ridges and pine trees."
         width={size}
         height={size}
         priority={priority}

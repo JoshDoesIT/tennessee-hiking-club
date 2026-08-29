@@ -29,7 +29,7 @@ function ExtLink({ href, children }: { href: string; children: ReactNode }) {
 export default function CreditsPage() {
   return (
     <Container className="max-w-2xl py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Tennessee Hiking Club</p>
+      <p className="eyebrow text-moss-700">Tennessee Hiking Club</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">Credits</h1>
       <p className="text-ink/75 mt-4 text-lg leading-relaxed">
         This site runs on open data and community generosity. Thank you to
@@ -103,12 +103,12 @@ export default function CreditsPage() {
         </h2>
         <p className="text-ink/75 mt-3 leading-relaxed">
           Set in{" "}
-          <ExtLink href="https://fonts.google.com/specimen/Fraunces">
-            Fraunces
+          <ExtLink href="https://fonts.google.com/specimen/Oswald">
+            Oswald
           </ExtLink>{" "}
           and{" "}
-          <ExtLink href="https://fonts.google.com/specimen/Hanken+Grotesk">
-            Hanken Grotesk
+          <ExtLink href="https://fonts.google.com/specimen/Inter">
+            Inter
           </ExtLink>
           , both under the SIL Open Font License.
         </p>

@@ -22,6 +22,7 @@ const pages = [
   { name: "credits", path: "/credits" },
   { name: "leaderboard", path: "/leaderboard" },
   { name: "leave no trace", path: "/leave-no-trace" },
+  { name: "sign in", path: "/signin" },
 ];
 
 for (const { name, path } of pages) {
@@ -47,6 +48,7 @@ const darkPages = pages.filter((p) =>
     "trail detail",
     "leaderboard",
     "leave no trace",
+    "sign in",
   ].includes(p.name),
 );
 

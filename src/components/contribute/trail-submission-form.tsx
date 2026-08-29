@@ -189,7 +189,7 @@ export function TrailSubmissionForm() {
           className="text-ink file:border-forest/20 file:bg-cream-50 file:text-pine hover:file:bg-parchment text-sm file:mr-3 file:cursor-pointer file:rounded-lg file:border file:px-3 file:py-2 file:text-sm file:font-medium"
         />
         <PhotoPreviews files={photos} />
-        <p className="text-ink/60 text-xs">
+        <p className="text-ink/65 text-xs">
           Up to 5 images, shared with reviewers. Only add photos that are yours
           to share.
         </p>

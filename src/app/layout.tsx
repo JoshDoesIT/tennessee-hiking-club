@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { MobileTabBar } from "@/components/mobile-tab-bar";
@@ -25,14 +25,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 // defaults to light and only goes dark on an explicit opt-in.
 const themeScript = `try{if((${shouldUseDarkTheme.toString()})(localStorage.getItem('theme')))document.documentElement.classList.add('dark')}catch(e){}`;
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
   display: "swap",
 });
 
-const hanken = Hanken_Grotesk({
-  variable: "--font-hanken",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     template: "%s · Tennessee Hiking Club",
   },
   description:
-    "Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead. A community hiking club for Tennessee.",
+    "A community for people who love exploring Tennessee trails, mountains, waterfalls, and the outdoors.",
   keywords: [
     "Tennessee hiking",
     "Tennessee trails",
@@ -59,37 +59,37 @@ export const metadata: Metadata = {
     siteName: "Tennessee Hiking Club",
     title: "Tennessee Hiking Club",
     description:
-      "Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions.",
+      "A community for people who love exploring Tennessee trails, mountains, waterfalls, and the outdoors.",
     url: "/",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Tennessee Hiking Club: a vintage badge above the layered ridges of the Smoky Mountains",
+        alt: "Tennessee Hiking Club logo beside the tagline Explore Tennessee. Together.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Tennessee Hiking Club",
-    description:
-      "Discover the Volunteer State's best trails on an interactive map.",
+    description: "Explore Tennessee. Together.",
     images: [
       {
         url: "/twitter-image.png",
         width: 1200,
         height: 630,
-        alt: "Tennessee Hiking Club: a vintage badge above the layered ridges of the Smoky Mountains",
+        alt: "Tennessee Hiking Club logo beside the tagline Explore Tennessee. Together.",
       },
     ],
   },
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {
   // The app defaults to light regardless of the OS setting, so the browser
-  // chrome takes the brand forest rather than tracking `prefers-color-scheme`.
-  themeColor: "#2a3623",
+  // chrome takes the brand Evergreen rather than tracking `prefers-color-scheme`.
+  themeColor: "#151f0a",
   // Render edge-to-edge so the native shell (Capacitor) can use the full screen;
   // `env(safe-area-inset-*)` then keeps content clear of the status bar, Dynamic
   // Island, and home indicator (see the header and globals.css).
@@ -105,7 +105,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${hanken.variable} ${fraunces.variable} h-full`}
+      className={`${inter.variable} ${oswald.variable} h-full`}
       suppressHydrationWarning
     >
       <head>

@@ -84,7 +84,7 @@ function ChallengeCard({
     <li
       className={cn(
         "rounded-2xl border p-5",
-        done ? "border-amber/40 bg-amber/10" : "border-forest/10 bg-cream-50",
+        done ? "border-moss/40 bg-moss/10" : "border-forest/10 bg-cream-50",
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -115,7 +115,7 @@ function ChallengeCard({
             className="bg-forest/10 h-2 overflow-hidden rounded-full"
           >
             <div
-              className="bg-amber h-full rounded-full transition-[width]"
+              className="bg-moss h-full rounded-full transition-[width]"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -135,7 +135,7 @@ function CheckIcon() {
       height="16"
       viewBox="0 0 16 16"
       aria-hidden="true"
-      className="text-amber-700"
+      className="text-moss-700"
     >
       <path
         d="M3 8.5l3.5 3.5L13 4.5"

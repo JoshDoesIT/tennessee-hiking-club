@@ -19,7 +19,7 @@ export default function TrailsPage() {
 
   return (
     <Container className="py-12 sm:py-16">
-      <p className="eyebrow text-amber-700">Trail directory</p>
+      <p className="eyebrow text-moss-700">Trail directory</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Every trail, in one place
       </h1>

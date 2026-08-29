@@ -144,7 +144,7 @@ export function PhotoSubmissionForm({
           }
           className={fieldClass}
         />
-        <p className="text-ink/60 text-xs">
+        <p className="text-ink/65 text-xs">
           You can add several at once. Each needs a short description.
         </p>
       </div>

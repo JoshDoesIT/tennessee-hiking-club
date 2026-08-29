@@ -41,18 +41,18 @@ export function TrailConditions({
                 key={i}
                 className={`rounded-xl border p-4 ${
                   strong
-                    ? "bg-amber/10 border-amber-600/40"
+                    ? "bg-moss/10 border-moss-600/40"
                     : "border-forest/15 bg-cream-50"
                 }`}
               >
                 <p className="text-sm">
                   <span
-                    className={`font-semibold ${strong ? "text-amber-700" : "text-olive"}`}
+                    className={`font-semibold ${strong ? "text-moss-700" : "text-olive"}`}
                   >
                     {ALERT_LABEL[alert.level]}
                   </span>
                   <span className="text-ink/40"> &middot; </span>
-                  <time dateTime={alert.date} className="text-ink/60">
+                  <time dateTime={alert.date} className="text-ink/65">
                     {alert.date}
                   </time>
                 </p>
@@ -90,7 +90,7 @@ export function TrailConditions({
                   {report.status}
                 </span>
                 <span className="text-ink/40"> &middot; </span>
-                <time dateTime={report.date} className="text-ink/60">
+                <time dateTime={report.date} className="text-ink/65">
                   {report.date}
                 </time>
                 {stale ? (

@@ -4,11 +4,13 @@
 
 # Tennessee Hiking Club
 
-**Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead.**
+**Explore Tennessee. Together.**
+
+Discover the Volunteer State's best trails on an interactive map: photos, coordinates, and one-tap directions to the trailhead.
 
 [![CI](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml/badge.svg)](https://github.com/JoshDoesIT/tennessee-hiking-club/actions/workflows/codeql.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-2A3623.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-151F0A.svg)](LICENSE)
 
 </div>
 
@@ -33,7 +35,7 @@ tier.
 |           |                                                                          |
 | --------- | ------------------------------------------------------------------------ |
 | Framework | [Next.js](https://nextjs.org) (App Router) + React + TypeScript          |
-| Styling   | Tailwind CSS v4 · Fraunces + Hanken Grotesk (`next/font`)                |
+| Styling   | Tailwind CSS v4 · Oswald + Inter (`next/font`)                           |
 | Map       | `d3-geo` (stylized state map) · `react-leaflet` + OpenStreetMap (detail) |
 | Content   | Markdown + front-matter, validated by Zod                                |
 | Store     | Stripe Checkout + print-on-demand (Printful/Printify)                    |

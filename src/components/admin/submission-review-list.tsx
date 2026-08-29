@@ -192,7 +192,7 @@ export function SubmissionReviewList({
                         </Button>
                       </div>
                       {!s.generated.valid && (
-                        <p className="mt-2 text-xs text-amber-700" role="note">
+                        <p className="text-moss-700 mt-2 text-xs" role="note">
                           Fill in before committing:{" "}
                           {s.generated.missing.join(", ")}
                         </p>

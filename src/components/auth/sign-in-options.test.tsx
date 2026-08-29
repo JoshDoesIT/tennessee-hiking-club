@@ -118,4 +118,41 @@ describe("SignInOptions", () => {
     render(<SignInOptions />);
     expect(await screen.findByText(/not configured/i)).toBeInTheDocument();
   });
+
+  it("treats a non-OK providers response as unconfigured, not as a provider", async () => {
+    // Auth.js answers /api/auth/providers with a 500 JSON error object when the
+    // server config is broken (e.g. missing AUTH_SECRET). Object.values() of
+    // that payload must not become a nameless "Continue with " button.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          ({
+            ok: false,
+            status: 500,
+            json: async () => ({
+              message:
+                "There was a problem with the server configuration. Check the server logs for more information.",
+            }),
+          }) as unknown as Response,
+      ),
+    );
+    render(<SignInOptions />);
+    expect(await screen.findByText(/not configured/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("falls back to the provider id when an entry has no name", async () => {
+    mockProviders({ acme: { id: "acme" } });
+    render(<SignInOptions />);
+    expect(
+      await screen.findByRole("button", { name: /continue with acme/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("ignores payload entries that are not provider objects", async () => {
+    mockProviders({ message: "some stray string", github: null });
+    render(<SignInOptions />);
+    expect(await screen.findByText(/not configured/i)).toBeInTheDocument();
+  });
 });

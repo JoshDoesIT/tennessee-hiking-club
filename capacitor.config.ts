@@ -53,7 +53,7 @@ const config: CapacitorConfig = {
     // clean, spinner-free branded splash is consistent across both (#295).
     SplashScreen: {
       launchAutoHide: false,
-      backgroundColor: "#2a3623",
+      backgroundColor: "#151f0a",
       showSpinner: false,
     },
   },

@@ -17,7 +17,7 @@ export default function ContributorsPage() {
 
   return (
     <Container className="max-w-2xl py-16 sm:py-20">
-      <p className="eyebrow text-amber-700">Community</p>
+      <p className="eyebrow text-moss-700">Community</p>
       <h1 className="display text-forest mt-3 text-4xl">Contributors</h1>
       <p className="text-ink/75 mt-4 leading-relaxed">
         Tennessee Hiking Club is built in the open. Thanks to everyone who adds

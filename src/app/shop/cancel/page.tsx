@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function CheckoutCancelPage() {
   return (
     <Container className="max-w-2xl py-20 text-center sm:py-28">
-      <p className="eyebrow text-amber-700">No worries</p>
+      <p className="eyebrow text-moss-700">No worries</p>
       <h1 className="display text-forest mt-3 text-4xl sm:text-5xl">
         Checkout canceled
       </h1>

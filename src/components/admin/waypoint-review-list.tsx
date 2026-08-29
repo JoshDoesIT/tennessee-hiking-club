@@ -81,11 +81,11 @@ export function WaypointReviewList({
             </div>
             <p className="text-olive mt-1 text-sm font-medium">
               {s.name}{" "}
-              <span className="text-ink/60 text-xs tracking-wider uppercase">
+              <span className="text-ink/65 text-xs tracking-wider uppercase">
                 · {s.type}
               </span>
             </p>
-            <p className="text-ink/60 mt-0.5 text-xs">
+            <p className="text-ink/65 mt-0.5 text-xs">
               {s.lat.toFixed(5)}, {s.lng.toFixed(5)}
             </p>
             {s.description && (

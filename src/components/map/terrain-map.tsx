@@ -139,7 +139,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               .addTo(map);
           });
 
-          // Draw every trail's shape as a faint amber line beneath the pins, so
+          // Draw every trail's shape as a faint moss line beneath the pins, so
           // the state map conveys the routes, not only their locations (#270).
           const routes = routeLinesCollection(trails);
           if (routes.features.length) {
@@ -153,7 +153,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               source: "trail-routes",
               layout: { "line-join": "round", "line-cap": "round" },
               paint: {
-                "line-color": "#e0a24c",
+                "line-color": "#8ca65e",
                 "line-width": 2.5,
                 "line-opacity": 0.75,
               },
@@ -179,22 +179,22 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
                 alertLabel ? `. ${alertLabel}.` : ""
               }`,
             );
-            // Closures and cautions get a darker amber pin so they stand out;
+            // Closures and cautions get a darker moss pin so they stand out;
             // the popup and aria-label carry the word, so it is never colour
             // alone.
             const background =
               trail.alert === "closure"
-                ? "#8a5a1c"
+                ? "#556b2f"
                 : trail.alert === "caution"
-                  ? "#c8852f"
-                  : "#e0a24c";
+                  ? "#8ca65e"
+                  : "#a2bd77";
             Object.assign(el.style, {
               display: "block",
               width: "16px",
               height: "16px",
               borderRadius: "9999px",
               background,
-              border: "2.5px solid #2a3623",
+              border: "2.5px solid #151f0a",
               cursor: "pointer",
               boxShadow: "0 1px 4px rgba(0,0,0,.35)",
             });
@@ -207,7 +207,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
             region.textContent = `${trail.region} Tennessee`;
             Object.assign(region.style, {
               fontSize: "12px",
-              color: "#5c6d4a",
+              color: "#465139",
               marginTop: "2px",
             });
             content.append(title, region);
@@ -217,7 +217,7 @@ export function TerrainMap({ trails }: { trails: TrailPin[] }) {
               Object.assign(alertEl.style, {
                 fontSize: "12px",
                 fontWeight: "600",
-                color: "#8a5a1c",
+                color: "#556b2f",
                 marginTop: "2px",
               });
               content.append(alertEl);

@@ -13,7 +13,7 @@ export const metadata = pageMetadata({
 export default function SignInPage() {
   return (
     <Container className="max-w-md py-16 sm:py-24">
-      <p className="eyebrow text-amber-700">Your Tennessee</p>
+      <p className="eyebrow text-moss-700">Your Tennessee</p>
       <h1 className="display text-forest mt-3 text-4xl">Sign in</h1>
       <p className="text-ink/70 mt-4 leading-relaxed">
         Sign in to sync your hikes across devices and back them up. Your log

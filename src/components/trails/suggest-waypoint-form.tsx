@@ -149,7 +149,7 @@ export function SuggestWaypointForm({
           />
         </div>
       </div>
-      <p className="text-ink/60 text-xs">
+      <p className="text-ink/65 text-xs">
         Tip: long-press the spot in Google Maps to copy its coordinates.
       </p>
 
@@ -178,7 +178,7 @@ export function SuggestWaypointForm({
           accept="image/*"
           className={fieldClass}
         />
-        <p className="text-ink/60 text-xs">
+        <p className="text-ink/65 text-xs">
           Only attach a photo you have the right to share.
         </p>
       </div>

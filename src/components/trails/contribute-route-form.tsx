@@ -104,7 +104,7 @@ export function ContributeRouteForm({
           required
           className={fieldClass}
         />
-        <p className="text-ink/60 text-xs">
+        <p className="text-ink/65 text-xs">
           Most watches and apps (AllTrails, Gaia, Strava) can export a GPX.
         </p>
       </div>

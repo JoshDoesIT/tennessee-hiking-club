@@ -34,7 +34,7 @@ export default function MyHikesPage() {
       <SyncOnSignIn />
 
       <header>
-        <p className="eyebrow text-amber-700">Your Tennessee</p>
+        <p className="eyebrow text-moss-700">Your Tennessee</p>
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="display text-forest text-4xl text-pretty sm:text-5xl">
             My hikes
