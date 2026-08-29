@@ -26,3 +26,10 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # Actions are pinned to full commit SHAs (a tag, even an exact one like
+    # v4.37.9, is mutable and can be repointed). Dependabot reads the trailing
+    # "# v…" comment to know the version and keeps both in sync. Grouped so a
+    # week of patch releases is one PR, not one per action.
+    groups:
+      github-actions:
+        patterns: ["*"]
