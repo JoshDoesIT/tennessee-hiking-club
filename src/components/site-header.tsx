@@ -43,8 +43,15 @@ export function SiteHeader() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
+  // The before: band extends the header's surface upward. On scrolled iOS
+  // Safari (minimized toolbar) the page paints in a bleed region above the
+  // layout viewport, behind the status bar, where a sticky top-0 element
+  // cannot reach — raw content showed in that strip. The band covers it with
+  // the header's own cream/blur; everywhere else it sits above the viewport
+  // and is invisible. The safe-area padding stays for the native WebView,
+  // which reports a real top inset.
   return (
-    <header className="border-forest/10 bg-cream/85 sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md">
+    <header className="border-forest/10 bg-cream/85 before:bg-cream/85 sticky top-0 z-50 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-24 before:backdrop-blur-md before:content-['']">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <Link href="/" aria-label="Tennessee Hiking Club home">
           <Logo size={42} priority />
