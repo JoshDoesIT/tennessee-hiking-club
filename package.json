@@ -99,7 +99,7 @@
     "tsx": "^4.23.12",
     "typescript": "^6",
     "us-atlas": "^3.0.1",
-    "vite": "^8.2.2",
+    "vite": "^8.2.4",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.11"
   },
