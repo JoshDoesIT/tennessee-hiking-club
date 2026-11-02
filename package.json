@@ -69,7 +69,7 @@
     "react-dom": "19.2.8",
     "stripe": "^22.5.0",
     "tailwind-merge": "^3.6.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
