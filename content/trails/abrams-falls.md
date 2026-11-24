@@ -15,6 +15,8 @@ kidFriendly: true
 feeRequired: true
 tags: [waterfall, smokies, river]
 photos:
+  - src: "/trails/contributed/abrams-falls-f116f629.jpg"
+    alt: "On the trail"
   - src: /trails/abrams-falls.jpg
     alt: Abrams Falls pouring over a 20-foot ledge into a wide plunge pool in Cades Cove
     credit: Photo by Darlene Leach, Great Smoky Mountains National Park (NPS), public domain, via Wikimedia Commons
